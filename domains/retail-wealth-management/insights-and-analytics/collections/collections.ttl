@@ -1,0 +1,198 @@
+@prefix ia-m: <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/governance/> .
+@prefix ent-fab: <https://ontology.example.com/fabric/model/> .
+@prefix ent-ctl: <https://ontology.example.com/governance/controls/> .
+@prefix ent-gov: <https://ontology.example.com/governance/model/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# Insights and Analytics - GOVERNED KNOWLEDGE COLLECTION(S)
+# The only route by which this domain's knowledge reaches AI agents.
+# Owned by the domain owner; published by the semantic fabric; risk approved by
+# the AI risk office. Standard: docs/standards/08-semantic-fabric.md
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/governance/collections/>
+    a owl:Ontology ;
+    rdfs:label "Insights and Analytics - knowledge collections"@en ;
+    dct:abstract "Knowledge collections published by Insights and Analytics, their named-graph partitions, usage policies and risk assessments."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/governance/collections/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+ia-m:Collection a ent-fab:KnowledgeCollection ;
+    rdfs:label "Insights and Analytics knowledge"@en ;
+    dct:description "Ontology, rules, processes, APIs, stewardship, records and execution models of Insights and Analytics."@en ;
+    ent-fab:publishedBy <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/insights-and-analytics> ;
+    owl:versionInfo "0.1.0" ;
+    ent-fab:sensitivity ent-ctl:Internal ;
+    ent-fab:usagePolicy ia-m:CollectionPolicy ;
+    ent-fab:subjectToControl ent-ctl:CTL-001 , ent-ctl:CTL-002 , ent-ctl:CTL-003 , ent-ctl:CTL-007 ;
+    ent-fab:hasRiskAssessment ia-m:CollectionRiskAssessment ;
+    ent-gov:hasDataSteward ia-m:DataStewardRole ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:OntologyPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/ontology"^^xsd:anyURI ;
+        ent-fab:sourcePath "ontology/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:RulesPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/rules"^^xsd:anyURI ;
+        ent-fab:sourcePath "rules/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:ProcessesPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/processes"^^xsd:anyURI ;
+        ent-fab:sourcePath "processes/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:ApisPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/apis"^^xsd:anyURI ;
+        ent-fab:sourcePath "apis/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:StewardshipPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/stewardship"^^xsd:anyURI ;
+        ent-fab:sourcePath "stewardship/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:RecordsPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/records"^^xsd:anyURI ;
+        ent-fab:sourcePath "records/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:ManifestPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/manifest"^^xsd:anyURI ;
+        ent-fab:sourcePath "domain-manifest.ttl" ;
+        ent-fab:sourcePath "collections/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:ExecutionPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/execution"^^xsd:anyURI ;
+        ent-fab:sourcePath "execution-models/*.ttl" ;
+    ] .
+
+ia-m:CollectionPolicy a odrl:Policy , odrl:Set ;
+    rdfs:label "usage policy for Insights and Analytics knowledge"@en ;
+    odrl:uid <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/governance/CollectionPolicy> ;
+    # Customer-facing agents may use this knowledge ONLY for self-directed guidance.
+    odrl:permission [
+        odrl:target ia-m:Collection ;
+        odrl:assignee ent-fab:CustomerFacingAgent ;
+        odrl:action odrl:use ;
+        odrl:constraint [ odrl:leftOperand odrl:purpose ; odrl:operator odrl:eq ;
+                          odrl:rightOperand ent-fab:SelfDirectedGuidance ]
+    ] , [
+        odrl:target ia-m:Collection ;
+        odrl:assignee ent-fab:AssociateAssistAgent , ent-fab:InternalAnalystAgent ;
+        odrl:action odrl:use ;
+        odrl:constraint [ odrl:leftOperand odrl:purpose ; odrl:operator odrl:isAnyOf ;
+                          odrl:rightOperand ent-fab:SelfDirectedGuidance , ent-fab:InternalAnalytics ]
+    ] ;
+    # Never as the basis of personalized advice (advice boundary, ALN-002 / IA-R-001).
+    odrl:prohibition [
+        odrl:target ia-m:Collection ;
+        odrl:action odrl:use ;
+        odrl:constraint [ odrl:leftOperand odrl:purpose ; odrl:operator odrl:eq ; odrl:rightOperand ent-fab:PersonalizedAdvice ]
+    ] , [
+        odrl:target ia-m:Collection ;
+        odrl:assignee ent-fab:ExternalModelProvider ;
+        odrl:action odrl:use
+    ] , [
+        odrl:target ia-m:Collection ;
+        odrl:action odrl:use ;
+        odrl:constraint [ odrl:leftOperand odrl:purpose ; odrl:operator odrl:eq ; odrl:rightOperand ent-fab:ModelTraining ]
+    ] .
+
+ia-m:CollectionRiskAssessment ;
+    ent-gov:hasDataSteward ia-m:DataStewardRole ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:OntologyPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/ontology"^^xsd:anyURI ;
+        ent-fab:sourcePath "ontology/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:RulesPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/rules"^^xsd:anyURI ;
+        ent-fab:sourcePath "rules/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:ProcessesPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/processes"^^xsd:anyURI ;
+        ent-fab:sourcePath "processes/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:ApisPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/apis"^^xsd:anyURI ;
+        ent-fab:sourcePath "apis/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:StewardshipPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/stewardship"^^xsd:anyURI ;
+        ent-fab:sourcePath "stewardship/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:RecordsPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/records"^^xsd:anyURI ;
+        ent-fab:sourcePath "records/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:ManifestPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/manifest"^^xsd:anyURI ;
+        ent-fab:sourcePath "domain-manifest.ttl" ;
+        ent-fab:sourcePath "collections/*.ttl" ;
+    ] ;
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:ExecutionPartition ;
+        ent-fab:graphName "https://ontology.example.com/graph/rwm-ia/insights-and-analytics/v0.1.0/execution"^^xsd:anyURI ;
+        ent-fab:sourcePath "execution-models/*.ttl" ;
+    ] .
+
+ia-m:CollectionPolicy a odrl:Policy , odrl:Set ;
+    rdfs:label "usage policy for Insights and Analytics knowledge"@en ;
+    odrl:uid <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/governance/CollectionPolicy> ;
+    odrl:permission [
+        odrl:target ia-m:Collection ;
+        odrl:assignee ent-fab:InternalAnalystAgent , ent-fab:AssociateAssistAgent ;
+        odrl:action odrl:use ;
+        odrl:constraint [ odrl:leftOperand odrl:purpose ; odrl:operator odrl:isAnyOf ;
+                          odrl:rightOperand ent-fab:InternalAnalytics ]
+    ] ;
+    odrl:prohibition [
+        odrl:target ia-m:Collection ;
+        odrl:assignee ent-fab:ExternalModelProvider ;
+        odrl:action odrl:use
+    ] , [
+        odrl:target ia-m:Collection ;
+        odrl:action odrl:use ;
+        odrl:constraint [ odrl:leftOperand odrl:purpose ; odrl:operator odrl:eq ; odrl:rightOperand ent-fab:ModelTraining ]
+    ] .
+
+ia-m:CollectionRiskAssessment a ent-ctl:RiskAssessment ;
+    rdfs:label "AI risk assessment - Insights and Analytics knowledge collection"@en ;
+    ent-ctl:assesses ia-m:Collection ;
+    ent-ctl:identifiedRisk ent-ctl:RSK-001 , ent-ctl:RSK-002 , ent-ctl:RSK-004 , ent-ctl:RSK-006 ;
+    ent-ctl:residualRiskRating ent-ctl:Low ;
+    ent-ctl:approvedBy ia-m:AIRiskApprover ;
+    ent-ctl:assessmentDate "2026-09-29"^^xsd:date .

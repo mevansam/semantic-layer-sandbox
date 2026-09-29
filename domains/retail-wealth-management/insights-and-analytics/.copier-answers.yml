@@ -1,0 +1,48 @@
+# Answers used to generate this repository from domain-template
+ai_risk_owner: AI Risk Office (placeholder)
+ai_risk_owner_team: '@example-org/ai-risk-office'
+api_owner: Insights Platform Product Owner (placeholder)
+api_owner_team: '@example-org/rwm-ia-api-owners'
+base_iri: https://ontology.example.com/
+capabilities:
+- financial-planning.planning-insights-and-analytics
+capability_domain_iri: https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/insights-and-analytics
+created: '2026-09-29'
+data_steward: Insights Data Steward (placeholder)
+data_steward_team: '@example-org/rwm-ia-data-stewards'
+dependencies:
+- domain_iri: https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance
+  module: https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/
+  path: ../planning-and-guidance
+domain_name: Insights and Analytics
+domain_owner: Head of Planning Insights & Analytics (placeholder)
+domain_owner_team: '@example-org/rwm-ia-domain-owners'
+domain_slug: insights-and-analytics
+fibo_extensions_path: ../../../fibo-extensions
+github_org: example-org
+governance_path: ../../../enterprise-semantic-governance
+module_name: insights
+namespace_path: retail-wealth-management/insights-and-analytics
+ontology_domain_name: Investment Servicing
+parent_domain_name: Retail Wealth Management
+parent_domain_owner: Head of Retail Wealth Management (placeholder)
+parent_domain_owner_team: '@example-org/rwm-domain-owners'
+parent_domain_slug: retail-wealth-management
+parent_registry_code: rwm
+prefix: ia
+records_owner: Wealth Records Manager (placeholder)
+records_owner_team: '@example-org/rwm-records'
+registry_code: rwm-ia
+repo_name: semantic-layer-sandbox
+rule_owner: Insights Rules & Conduct Lead (placeholder)
+rule_owner_team: '@example-org/rwm-ia-rule-owners'
+rule_prefix: IA
+seed_class: PlanningInsight
+seed_class_anchor: customers.customer-intelligence-and-analytics.customer-portfolio-analytics
+seed_class_definition: opinion generated from a customer's plan or portfolio that
+  draws their attention to something relevant to their financial planning
+seed_class_label: planning insight
+seed_class_parent: fibo-fnd-arr-asmt:Opinion
+taxonomy_anchors:
+- customers.customer-intelligence-and-analytics.customer-portfolio-analytics
+- customers.customer-intelligence-and-analytics.customer-financial-health-scores

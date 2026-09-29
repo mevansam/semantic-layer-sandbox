@@ -1,0 +1,61 @@
+# Planning and Guidance
+
+Semantic repository of the **Planning and Guidance** sub-domain of the **Retail Wealth Management** business domain (Investment Servicing ontology domain in the capability map). It was generated from `domains/domain-template`.
+
+This domain is accountable for **meaning, rules, data, records and APIs**. The enterprise governs how that knowledge is represented, shared and consumed by AI (see `enterprise-semantic-governance`).
+
+| Folder | Accountability | Owner (see `domain-manifest.ttl`, `CODEOWNERS`) |
+|---|---|---|
+| `domain-manifest.ttl` | who is accountable for what; taxonomy anchors; capabilities | domain owner |
+| `ontology/` | **Meaning**: business concepts specializing FIBO | domain owner |
+| `rules/` | **Rules**: SHACL shapes with authoritative rule statements | rule owner |
+| `processes/` | process knowledge: steps, roles, rules applied, APIs, records | domain owner |
+| `apis/` | **APIs**: OpenAPI contracts with `x-ontology-*` annotations, plus registry | API owner |
+| `stewardship/` | **Data**: data products and critical data elements | data steward |
+| `mappings/` | **Data**: RML mappings from physical sources | data steward |
+| `records/` | **Records**: record classes, retention, legal hold | records owner |
+| `collections/` | fabric: governed knowledge collection, ODRL usage policy, AI risk assessment | domain owner + fabric + AI risk |
+| `execution-models/` | fabric: rule packs, process models, query tools for agents | domain owner + fabric + AI risk |
+| `competency-questions/` | questions the knowledge graph must answer (gate G6): cq-001…005 from the template, cq-101+ domain-specific | domain owner |
+| `examples/`, `tests/negative/` | positive and negative test data for rules (gate G5) | rule owner |
+| `docs/modeling-notes.md` | semantic review record: FIBO parent choices, rules ↔ tests ↔ tools, open items | domain owner |
+
+Structure: this repository follows the enterprise domain repository standard (`semtool structure`, gate G1). Edit files in place; add files only where the naming conventions allow (`<toolName>.rq`, `cq-101-…`, `nc-NNN-…`).
+
+## Extension points
+
+- **Builds on:** no other sub-domain. Dependencies run one way; this sub-domain never mints terms in another's namespace.
+- **Published for others:** the modules listed for `rwm-pg` in `fibo-extensions/registry/domain-registry.ttl`. Anything published is a contract; breaking changes need a MAJOR version.
+- **Parent:** `../domain.ttl` imports this sub-domain's published module into the Retail Wealth Management umbrella.
+
+## Namespace
+
+`https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/` (registered as `rwm-pg` in `fibo-extensions/registry`).
+
+## Working locally
+
+```bash
+# from the repository root
+export ROBOT_JAR=/path/to/robot.jar
+python enterprise-semantic-governance/tools/semtool.py verify --repo domains/retail-wealth-management/planning-and-guidance
+python enterprise-semantic-governance/tools/semtool.py cq --repo domains/retail-wealth-management/planning-and-guidance --show 5
+```
+
+`verify` runs gates G1–G7 and writes `build/kg.trig` (knowledge graph) and `build/graphrag/cards.jsonl` (GraphRAG concept cards).
+
+## Changing things
+
+- **New concept:** add it to `ontology/` with a FIBO parent, a taxonomy anchor, a definition and agent guidance.
+- **New rule:** add a shape to `rules/` with id, statement, policy source and owner. Add a negative test to `tests/negative/`.
+- **Anything exposed to agents:** it must be in the collection's partitions. New execution models need a risk assessment approved by the AI risk office.
+- **Role holder changes:** update `domain-manifest.ttl`, then run `semtool codeowners`.
+
+## Current content (v0.1.0)
+
+Goals, self-directed plans, planning scenarios and assumptions (with mortality-table provenance) and goal projections. Also:
+- 4 rules (PG-R-001…004), each with a failing test
+- the goal planning cycle (3 steps; projections are calculated by Calculator Management)
+- the Planning API, the goals-and-plans data product and plan records
+- a knowledge collection and the `rwm_pg_goal_progress` query tool
+
+The `planning` module is **published**: Insights and Analytics builds on it. See `docs/modeling-notes.md`.

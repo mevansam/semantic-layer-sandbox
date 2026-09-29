@@ -1,0 +1,17 @@
+# Extension point check: every place this sub-domain refers to Planning and Guidance's published module.
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ent-proc: <https://ontology.example.com/governance/process/>
+SELECT DISTINCT ?planningConcept ?via ?from WHERE {
+  {
+    ?p rdfs:range ?c ; rdfs:label ?via .
+    FILTER(STRSTARTS(STR(?p), "https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/"))
+    BIND("property" AS ?from)
+  } UNION {
+    ?s ent-proc:usesConcept ?c ; rdfs:label ?via .
+    FILTER(STRSTARTS(STR(?s), "https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/"))
+    BIND("process step" AS ?from)
+  }
+  FILTER(STRSTARTS(STR(?c), "https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/"))
+  BIND(REPLACE(STR(?c), "^.*/", "") AS ?planningConcept)
+}
+ORDER BY ?planningConcept ?via

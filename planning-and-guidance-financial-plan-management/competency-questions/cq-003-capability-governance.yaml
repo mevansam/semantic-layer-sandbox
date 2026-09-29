@@ -1,9 +1,0 @@
-id: CQ-003
-question: Which ontology domain does this domain belong to, which capabilities does it realize (authoritative or proposed), and is it the accountable domain for each?
-query: cq-003-capability-governance.rq
-expect:
-  min_rows: 3
-  contains:
-    ontologyDomain: Planning and Guidance
-    status: Proposed
-    accountable: "true"

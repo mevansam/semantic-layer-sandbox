@@ -1,0 +1,36 @@
+repo_kind: domain
+governance: {{ governance_path }}
+fibo_extensions: {{ fibo_extensions_path }}
+
+# Extension point: sibling sub-domains whose PUBLISHED modules this one imports
+# (one direction only, no cycles; see domain-manifest.ttl ent-gov:dependsOnSubDomain).
+dependencies:{% if not dependencies %} []{% endif %}
+{%- for d in dependencies %}
+  - {{ d.path }}
+{%- endfor %}
+
+domain:
+  name: "{{ domain_name }}"
+  parent: "{{ parent_domain_name }}"
+  ontology_domain: "{{ ontology_domain_name }}"
+  code: {{ registry_code }}
+  namespace: {{ base_iri }}domain/{{ namespace_path }}/
+
+# Files by asset kind. Each kind has its own owner in CODEOWNERS (generated from
+# domain-manifest.ttl by `semtool codeowners`).
+paths:
+  manifest:    [domain-manifest.ttl]              # accountable roles, anchors, capabilities
+  ontology:    [ontology/*.ttl]                   # MEANING  - domain owner
+  rules:       [rules/*.ttl]                      # RULES    - rule owner
+  processes:   [processes/*.ttl]                  # process knowledge - domain owner
+  apis:        [apis/*.ttl]                       # APIs     - API owner
+  stewardship: [stewardship/*.ttl]                # DATA     - data steward
+  records:     [records/*.ttl]                    # RECORDS  - records owner
+  collections: [collections/*.ttl]                # fabric: knowledge collections (+ policy, risk)
+  execution:   [execution-models/*.ttl]           # fabric: published execution models
+
+examples:
+  positive: [examples/*.ttl]                      # must conform to all rules
+  negative: tests/negative/expectations.yaml      # must trip the listed rules
+
+competency_questions: competency-questions/*.yaml

@@ -10,7 +10,7 @@ cd ../..
 git config -f .gitmodules submodule.vendor/fibo.branch master_2026Q3
 bash scripts/fetch-omg-dependencies.sh     # Commons / LCC may have moved too
 # update the pinned tag in enterprise-semantic-governance/semantic.yaml (fibo.release_tag)
-python ../enterprise-semantic-governance/tools/semtool.py verify
+make verify   # from the repository root: every repo and sub-domain against the new FIBO
 ```
 
 Then run **every registered domain's CI** against the upgrade branch, using the `fibo-extensions-ref` input of the reusable workflow. The upgrade PR must list:

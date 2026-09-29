@@ -1,0 +1,40 @@
+@prefix dct:              <http://purl.org/dc/terms/> .
+@prefix ent-av:           <https://ontology.example.com/governance/annotations/> .
+@prefix ent-core:         <https://ontology.example.com/fibo-ext/core/> .
+@prefix ent-tax:          <https://ontology.example.com/taxonomy/> .
+@prefix fa:               <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/assessments/> .
+@prefix fibo-fnd-utl-alx: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/Analytics/> .
+@prefix fibo-fnd-utl-av:  <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:              <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:             <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:             <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:              <http://www.w3.org/2001/XMLSchema#> .
+
+# Retail Wealth Management - Insights and Analytics: ASSESSMENTS module
+# Financial health score. Incubated here; the capability map makes Financial Assessments
+# accountable for it, so the module is kept separate for a later transfer.
+
+<https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/assessments/>
+    a owl:Ontology ;
+    rdfs:label "Insights and Analytics - assessments"@en ;
+    dct:abstract "Financial health score of a retail customer, specializing FIBO key performance indicators. Earmarked for the Financial Assessments business domain."@en ;
+    owl:imports <https://ontology.example.com/fibo-ext/core/> ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/assessments/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+fa:FinancialHealthScore a owl:Class ;
+    rdfs:subClassOf fibo-fnd-utl-alx:KeyPerformanceIndicator ;
+    rdfs:label "financial health score"@en ;
+    skos:definition "key performance indicator, on a 0-100 scale, summarizing a retail customer's overall financial resilience from savings, debt, protection and progress towards goals"@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-health-scores ;
+    ent-av:agentGuidance "Explain which factors drive the score; do not compare a customer's score with other named customers."@en ;
+    ent-av:owningDomain <https://ontology.example.com/capability/domain/planning-and-guidance/financial-assessments> ;
+    ent-av:realizesCapability <https://ontology.example.com/capability/financial-assessment.financial-wellness-assessment> ;
+    skos:editorialNote "Incubated in Financial Plan Management; meaning owned by Financial Assessments (ADR-0004). Transfer this module to the pg-fa repository when it is created."@en .
+
+fa:scoresCustomer a owl:ObjectProperty ;
+    rdfs:label "scores customer"@en ;
+    skos:definition "relates a financial health score to the customer it describes"@en ;
+    rdfs:domain fa:FinancialHealthScore ; rdfs:range ent-core:RetailCustomer ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-health-scores .

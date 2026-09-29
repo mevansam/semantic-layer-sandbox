@@ -1,0 +1,12 @@
+# Negative test cases: each file MUST trigger the listed business rules (gate G5).
+# nc-NNN tests rule IA-R-NNN (it may trip others too). Validated together with the positive examples.
+cases:
+  - name: self-directed insight recommends buying a security (advice boundary)
+    file: nc-001-buy-recommendation.ttl
+    expect_violations: [IA-R-001]
+  - name: health score out of range and without model version
+    file: nc-002-invalid-health-score.ttl
+    expect_violations: [IA-R-002]
+  - name: insight without model provenance or category
+    file: nc-003-insight-without-provenance.ttl
+    expect_violations: [IA-R-003]

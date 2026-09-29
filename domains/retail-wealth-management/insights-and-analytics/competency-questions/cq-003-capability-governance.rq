@@ -1,0 +1,12 @@
+PREFIX ent-gov: <https://ontology.example.com/governance/model/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?ontologyDomain ?domain ?capability ?status ?accountable WHERE {
+  ?m a ent-gov:DomainManifest ; ent-gov:describesDomain ?d ; ent-gov:realizesCapability ?c .
+  ?d rdfs:label ?domain .
+  OPTIONAL { ?d ent-gov:inOntologyDomain/rdfs:label ?ontologyDomain }
+  ?c skos:notation ?capability .
+  OPTIONAL { ?c ent-gov:capabilityStatus ?status }
+  BIND(EXISTS { ?c ent-gov:accountableDomain ?d } AS ?accountable)
+}
+ORDER BY ?capability

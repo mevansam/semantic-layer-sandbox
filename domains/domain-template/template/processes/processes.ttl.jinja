@@ -1,0 +1,44 @@
+@prefix {{ prefix }}:      <{{ base_iri }}domain/{{ namespace_path }}/{{ module_name }}/> .
+@prefix {{ prefix }}-proc: <{{ base_iri }}domain/{{ namespace_path }}/processes/> .
+@prefix {{ prefix }}-rule: <{{ base_iri }}domain/{{ namespace_path }}/rules/> .
+@prefix {{ prefix }}-api:  <{{ base_iri }}domain/{{ namespace_path }}/apis/> .
+@prefix {{ prefix }}-rec:  <{{ base_iri }}domain/{{ namespace_path }}/records/> .
+@prefix ent-proc: <{{ base_iri }}governance/process/> .
+@prefix ent-av:   <{{ base_iri }}governance/annotations/> .
+@prefix ent-cap:  <{{ base_iri }}capability/> .
+@prefix ent-tax:  <{{ base_iri }}taxonomy/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+# -----------------------------------------------------------------------------
+# {{ domain_name }} - PROCESSES (owned by the domain owner)
+# Standard: docs/standards/03-processes.md
+# -----------------------------------------------------------------------------
+
+<{{ base_iri }}domain/{{ namespace_path }}/processes/>
+    a owl:Ontology ;
+    rdfs:label "{{ domain_name }} - processes"@en ;
+    dct:abstract "Business processes of the {{ domain_name }} business domain."@en ;
+    owl:versionIRI <{{ base_iri }}domain/{{ namespace_path }}/processes/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+{{ prefix }}-proc:Maintain{{ seed_class }} a ent-proc:BusinessProcess ;
+    rdfs:label "maintain {{ seed_class_label }}"@en ;
+    skos:definition "Placeholder process: capture and maintain a {{ seed_class_label }}."@en ;
+    ent-av:realizesCapability ent-cap:{{ capabilities[0] }} ;
+    ent-av:governedBy ent-tax:{{ seed_class_anchor }} ;
+    ent-proc:hasStep {{ prefix }}-proc:Capture{{ seed_class }} .
+
+{{ prefix }}-proc:Capture{{ seed_class }} a ent-proc:ProcessStep ;
+    rdfs:label "capture {{ seed_class_label }}"@en ;
+    ent-proc:stepOrder 1 ;
+    ent-proc:performedBy "customer (digital channel)" ;
+    ent-proc:automationLevel ent-proc:CustomerSelfService ;
+    ent-proc:producesConcept {{ prefix }}:{{ seed_class }} ;
+    ent-proc:appliesRule {{ prefix }}-rule:ReferenceCodeRule ;
+    ent-proc:invokesApi {{ prefix }}-api:{{ module_name | capitalize }}Api ;
+    ent-proc:createsRecord {{ prefix }}-rec:{{ seed_class }}Record .

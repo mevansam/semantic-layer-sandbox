@@ -13,5 +13,5 @@ Central ontology teams become bottlenecks and lose business credibility when the
 - CODEOWNERS is generated from the manifest, so every change needs a domain approval (meaning) and an enterprise approval (representation).
 
 ## Consequences
-- Accountability can be queried in the knowledge graph ("who owns rule SDP-R-001?").
+- Accountability can be queried in the knowledge graph ("who owns rule IA-R-001?").
 - A domain cannot publish to AI without the enterprise gates; the enterprise cannot change a domain's meaning.

@@ -1,0 +1,90 @@
+@prefix ia-m:    <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/governance/> .
+@prefix ia-rule: <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/rules/> .
+@prefix ia-proc: <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/processes/> .
+@prefix ent-fab: <https://ontology.example.com/fabric/model/> .
+@prefix ent-ctl: <https://ontology.example.com/governance/controls/> .
+@prefix ent-av:  <https://ontology.example.com/governance/annotations/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# Insights and Analytics - PUBLISHED EXECUTION MODELS
+# Files are named after the tool: execution-models/{queries,schemas,rulepacks}/<toolName>.*
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/governance/execution-models/>
+    a owl:Ontology ;
+    rdfs:label "Insights and Analytics - execution models"@en ;
+    dct:abstract "Advice-boundary rule pack, customer-insights query tool and insight-cycle process model published by Insights and Analytics for AI agents."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/governance/execution-models/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# ---- Rule pack: advice boundary (guards a regulated boundary -> CTL-005) -----------
+
+ia-m:AdviceBoundaryRulePack a ent-fab:RulePack ;
+    rdfs:label "advice boundary rule pack"@en ;
+    skos:definition "Runtime check applied to every insight an agent proposes for a self-directed customer, before delivery: blocks personalized buy/sell recommendations and untraceable insights."@en ;
+    ent-fab:toolName "rwm_ia_advice_boundary_rulepack" ;
+    ent-fab:artifactPath "execution-models/rulepacks/rwm_ia_advice_boundary_rulepack.yaml" ;
+    ent-fab:derivedFromRule ia-rule:AdviceBoundaryRule , ia-rule:InsightTraceabilityRule ;
+    ent-fab:implementsProcess ia-proc:InsightCycle ;
+    ent-fab:groundedIn ia-m:Collection ;
+    ent-fab:subjectToControl ent-ctl:CTL-005 , ent-ctl:CTL-006 , ent-ctl:CTL-008 ;
+    ent-fab:hasRiskAssessment ia-m:AdviceBoundaryRiskAssessment ;
+    ent-av:agentGuidance "Call before delivering ANY insight. On a violation, do not deliver; tell the customer this needs a conversation with an advisor and offer the advised channel."@en .
+
+ia-m:AdviceBoundaryRiskAssessment a ent-ctl:RiskAssessment ;
+    rdfs:label "AI risk assessment - advice boundary rule pack"@en ;
+    ent-ctl:assesses ia-m:AdviceBoundaryRulePack ;
+    ent-ctl:identifiedRisk ent-ctl:RSK-004 , ent-ctl:RSK-005 ;
+    ent-ctl:residualRiskRating ent-ctl:Medium ;
+    ent-ctl:approvedBy ia-m:AIRiskApprover ;
+    ent-ctl:assessmentDate "2026-09-29"^^xsd:date .
+
+# ---- Query tool: a customer's delivered insights ------------------------------------
+
+ia-m:CustomerInsightsTool a ent-fab:QueryTool ;
+    rdfs:label "customer insights tool"@en ;
+    skos:definition "Returns a customer's self-directed insights with category, suggested action, related goal, model provenance, and the rules that govern insights."@en ;
+    ent-fab:toolName "rwm_ia_customer_insights" ;
+    ent-fab:artifactPath "execution-models/queries/rwm_ia_customer_insights.rq" ;
+    ent-fab:inputSchemaPath "execution-models/schemas/rwm_ia_customer_insights.schema.json" ;
+    ent-fab:derivedFromRule ia-rule:InsightTraceabilityRule ;
+    ent-fab:implementsProcess ia-proc:InsightCycle ;
+    ent-fab:groundedIn ia-m:Collection ;
+    ent-fab:subjectToControl ent-ctl:CTL-006 , ent-ctl:CTL-002 , ent-ctl:CTL-004 ;
+    ent-fab:hasRiskAssessment ia-m:CustomerInsightsRiskAssessment ;
+    ent-av:agentGuidance "Only call for the authenticated customer. Quote insights as delivered; never add a recommendation of your own."@en .
+
+ia-m:CustomerInsightsRiskAssessment a ent-ctl:RiskAssessment ;
+    rdfs:label "AI risk assessment - customer insights tool"@en ;
+    ent-ctl:assesses ia-m:CustomerInsightsTool ;
+    ent-ctl:identifiedRisk ent-ctl:RSK-003 , ent-ctl:RSK-004 ;
+    ent-ctl:residualRiskRating ent-ctl:Low ;
+    ent-ctl:approvedBy ia-m:AIRiskApprover ;
+    ent-ctl:assessmentDate "2026-09-29"^^xsd:date .
+
+# ---- Process model: insight cycle -------------------------------------------------------
+
+ia-m:InsightCycleProcessModel a ent-fab:ProcessModel ;
+    rdfs:label "insight cycle process model"@en ;
+    skos:definition "Orchestration of the agent-assisted part of the insight cycle: generate insights (step 2), check them with the advice-boundary rule pack, then hand over for delivery and retention (step 3)."@en ;
+    ent-fab:toolName "rwm_ia_insight_cycle" ;
+    ent-fab:artifactPath "processes/processes.ttl" ;
+    ent-fab:implementsProcess ia-proc:InsightCycle ;
+    ent-fab:groundedIn ia-m:Collection ;
+    ent-fab:subjectToControl ent-ctl:CTL-006 , ent-ctl:CTL-005 , ent-ctl:CTL-008 ;
+    ent-fab:hasRiskAssessment ia-m:InsightCycleRiskAssessment .
+
+ia-m:InsightCycleRiskAssessment a ent-ctl:RiskAssessment ;
+    rdfs:label "AI risk assessment - insight cycle process model"@en ;
+    ent-ctl:assesses ia-m:InsightCycleProcessModel ;
+    ent-ctl:identifiedRisk ent-ctl:RSK-004 , ent-ctl:RSK-005 ;
+    ent-ctl:residualRiskRating ent-ctl:Medium ;
+    ent-ctl:approvedBy ia-m:AIRiskApprover ;
+    ent-ctl:assessmentDate "2026-09-29"^^xsd:date .

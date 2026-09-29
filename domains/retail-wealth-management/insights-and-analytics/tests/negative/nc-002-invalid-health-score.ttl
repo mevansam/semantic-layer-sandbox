@@ -1,0 +1,10 @@
+@prefix ent-ra: <https://ontology.example.com/fabric/assets/> .
+@prefix fa:     <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/assessments/> .
+@prefix ia-ex:  <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/examples/> .
+
+# NEGATIVE (IA-R-002): score out of range and no model version.
+ia-ex:bad-score a fa:FinancialHealthScore ;
+    fa:scoresCustomer ia-ex:customer-001 ;
+    ent-ra:scoreValue 130.0 ;
+    ent-ra:generatedByModel "fin-health-model" ;
+    ent-ra:generatedAt "2026-09-28T09:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .

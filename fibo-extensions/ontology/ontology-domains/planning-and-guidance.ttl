@@ -8,17 +8,16 @@
 # UMBRELLA ONTOLOGY - ontology domain "Planning and Guidance" (capability map)
 #
 # Imports the PUBLISHED modules of the ontology domain's business domains, in
-# the same way FIBO's AllFND works. Consumers that need the whole ontology
+# the same way FIBO's AllFND works. IRIs: {base}ontology-domain/{od}/ (ADR-0005). Consumers that need the whole ontology
 # domain import this; domains never import it (they import only what they
 # need, rule E3). Add a line when a domain publishes a module (registry).
 # -----------------------------------------------------------------------------
 
-<https://ontology.example.com/domain/planning-and-guidance/>
+<https://ontology.example.com/ontology-domain/planning-and-guidance/>
     a owl:Ontology ;
     rdfs:label "Planning and Guidance ontology domain"@en ;
-    dct:abstract "Umbrella for the Planning and Guidance ontology domain: Financial Plan Management (published), Financial Assessments, Household Management, Benefits Management and other domains as they publish modules."@en ;
+    dct:abstract "Umbrella for the Planning and Guidance ontology domain (Financial Plan Management, Financial Assessments, Household Management, Benefits Management, ...). No domain in this ontology domain publishes modules yet."@en ;
     dct:subject <https://ontology.example.com/capability/ontology-domain/planning-and-guidance> ;
-    owl:imports <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/planning/> ;
-    owl:versionIRI <https://ontology.example.com/domain/planning-and-guidance/0.1.0/> ;
-    owl:versionInfo "0.1.0" ;
+    owl:versionIRI <https://ontology.example.com/ontology-domain/planning-and-guidance/0.2.0/> ;
+    owl:versionInfo "0.2.0" ;
     fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .

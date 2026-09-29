@@ -185,3 +185,32 @@ ent-ms:RiskAssessmentShape a sh:NodeShape ;
     sh:property [ sh:path ent-ctl:residualRiskRating ; sh:minCount 1 ; sh:maxCount 1 ] ;
     sh:property [ sh:path ent-ctl:approvedBy ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ] ;
     sh:property [ sh:path ent-ctl:assessmentDate ; sh:minCount 1 ; sh:datatype xsd:date ] .
+
+# ---- Business domains with sub-domains (ADR-0005) ----------------------------------------
+
+ent-ms:ParentDomainManifestShape a sh:NodeShape ;
+    rdfs:label "Parent domain manifest (business domain with sub-domains)" ;
+    sh:targetClass ent-gov:ParentDomainManifest ;
+    sh:property [ sh:path ent-gov:describesDomain ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ent-gov:BusinessDomain ;
+                  sh:message "The parent manifest must describe exactly one business domain of the capability map." ] ;
+    sh:property [ sh:path ent-gov:hasDomainOwner ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ;
+                  sh:message "A business domain with sub-domains needs a business-domain owner." ] ;
+    sh:property [ sh:path ent-gov:includesSubDomain ; sh:minCount 1 ; sh:class ent-gov:SubDomain ;
+                  sh:message "A parent manifest lists at least one sub-domain registered in the capability map." ] ;
+    sh:property [ sh:path ent-gov:namespace ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+ent-ms:SubDomainDependencyShape a sh:NodeShape ;
+    rdfs:label "Sub-domain dependency direction" ;
+    sh:targetSubjectsOf ent-gov:dependsOnSubDomain ;
+    sh:property [ sh:path ent-gov:dependsOnSubDomain ; sh:class ent-gov:SubDomain ] ;
+    sh:sparql [
+        sh:message "Sub-domain dependencies must not be circular." ;
+        sh:prefixes ent-ms:prefixes ;
+        sh:select """
+            SELECT $this ?value WHERE {
+              $this ent-gov:describesDomain ?me ; ent-gov:dependsOnSubDomain ?value .
+              ?other ent-gov:describesDomain ?value ; ent-gov:dependsOnSubDomain ?me .
+            }""" ] .
+
+ent-ms:prefixes a owl:Ontology ;
+    sh:declare [ sh:prefix "ent-gov" ; sh:namespace "https://ontology.example.com/governance/model/"^^xsd:anyURI ] .

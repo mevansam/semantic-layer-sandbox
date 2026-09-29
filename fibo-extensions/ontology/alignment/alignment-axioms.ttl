@@ -14,7 +14,7 @@
 # Current decisions:
 #   ALN-001  Equivalent -> implemented by promotion to ent-core:RetailCustomer (no axiom needed)
 #   ALN-002  RelatedNotEquivalent -> no axiom; agents keep terms distinct (CTL-007).
-#            When Retail Wealth Management publishes its advice Recommendation class, add:
+#            When a Retail Wealth Management advice sub-domain publishes its Recommendation class, add:
 #            [] a owl:AllDisjointClasses ; owl:members ( <...SelfDirectedInsight> <...advised/Recommendation> ) .
 # -----------------------------------------------------------------------------
 

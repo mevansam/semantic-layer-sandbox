@@ -591,12 +591,6 @@ ent-cap:charitable-giving.user-and-entitlement-management a skos:Concept ;
     rdfs:label "Profiling Management"@en ;
     ent-gov:inOntologyDomain ent-od:investment-servicing .
 
-<https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management> a ent-gov:BusinessDomain ;
-    rdfs:label "Retail Wealth Management"@en ;
-    ent-av:governedBy ent-tax:clients.client-products-and-services.client-personalized-planning-and-advice,
-        ent-tax:products-and-services.personalized-planning-and-guidance-services ;
-    ent-gov:inOntologyDomain ent-od:investment-servicing .
-
 <https://ontology.example.com/capability/domain/investment-servicing/trade-management> a ent-gov:BusinessDomain ;
     rdfs:label "Trade Management"@en ;
     ent-gov:inOntologyDomain ent-od:investment-servicing .
@@ -622,6 +616,12 @@ ent-cap:charitable-giving.user-and-entitlement-management a skos:Concept ;
 <https://ontology.example.com/capability/domain/other/experience-management> a ent-gov:BusinessDomain ;
     rdfs:label "Experience Management"@en ;
     ent-gov:inOntologyDomain ent-od:other .
+
+<https://ontology.example.com/capability/domain/planning-and-guidance/financial-plan-management> a ent-gov:BusinessDomain ;
+    rdfs:label "Financial Plan Management"@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans,
+        ent-tax:products-and-services.planning-and-guidance-services ;
+    ent-gov:inOntologyDomain ent-od:planning-and-guidance .
 
 <https://ontology.example.com/capability/domain/planning-and-guidance/household-management> a ent-gov:BusinessDomain ;
     rdfs:label "Household Management"@en ;
@@ -989,6 +989,14 @@ ent-cap:brokerage-recordkeeping-services.transaction-management.trade-management
     ent-gov:inOntologyDomain ent-od:investment-servicing ;
     ent-gov:realizesCapability ent-cap:investment-management.portfolio-management .
 
+<https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/insights-and-analytics> a ent-gov:SubDomain ;
+    rdfs:label "Insights and Analytics"@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-health-scores,
+        ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics ;
+    ent-gov:inOntologyDomain ent-od:investment-servicing ;
+    ent-gov:isSubDomainOf <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management> ;
+    ent-gov:realizesCapability ent-cap:financial-planning.planning-insights-and-analytics .
+
 <https://ontology.example.com/capability/domain/markets-and-money/digital-assets> a ent-gov:BusinessDomain ;
     rdfs:label "Digital Assets"@en ;
     ent-gov:inOntologyDomain ent-od:markets-and-money ;
@@ -1018,17 +1026,17 @@ ent-cap:financial-planning.goal-based-planning a skos:Concept ;
     skos:inScheme ent-cap:CapabilityMap ;
     skos:notation "Financial Planning > Goal-Based Planning" ;
     skos:prefLabel "Goal-Based Planning"@en ;
-    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/planning-and-guidance/financial-plan-management> ;
+    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance> ;
     ent-gov:capabilityStatus "Proposed" .
 
 ent-cap:financial-planning.planning-insights-and-analytics a skos:Concept ;
     skos:broader ent-cap:financial-planning ;
-    skos:definition "Generating educational, non-personalized insights from a customer's plan and portfolio."@en ;
+    skos:definition "Generating educational, non-personalized insights and health scores from a customer's plan and portfolio."@en ;
     skos:editorialNote "PROPOSED by the domain; not yet in the authoritative capability map."@en ;
     skos:inScheme ent-cap:CapabilityMap ;
     skos:notation "Financial Planning > Planning Insights & Analytics" ;
     skos:prefLabel "Planning Insights & Analytics"@en ;
-    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/planning-and-guidance/financial-plan-management> ;
+    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/insights-and-analytics> ;
     ent-gov:capabilityStatus "Proposed" .
 
 ent-cap:financial-planning.retirement-income-projection a skos:Concept ;
@@ -1038,7 +1046,7 @@ ent-cap:financial-planning.retirement-income-projection a skos:Concept ;
     skos:inScheme ent-cap:CapabilityMap ;
     skos:notation "Financial Planning > Retirement Income Projection" ;
     skos:prefLabel "Retirement Income Projection"@en ;
-    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/planning-and-guidance/financial-plan-management> ;
+    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance> ;
     ent-gov:capabilityStatus "Proposed" .
 
 ent-cap:investment-management.digital-asset-management a skos:Concept ;
@@ -1145,6 +1153,16 @@ ent-cap:benefits-management.benefits-record-keeping a skos:Concept ;
     ent-gov:accountableDomain <https://ontology.example.com/capability/domain/planning-and-guidance/benefits-management> ;
     ent-gov:capabilityStatus "Authoritative" .
 
+<https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance> a ent-gov:SubDomain ;
+    rdfs:label "Planning and Guidance"@en ;
+    skos:editorialNote "Name coincides with the capability map's ontology domain 'Planning and Guidance'; they are different things (this is a sub-domain of Retail Wealth Management)."@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans,
+        ent-tax:products-and-services.planning-and-guidance-services ;
+    ent-gov:inOntologyDomain ent-od:investment-servicing ;
+    ent-gov:isSubDomainOf <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management> ;
+    ent-gov:realizesCapability ent-cap:financial-planning.goal-based-planning,
+        ent-cap:financial-planning.retirement-income-projection .
+
 <https://ontology.example.com/capability/domain/planning-and-guidance/financial-assessments> a ent-gov:BusinessDomain ;
     rdfs:label "Financial Assessments"@en ;
     ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-health-scores,
@@ -1193,6 +1211,13 @@ ent-cap:brokerage-recordkeeping-services.common-services-and-utilities-managemen
     ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/brokerage-asset-servicing> ;
     ent-gov:capabilityStatus "Authoritative" .
 
+<https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management> a ent-gov:BusinessDomain ;
+    rdfs:label "Retail Wealth Management"@en ;
+    ent-av:governedBy ent-tax:clients.client-products-and-services.client-personalized-planning-and-advice,
+        ent-tax:products-and-services.personalized-planning-and-guidance-services ;
+    ent-gov:inOntologyDomain ent-od:investment-servicing ;
+    ent-gov:realizesCapability ent-cap:financial-planning .
+
 ent-cap:investment-operations.nav-management a skos:Concept ;
     skos:broader ent-cap:investment-operations ;
     skos:inScheme ent-cap:CapabilityMap ;
@@ -1226,24 +1251,14 @@ ent-cap:brokerage-recordkeeping-services.trade-management-services a skos:Concep
     ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/brokerage-asset-servicing> ;
     ent-gov:capabilityStatus "Authoritative" .
 
-<https://ontology.example.com/capability/domain/planning-and-guidance/financial-plan-management> a ent-gov:BusinessDomain ;
-    rdfs:label "Financial Plan Management"@en ;
-    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans,
-        ent-tax:products-and-services.planning-and-guidance-services ;
-    ent-gov:inOntologyDomain ent-od:planning-and-guidance ;
-    ent-gov:realizesCapability ent-cap:financial-planning,
-        ent-cap:financial-planning.goal-based-planning,
-        ent-cap:financial-planning.planning-insights-and-analytics,
-        ent-cap:financial-planning.retirement-income-projection .
-
 ent-cap:financial-planning a skos:Concept ;
-    skos:definition "Helping retail customers set, plan for and track financial goals."@en ;
+    skos:definition "Helping retail customers set, plan for and track financial goals, and understand how they are doing."@en ;
     skos:editorialNote "PROPOSED by the domain; not yet in the authoritative capability map."@en ;
     skos:inScheme ent-cap:CapabilityMap ;
     skos:notation "Financial Planning" ;
     skos:prefLabel "Financial Planning"@en ;
     skos:topConceptOf ent-cap:CapabilityMap ;
-    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/planning-and-guidance/financial-plan-management> ;
+    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management> ;
     ent-gov:capabilityStatus "Proposed" .
 
 ent-cap:brokerage-recordkeeping-services.transaction-management a skos:Concept ;
@@ -1298,9 +1313,6 @@ ent-cap:investment-management a skos:Concept ;
     ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/investment-management> ;
     ent-gov:capabilityStatus "Authoritative" .
 
-ent-od:investment-servicing a ent-gov:OntologyDomain ;
-    rdfs:label "Investment Servicing"@en .
-
 <https://ontology.example.com/capability/domain/investment-servicing/investment-operations> a ent-gov:BusinessDomain ;
     rdfs:label "Investment Operations"@en ;
     ent-av:governedBy ent-tax:portfolios.portfolio-cash,
@@ -1322,6 +1334,9 @@ ent-cap:retail-brokerage-services a skos:Concept ;
         ent-tax:products-and-services.retail-brokerage-services ;
     ent-gov:inOntologyDomain ent-od:investment-servicing ;
     ent-gov:realizesCapability ent-cap:retail-brokerage-services .
+
+ent-od:investment-servicing a ent-gov:OntologyDomain ;
+    rdfs:label "Investment Servicing"@en .
 
 <https://ontology.example.com/capability/domain/other/charitable-giving> a ent-gov:BusinessDomain ;
     rdfs:label "Charitable Giving"@en ;

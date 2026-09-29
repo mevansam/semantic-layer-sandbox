@@ -1,0 +1,72 @@
+@prefix {{ prefix }}-m:    <{{ base_iri }}domain/{{ namespace_path }}/governance/> .
+@prefix {{ prefix }}-proc: <{{ base_iri }}domain/{{ namespace_path }}/processes/> .
+@prefix {{ prefix }}-rule: <{{ base_iri }}domain/{{ namespace_path }}/rules/> .
+@prefix ent-fab: <{{ base_iri }}fabric/model/> .
+@prefix ent-ctl: <{{ base_iri }}governance/controls/> .
+@prefix ent-av:  <{{ base_iri }}governance/annotations/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# {{ domain_name }} - PUBLISHED EXECUTION MODELS
+# What agents execute (rule packs, process models, query tools). Each traces to
+# a domain rule/process, is grounded in a collection, is subject to CTL-006 and
+# has an approved risk assessment. Standard: docs/standards/08-semantic-fabric.md
+# -----------------------------------------------------------------------------
+
+<{{ base_iri }}domain/{{ namespace_path }}/governance/execution-models/>
+    a owl:Ontology ;
+    rdfs:label "{{ domain_name }} - execution models"@en ;
+    dct:abstract "Rule packs, process models and query tools published by {{ domain_name }} for AI agents."@en ;
+    owl:versionIRI <{{ base_iri }}domain/{{ namespace_path }}/governance/execution-models/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# ---- Query tool: files are named after the tool (execution-models/{queries,schemas}/<toolName>.*)
+
+{{ prefix }}-m:LookupTool a ent-fab:QueryTool ;
+    rdfs:label "{{ seed_class_label }} lookup tool"@en ;
+    skos:definition "Returns a {{ seed_class_label }} and the business rules that govern it, by reference code."@en ;
+    ent-fab:toolName "{{ registry_code | replace('-', '_') }}_{{ module_name }}_lookup" ;
+    ent-fab:artifactPath "execution-models/queries/{{ registry_code | replace('-', '_') }}_{{ module_name }}_lookup.rq" ;
+    ent-fab:inputSchemaPath "execution-models/schemas/{{ registry_code | replace('-', '_') }}_{{ module_name }}_lookup.schema.json" ;
+    ent-fab:derivedFromRule {{ prefix }}-rule:ReferenceCodeRule ;
+    ent-fab:groundedIn {{ prefix }}-m:Collection ;
+    ent-fab:subjectToControl ent-ctl:CTL-006 , ent-ctl:CTL-002 ;
+    ent-fab:hasRiskAssessment {{ prefix }}-m:LookupToolRiskAssessment ;
+    ent-av:agentGuidance "Use to fetch governed facts; quote rule statements from the result rather than paraphrasing."@en .
+
+{{ prefix }}-m:LookupToolRiskAssessment a ent-ctl:RiskAssessment ;
+    rdfs:label "AI risk assessment - {{ seed_class_label }} lookup tool"@en ;
+    ent-ctl:assesses {{ prefix }}-m:LookupTool ;
+    ent-ctl:identifiedRisk ent-ctl:RSK-001 ;
+    ent-ctl:residualRiskRating ent-ctl:Low ;
+    ent-ctl:approvedBy {{ prefix }}-m:AIRiskApprover ;
+    ent-ctl:assessmentDate "{{ created }}"^^xsd:date .
+
+# ---- Rule pack: domain rules evaluated on agent inputs/outputs at runtime (CTL-005)
+#      file: execution-models/rulepacks/<toolName>.yaml
+
+{{ prefix }}-m:RulePack a ent-fab:RulePack ;
+    rdfs:label "{{ domain_name }} rule pack"@en ;
+    skos:definition "Runtime check of agent-proposed {{ seed_class_label }} data against the domain's business rules, before it is saved or delivered."@en ;
+    ent-fab:toolName "{{ registry_code | replace('-', '_') }}_{{ module_name }}_rulepack" ;
+    ent-fab:artifactPath "execution-models/rulepacks/{{ registry_code | replace('-', '_') }}_{{ module_name }}_rulepack.yaml" ;
+    ent-fab:derivedFromRule {{ prefix }}-rule:ReferenceCodeRule ;
+    ent-fab:implementsProcess {{ prefix }}-proc:Maintain{{ seed_class }} ;
+    ent-fab:groundedIn {{ prefix }}-m:Collection ;
+    ent-fab:subjectToControl ent-ctl:CTL-005 , ent-ctl:CTL-006 ;
+    ent-fab:hasRiskAssessment {{ prefix }}-m:RulePackRiskAssessment ;
+    ent-av:agentGuidance "Call before saving or delivering any {{ seed_class_label }} an agent has produced; on a violation, do not proceed."@en .
+
+{{ prefix }}-m:RulePackRiskAssessment a ent-ctl:RiskAssessment ;
+    rdfs:label "AI risk assessment - {{ domain_name }} rule pack"@en ;
+    ent-ctl:assesses {{ prefix }}-m:RulePack ;
+    ent-ctl:identifiedRisk ent-ctl:RSK-005 ;
+    ent-ctl:residualRiskRating ent-ctl:Low ;
+    ent-ctl:approvedBy {{ prefix }}-m:AIRiskApprover ;
+    ent-ctl:assessmentDate "{{ created }}"^^xsd:date .

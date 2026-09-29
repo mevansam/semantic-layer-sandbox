@@ -14,21 +14,21 @@ If they disagree, the statement is right and the shape is a defect.
 ## Required metadata
 
 ```turtle
-sdp-rule:AdviceBoundaryRule
+ia-rule:AdviceBoundaryRule
     a sh:NodeShape , ent-gov:BusinessRule ;
-    ent-av:ruleIdentifier "SDP-R-001" ;
+    ent-av:ruleIdentifier "IA-R-001" ;
     ent-av:ruleStatement  "A self-directed insight must not recommend buying or selling a specific security." ;
     ent-av:policySource   "Retail advice boundary policy RP-ADV-004 (placeholder)" ;
-    ent-gov:hasRuleOwner  sdp-m:RuleOwnerRole ;
+    ent-gov:hasRuleOwner  ia-m:RuleOwnerRole ;
     ent-av:governedBy     ent-tax:products-and-services.personalized-planning-and-guidance-services ;
-    sh:targetClass sdp:SelfDirectedInsight ;
+    sh:targetClass ia:SelfDirectedInsight ;
     sh:message "…" ;
     … .
 ```
 
 ## Conventions
 
-- **One rule, one shape, one identifier** (`{DOMAIN}-R-{nnn}`). Don't bundle unrelated constraints into one shape.
+- **One rule, one shape, one identifier** (`{PREFIX}-R-{nnn}`, numbered per sub-domain, e.g. `PG-R-001`, `IA-R-001`). Don't bundle unrelated constraints into one shape.
 - Use core SHACL first. Use SHACL-SPARQL (`sh:sparql`) only when core SHACL cannot express the rule, and explain why in `skos:editorialNote`.
 - Reuse fabric shapes (`fabric/reusable-assets/`) with `sh:node` instead of rewriting them.
 - Every rule has at least one **negative test case**: an example that must violate it, listed in `tests/negative/expectations.yaml`.

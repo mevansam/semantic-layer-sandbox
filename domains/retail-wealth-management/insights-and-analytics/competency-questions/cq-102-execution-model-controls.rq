@@ -1,0 +1,15 @@
+PREFIX ent-fab: <https://ontology.example.com/fabric/model/>
+PREFIX ent-ctl: <https://ontology.example.com/governance/controls/>
+PREFIX ent-gov: <https://ontology.example.com/governance/model/>
+PREFIX ent-av:  <https://ontology.example.com/governance/annotations/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?tool ?ruleId ?control ?residualRisk ?approvedBy WHERE {
+  ?m ent-fab:toolName ?tool ; ent-fab:derivedFromRule ?rule ; ent-fab:subjectToControl ?c ;
+     ent-fab:hasRiskAssessment ?ra .
+  ?rule ent-av:ruleIdentifier ?ruleId .
+  FILTER(?ruleId = "IA-R-001")
+  ?c rdfs:label ?control .
+  ?ra ent-ctl:residualRiskRating/skos:prefLabel ?residualRisk ; ent-ctl:approvedBy/ent-gov:heldBy ?approvedBy .
+}
+ORDER BY ?control

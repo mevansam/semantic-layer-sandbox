@@ -1,0 +1,39 @@
+@prefix dcat:            <http://www.w3.org/ns/dcat#> .
+@prefix dct:             <http://purl.org/dc/terms/> .
+@prefix dprod:           <https://ekgf.github.io/dprod/> .
+@prefix ent-av:          <https://ontology.example.com/governance/annotations/> .
+@prefix ent-ctl:         <https://ontology.example.com/governance/controls/> .
+@prefix ent-gov:         <https://ontology.example.com/governance/model/> .
+@prefix ent-ra:          <https://ontology.example.com/fabric/assets/> .
+@prefix ent-tax:         <https://ontology.example.com/taxonomy/> .
+@prefix fa:              <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/assessments/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix ia:              <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> .
+@prefix ia-data:         <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/stewardship/> .
+@prefix ia-m:            <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/governance/> .
+@prefix ia-rule:         <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/rules/> .
+@prefix owl:             <http://www.w3.org/2002/07/owl#> .
+@prefix pg:              <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/stewardship/>
+    a owl:Ontology ;
+    rdfs:label "Insights and Analytics - data stewardship"@en ;
+    dct:abstract "Data products and critical data elements for financial health scores and self-directed insights."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/stewardship/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+ia-data:PlanningInsights a dcat:Dataset , dprod:DataProduct ;
+    rdfs:label "planning insights and scores"@en ;
+    dct:description "Goal projections, financial health scores and self-directed insights produced for retail customers."@en ;
+    ent-gov:servesConcept pg:GoalProjection , fa:FinancialHealthScore , ia:SelfDirectedInsight ;
+    ent-gov:hasDataSteward ia-m:DataStewardRole ;
+    ent-av:sensitivity ent-ctl:RestrictedPersonal ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics .
+
+ia-data:HealthScoreValue a ent-gov:CriticalDataElement ;
+    rdfs:label "financial health score value"@en ;
+    ent-gov:elementOf ent-ra:scoreValue ;
+    ent-gov:hasDataSteward ia-m:DataStewardRole ;
+    ent-gov:hasQualityRule ia-rule:HealthScoreRule .

@@ -1,0 +1,7 @@
+id: CQ-001
+question: Which business rules govern a financial goal, and who owns them?
+query: cq-001-rules-and-owners.rq
+expect:
+  min_rows: 1
+  contains:
+    ruleId: PG-R-

@@ -17,13 +17,15 @@ Owner: Semantic review board. Enforced by: `shapes/meta-common.ttl`, `shapes/met
 | Semantic fabric | `{base}fabric/{module}/` | `…/fabric/model/` |
 | Taxonomy | `{base}taxonomy/{path}` | `…/taxonomy/customers.customer-profile` |
 | Capability map | `{base}capability/{path}` | `…/capability/investment-management.portfolio-management` |
-| Ontology / business domains | `{base}capability/ontology-domain/{od}`, `{base}capability/domain/{od}/{domain}` | `…/capability/domain/planning-and-guidance/financial-plan-management` |
+| Ontology / business domains / sub-domains (capability map) | `{base}capability/ontology-domain/{od}`, `{base}capability/domain/{od}/{domain}[/{sub-domain}]` | `…/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance` |
 | Enterprise FIBO extensions | `{base}fibo-ext/{module}/` | `…/fibo-ext/core/` |
-| Domain modules | `{base}domain/{ontology-domain}/{business-domain}/{module}/` | `…/domain/planning-and-guidance/financial-plan-management/planning/` |
-| Ontology-domain umbrella | `{base}domain/{ontology-domain}/` | `…/domain/planning-and-guidance/` |
+| Sub-domain modules | `{base}domain/{business-domain}/{sub-domain}/{module}/` (= folder `domains/{business-domain}/{sub-domain}`) | `…/domain/retail-wealth-management/planning-and-guidance/planning/` |
+| Business-domain umbrella | `{base}domain/{business-domain}/` (= `domains/{business-domain}/domain.ttl`) | `…/domain/retail-wealth-management/` |
+| Ontology-domain umbrella | `{base}ontology-domain/{ontology-domain}/` | `…/ontology-domain/investment-servicing/` |
 | Knowledge-graph named graphs | `{base}graph/{publisher}/{collection}/v{semver}/{partition}` | see standard 08 |
 
 - `{base}` is set once in `semantic.yaml` (`https://ontology.example.com/`, a neutral placeholder) and changed with `semtool rebase --to … --all`.
+- IRIs follow the folder layout, not the capability map's ontology domains (ADR-0005), so re-grouping the map never changes IRIs. The ontology domain is recorded as metadata.
 - Domain namespaces are **reserved** in `fibo-extensions/registry/domain-registry.ttl`. CI rejects IRIs minted outside the registered namespace (rule E2).
 - IRIs are opaque and permanent. A renamed concept keeps its IRI; if the meaning changes, deprecate it with `owl:deprecated true` and `dct:isReplacedBy`.
 

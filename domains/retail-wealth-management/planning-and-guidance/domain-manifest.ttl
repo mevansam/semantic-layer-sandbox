@@ -1,0 +1,82 @@
+@prefix pg-m: <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/governance/> .
+@prefix ent-gov: <https://ontology.example.com/governance/model/> .
+@prefix ent-tax: <https://ontology.example.com/taxonomy/> .
+@prefix ent-cap: <https://ontology.example.com/capability/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# DOMAIN MANIFEST - Planning and Guidance
+#
+# The machine-readable statement of what this domain is accountable for and
+# who holds each accountability. CI validates it (ent-ms:DomainManifestShape)
+# and generates CODEOWNERS from it. Keep role holders current.
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/governance/>
+    a owl:Ontology ;
+    rdfs:label "Planning and Guidance - domain governance"@en ;
+    dct:abstract "Domain manifest, accountable roles, knowledge collections and execution models of the Planning and Guidance business domain."@en ;
+    owl:imports <https://ontology.example.com/governance/model/> ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/governance/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+pg-m:Manifest a ent-gov:DomainManifest ;
+    rdfs:label "Planning and Guidance domain manifest"@en ;
+    ent-gov:describesDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance> ;
+    ent-gov:namespace "https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/"^^xsd:anyURI ;
+    ent-gov:codeRepository "https://github.com/example-org/semantic-layer-sandbox"^^xsd:anyURI ;
+    ent-gov:hasOntologyModule <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> ;
+    ent-gov:anchoredTo ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans ;
+    ent-gov:anchoredTo ent-tax:products-and-services.planning-and-guidance-services ;
+    ent-gov:realizesCapability ent-cap:financial-planning.goal-based-planning ;
+    ent-gov:realizesCapability ent-cap:financial-planning.retirement-income-projection ;
+    ent-gov:hasDomainOwner pg-m:DomainOwnerRole ;
+    ent-gov:hasRuleOwner pg-m:RuleOwnerRole ;
+    ent-gov:hasApiOwner pg-m:ApiOwnerRole ;
+    ent-gov:hasDataSteward pg-m:DataStewardRole ;
+    ent-gov:hasRecordsOwner pg-m:RecordsOwnerRole ;
+    dct:created "2026-09-29"^^xsd:date .
+
+# ---- Accountable roles (MEANING, RULES, APIs, DATA, RECORDS) -------------------
+
+pg-m:DomainOwnerRole a ent-gov:DomainOwner ;
+    rdfs:label "Planning and Guidance domain owner"@en ;
+    ent-gov:accountableFor ent-gov:Meaning ;
+    ent-gov:heldBy "Head of Digital Financial Planning (placeholder)" ;
+    ent-gov:reviewTeam "@example-org/rwm-pg-domain-owners" .
+
+pg-m:RuleOwnerRole a ent-gov:RuleOwner ;
+    rdfs:label "Planning and Guidance rule owner"@en ;
+    ent-gov:accountableFor ent-gov:Rules ;
+    ent-gov:heldBy "Financial Planning Rules Lead (placeholder)" ;
+    ent-gov:reviewTeam "@example-org/rwm-pg-rule-owners" .
+
+pg-m:ApiOwnerRole a ent-gov:ApiOwner ;
+    rdfs:label "Planning and Guidance API owner"@en ;
+    ent-gov:accountableFor ent-gov:Apis ;
+    ent-gov:heldBy "Planning Platform Product Owner (placeholder)" ;
+    ent-gov:reviewTeam "@example-org/rwm-pg-api-owners" .
+
+pg-m:DataStewardRole a ent-gov:DataSteward ;
+    rdfs:label "Planning and Guidance data steward"@en ;
+    ent-gov:accountableFor ent-gov:Data ;
+    ent-gov:heldBy "Planning Data Steward (placeholder)" ;
+    ent-gov:reviewTeam "@example-org/rwm-pg-data-stewards" .
+
+pg-m:RecordsOwnerRole a ent-gov:RecordsOwner ;
+    rdfs:label "Planning and Guidance records owner"@en ;
+    ent-gov:accountableFor ent-gov:Records ;
+    ent-gov:heldBy "Wealth Records Manager (placeholder)" ;
+    ent-gov:reviewTeam "@example-org/rwm-records" .
+
+# Enterprise role referenced by this domain's risk assessments (approver, not owner)
+pg-m:AIRiskApprover a ent-gov:AIRiskOwner ;
+    rdfs:label "AI risk approver for Planning and Guidance"@en ;
+    ent-gov:accountableFor ent-gov:AIRiskAndControls ;
+    ent-gov:heldBy "AI Risk Office (placeholder)" ;
+    ent-gov:reviewTeam "@example-org/ai-risk-office" .

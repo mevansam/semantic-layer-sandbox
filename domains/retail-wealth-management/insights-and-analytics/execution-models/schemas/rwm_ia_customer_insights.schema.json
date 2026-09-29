@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "rwm_ia_customer_insights",
+  "description": "The authenticated customer's self-directed insights, with category, suggested action, related goal, model provenance and governing rule ids.",
+  "type": "object",
+  "required": ["customer"],
+  "properties": {
+    "customer": { "type": "string", "format": "iri", "description": "IRI of the authenticated customer (supplied by the runtime, never by the user)." }
+  },
+  "additionalProperties": false
+}

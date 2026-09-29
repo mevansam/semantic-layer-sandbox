@@ -1,0 +1,16 @@
+# Query tool: {{ registry_code | replace('-', '_') }}_{{ module_name }}_lookup
+# Input: $referenceCode (see ../schemas/{{ registry_code | replace('-', '_') }}_{{ module_name }}_lookup.schema.json). The agent runtime
+# binds inputs with VALUES; never string-concatenate user input into the query.
+PREFIX {{ prefix }}: <{{ base_iri }}domain/{{ namespace_path }}/{{ module_name }}/>
+PREFIX ent-av: <{{ base_iri }}governance/annotations/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+SELECT ?item ?referenceCode ?ruleId ?ruleStatement WHERE {
+  VALUES ?referenceCode { $referenceCode }
+  ?item a {{ prefix }}:{{ seed_class }} ;
+        {{ prefix }}:hasReferenceCode ?referenceCode .
+  OPTIONAL {
+    ?rule sh:targetClass {{ prefix }}:{{ seed_class }} ;
+          ent-av:ruleIdentifier ?ruleId ;
+          ent-av:ruleStatement ?ruleStatement .
+  }
+}

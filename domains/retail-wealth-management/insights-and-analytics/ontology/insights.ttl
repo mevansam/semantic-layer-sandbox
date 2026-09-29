@@ -1,0 +1,115 @@
+@prefix cmns-cls:          <https://www.omg.org/spec/Commons/Classifiers/> .
+@prefix dct:               <http://purl.org/dc/terms/> .
+@prefix ent-av:            <https://ontology.example.com/governance/annotations/> .
+@prefix ent-core:          <https://ontology.example.com/fibo-ext/core/> .
+@prefix ent-tax:           <https://ontology.example.com/taxonomy/> .
+@prefix fibo-fbc-fi-fi:    <https://spec.edmcouncil.org/fibo/ontology/FBC/FinancialInstruments/FinancialInstruments/> .
+@prefix fibo-fnd-arr-asmt: <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Assessments/> .
+@prefix fibo-fnd-utl-av:   <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix ia:                <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> .
+@prefix owl:               <http://www.w3.org/2002/07/owl#> .
+@prefix pg:                <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> .
+@prefix rdfs:              <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:              <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:               <http://www.w3.org/2001/XMLSchema#> .
+
+# Retail Wealth Management - Insights and Analytics: INSIGHTS module (published)
+# MEANING owned by the Insights and Analytics domain owner. Builds on the published
+# planning module of Planning and Guidance (extension point: dependencies).
+
+<https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/>
+    a owl:Ontology ;
+    rdfs:label "Insights and Analytics - insights"@en ;
+    dct:abstract "Self-directed planning insights, their categories and suggested actions, specializing FIBO. Builds on the planning module of Retail Wealth Management - Planning and Guidance."@en ;
+    owl:imports <https://ontology.example.com/fibo-ext/core/> ,
+        <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# =============================================================================
+# Insights  (financial health score: see assessments.ttl)
+# =============================================================================
+ia:PlanningInsight a owl:Class ;
+    rdfs:subClassOf fibo-fnd-arr-asmt:Opinion ;
+    rdfs:label "planning insight"@en ;
+    skos:definition "opinion, generated from a customer's goals, plans, projections or portfolio analytics, that draws the customer's attention to something relevant to their financial planning"@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics ;
+    ent-av:agentGuidance "Insights are generated content; always carry model provenance (IA-R-003) and retain them as records."@en .
+
+ia:SelfDirectedInsight a owl:Class ;
+    rdfs:subClassOf ia:PlanningInsight ;
+    rdfs:label "self-directed insight"@en ;
+    skos:definition "planning insight delivered on a self-directed basis, which educates or prompts the customer but does not recommend a specific transaction in a specific security"@en ;
+    ent-av:governedBy ent-tax:products-and-services.planning-and-guidance-services ;
+    ent-av:agentGuidance "Never phrase a self-directed insight as 'buy' or 'sell' a named security; that is personalized advice (IA-R-001, alignment ALN-002). Route such requests to the advised channel."@en .
+
+ia:insightFor a owl:ObjectProperty ;
+    rdfs:label "insight for"@en ;
+    skos:definition "relates a planning insight to the customer it is addressed to"@en ;
+    rdfs:domain ia:PlanningInsight ; rdfs:range ent-core:RetailCustomer ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics .
+
+ia:insightText a owl:DatatypeProperty ;
+    rdfs:label "insight text"@en ;
+    skos:definition "the customer-facing wording of a planning insight"@en ;
+    rdfs:domain ia:PlanningInsight ; rdfs:range xsd:string ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics .
+
+ia:relatesToGoal a owl:ObjectProperty ;
+    rdfs:label "relates to goal"@en ;
+    skos:definition "relates a planning insight to a goal it concerns"@en ;
+    rdfs:domain ia:PlanningInsight ; rdfs:range pg:FinancialGoal ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+ia:refersToSecurity a owl:ObjectProperty ;
+    rdfs:label "refers to security"@en ;
+    skos:definition "relates a planning insight to a specific security it mentions"@en ;
+    rdfs:domain ia:PlanningInsight ; rdfs:range fibo-fbc-fi-fi:Security ;
+    ent-av:governedBy ent-tax:securities.securities-reference .
+
+ia:InsightCategory a owl:Class ;
+    rdfs:subClassOf cmns-cls:Classifier ;
+    rdfs:label "insight category"@en ;
+    skos:definition "classifier that groups planning insights by the planning topic they address"@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics ;
+    ent-av:agentGuidance "Use categories to explain why an insight was shown."@en .
+
+ia:SavingsRate a owl:NamedIndividual , ia:InsightCategory ; rdfs:label "savings rate"@en ;
+    skos:definition "insights about how much the customer saves relative to their goals"@en .
+ia:RetirementReadiness a owl:NamedIndividual , ia:InsightCategory ; rdfs:label "retirement readiness"@en ;
+    skos:definition "insights about progress towards retirement goals"@en .
+ia:DiversificationEducation a owl:NamedIndividual , ia:InsightCategory ; rdfs:label "diversification education"@en ;
+    skos:definition "educational insights about diversification and asset allocation concepts"@en .
+ia:EmergencyFund a owl:NamedIndividual , ia:InsightCategory ; rdfs:label "emergency fund"@en ;
+    skos:definition "insights about cash reserves for unexpected expenses"@en .
+
+ia:hasInsightCategory a owl:ObjectProperty ;
+    rdfs:label "has insight category"@en ;
+    skos:definition "classifies a planning insight by topic"@en ;
+    rdfs:domain ia:PlanningInsight ; rdfs:range ia:InsightCategory ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics .
+
+ia:SuggestedAction a owl:Class ;
+    rdfs:subClassOf cmns-cls:Classifier ;
+    rdfs:label "suggested action"@en ;
+    skos:definition "classifier for the kind of action a planning insight prompts the customer to consider"@en ;
+    ent-av:governedBy ent-tax:products-and-services.planning-and-guidance-services ;
+    ent-av:agentGuidance "BuySecurity and SellSecurity are transaction recommendations and are never permitted in self-directed insights."@en .
+
+ia:IncreaseContributions a owl:NamedIndividual , ia:SuggestedAction ; rdfs:label "increase contributions"@en ;
+    skos:definition "consider saving more towards a goal"@en .
+ia:ReviewAllocation a owl:NamedIndividual , ia:SuggestedAction ; rdfs:label "review allocation"@en ;
+    skos:definition "consider reviewing asset allocation using educational tools"@en .
+ia:LearnMore a owl:NamedIndividual , ia:SuggestedAction ; rdfs:label "learn more"@en ;
+    skos:definition "read educational content on the topic"@en .
+ia:BuySecurity a owl:NamedIndividual , ia:SuggestedAction ; rdfs:label "buy security"@en ;
+    skos:definition "recommendation to purchase a specific security (advised channel only)"@en .
+ia:SellSecurity a owl:NamedIndividual , ia:SuggestedAction ; rdfs:label "sell security"@en ;
+    skos:definition "recommendation to sell a specific security (advised channel only)"@en .
+
+ia:suggestsAction a owl:ObjectProperty ;
+    rdfs:label "suggests action"@en ;
+    skos:definition "relates a planning insight to the kind of action it prompts the customer to consider"@en ;
+    rdfs:domain ia:PlanningInsight ; rdfs:range ia:SuggestedAction ;
+    ent-av:governedBy ent-tax:products-and-services.planning-and-guidance-services .

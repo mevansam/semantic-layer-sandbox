@@ -1,0 +1,19 @@
+# Runs from the monorepo root workflow (.github/workflows/semantic-ci.yml) as job
+# "template"; kept here for when domain-template lives in its own repository.
+name: template-test
+on: [pull_request, push]
+jobs:
+  generate-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: true }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "17" }
+      - run: |
+          pip install -r enterprise-semantic-governance/requirements.txt
+          bash fibo-extensions/scripts/fetch-omg-dependencies.sh
+          curl -sSL -o robot.jar https://github.com/ontodev/robot/releases/download/v1.9.10/robot.jar
+          ROBOT_JAR=$PWD/robot.jar make verify-template

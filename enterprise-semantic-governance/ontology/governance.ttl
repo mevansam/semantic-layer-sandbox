@@ -276,7 +276,7 @@ ent-gov:registersDomain a owl:ObjectProperty ; rdfs:label "registers domain"@en 
     skos:definition "The capability-map domain being registered."@en .
 ent-gov:domainCode a owl:DatatypeProperty ; rdfs:label "domain code"@en ;
     rdfs:domain ent-gov:DomainRegistration ;
-    skos:definition "Short stable code used in graph names and rule identifiers (e.g. pg-fpm)."@en .
+    skos:definition "Short stable code used in graph names and rule identifiers (e.g. rwm-pg)."@en .
 ent-gov:publishedModule a owl:ObjectProperty ; rdfs:label "published module"@en ;
     rdfs:domain ent-gov:DomainRegistration ; rdfs:range owl:Ontology ;
     skos:definition "An ontology module the domain publishes for import by other domains. Unpublished modules are private to the domain."@en .
@@ -312,3 +312,20 @@ ent-gov:TechnologyCapability a owl:Class ;
 
 ent-gov:capabilityStatus a owl:DatatypeProperty ; rdfs:label "capability status"@en ;
     skos:definition "Provenance of a capability or mapping: Authoritative (from the enterprise capability map) or Proposed (suggested by a domain, pending addition to the map)."@en .
+
+# =============================================================================
+# Business domains with sub-domains (ADR-0005)
+# =============================================================================
+
+ent-gov:ParentDomainManifest a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "parent domain manifest"@en ;
+    skos:definition "Declaration, held in a business domain's parent folder, of the business-domain owner and the sub-domains that make up the business domain. The business-domain owner settles overlaps between its own sub-domains before they reach enterprise alignment."@en .
+
+ent-gov:includesSubDomain a owl:ObjectProperty ; rdfs:label "includes sub-domain"@en ;
+    rdfs:domain ent-gov:ParentDomainManifest ; rdfs:range ent-gov:SubDomain ;
+    skos:definition "A sub-domain that is part of the business domain described by a parent manifest."@en .
+
+ent-gov:dependsOnSubDomain a owl:ObjectProperty ; rdfs:label "depends on sub-domain"@en ;
+    rdfs:domain ent-gov:DomainManifest ; rdfs:range ent-gov:SubDomain ;
+    skos:definition "A sub-domain whose published ontology modules this domain builds on (imports). Dependencies must not form cycles."@en .

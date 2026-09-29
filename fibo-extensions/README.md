@@ -18,7 +18,7 @@ The enterprise's governed use of FIBO, and the mechanism through which business 
 ```bash
 git submodule update --init --depth 1           # FIBO at the pinned tag
 bash scripts/fetch-omg-dependencies.sh          # OMG Commons + LCC (needs www.omg.org)
-python ../enterprise-semantic-governance/tools/semtool.py verify
+python enterprise-semantic-governance/tools/semtool.py verify --repo fibo-extensions   # from the repository root
 ```
 
 ## How extension works

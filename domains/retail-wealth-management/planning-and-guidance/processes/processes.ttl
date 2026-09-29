@@ -1,0 +1,70 @@
+@prefix ent-proc: <https://ontology.example.com/governance/process/> .
+@prefix ent-fab:  <https://ontology.example.com/fabric/model/> .
+@prefix ent-av:   <https://ontology.example.com/governance/annotations/> .
+@prefix ent-cap:  <https://ontology.example.com/capability/> .
+@prefix ent-tax:  <https://ontology.example.com/taxonomy/> .
+@prefix ent-core: <https://ontology.example.com/fibo-ext/core/> .
+@prefix fibo-fbc-pas-caa:  <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/ClientsAndAccounts/> .
+@prefix fibo-fbc-pas-fpas: <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/FinancialProductsAndServices/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix pg:      <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> .
+@prefix pg-proc: <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/processes/> .
+@prefix pg-rule: <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/rules/> .
+@prefix pg-api:  <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/apis/> .
+@prefix pg-rec:  <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/records/> .
+
+# -----------------------------------------------------------------------------
+# Planning and Guidance - PROCESSES (owned by the domain owner)
+# Hand-off: the goal projection produced by step 3 is consumed by Insights and
+# Analytics (ia-proc:InsightCycle), which declares the dependency.
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/processes/>
+    a owl:Ontology ;
+    rdfs:label "Planning and Guidance - processes"@en ;
+    dct:abstract "The goal planning cycle: goal capture, balance aggregation and goal projection."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/processes/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+pg-proc:GoalPlanningCycle a ent-proc:BusinessProcess ;
+    rdfs:label "goal planning cycle"@en ;
+    skos:definition "Process by which a retail customer sets goals and builds a self-directed plan, and the planning platform projects each goal under stated assumptions."@en ;
+    ent-av:realizesCapability ent-cap:financial-planning.goal-based-planning , ent-cap:financial-planning.retirement-income-projection ;
+    ent-av:governedBy ent-tax:products-and-services.planning-and-guidance-services ;
+    ent-proc:hasStep pg-proc:CaptureGoals , pg-proc:AggregateBalances , pg-proc:RunProjection .
+
+pg-proc:CaptureGoals a ent-proc:ProcessStep ;
+    rdfs:label "capture goals"@en ;
+    ent-proc:stepOrder 1 ;
+    ent-proc:performedBy ent-core:RetailCustomer ;
+    ent-proc:automationLevel ent-proc:CustomerSelfService ;
+    ent-proc:producesConcept pg:FinancialGoal , pg:SelfDirectedPlan ;
+    ent-proc:appliesRule pg-rule:GoalCompletenessRule ;
+    ent-proc:invokesApi pg-api:PlanningApi ;
+    ent-proc:createsRecord pg-rec:PlanRecord .
+
+pg-proc:AggregateBalances a ent-proc:ProcessStep ;
+    rdfs:label "aggregate balances and positions"@en ;
+    ent-proc:stepOrder 2 ;
+    ent-proc:precededBy pg-proc:CaptureGoals ;
+    ent-proc:performedBy "planning platform" ;
+    ent-proc:automationLevel ent-proc:SystemAutomated ;
+    ent-proc:usesConcept fibo-fbc-pas-caa:Account , fibo-fbc-pas-fpas:Holding .
+
+pg-proc:RunProjection a ent-proc:ProcessStep ;
+    rdfs:label "run goal projection"@en ;
+    ent-proc:stepOrder 3 ;
+    ent-proc:precededBy pg-proc:AggregateBalances ;
+    ent-proc:performedBy <https://ontology.example.com/capability/domain/investment-servicing/calculator-management> ;
+    skos:editorialNote "Projection calculations are provided by Calculator Management (Investment Servicing); this sub-domain owns the scenarios, assumptions and resulting projections."@en ;
+    ent-proc:automationLevel ent-proc:SystemAutomated ;
+    ent-proc:usesConcept pg:PlanningScenario , pg:LifeExpectancyAssumption , ent-core:MortalityTable ;
+    ent-proc:producesConcept pg:GoalProjection ;
+    ent-proc:appliesRule pg-rule:LifeExpectancyProvenanceRule , pg-rule:RetirementScenarioRule , pg-rule:ProjectionValidityRule ;
+    ent-proc:invokesApi pg-api:PlanningApi ;
+    ent-proc:createsRecord pg-rec:PlanRecord .

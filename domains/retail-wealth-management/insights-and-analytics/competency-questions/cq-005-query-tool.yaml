@@ -1,0 +1,10 @@
+id: CQ-005
+question: "Query tool rwm_ia_customer_insights: which insights has customer 001 received, and under which rules?"
+query: ../execution-models/queries/rwm_ia_customer_insights.rq
+bindings:
+  customer: "<https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/examples/customer-001>"
+expect:
+  min_rows: 2
+  contains:
+    governingRules: IA-R-001
+    goalReference: G-0001

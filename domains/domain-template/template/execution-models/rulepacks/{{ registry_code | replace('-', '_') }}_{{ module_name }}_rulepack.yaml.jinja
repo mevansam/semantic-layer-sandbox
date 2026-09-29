@@ -1,0 +1,21 @@
+# Rule pack: {{ registry_code | replace('-', '_') }}_{{ module_name }}_rulepack
+# Evaluated by the agent runtime against the RDF an agent proposes, BEFORE it is
+# saved or delivered (control CTL-005). The pack references the domain-owned SHACL
+# shapes; it never copies them.
+name: {{ registry_code | replace('-', '_') }}_{{ module_name }}_rulepack
+version: 0.1.0
+source_rules:
+  - file: rules/business-rules.ttl
+    shapes:
+      - {{ base_iri }}domain/{{ namespace_path }}/rules/ReferenceCodeRule   # {{ rule_prefix }}-R-000
+reusable_shapes:
+  - enterprise-semantic-governance/fabric/reusable-assets/common-shapes.ttl
+input:
+  graph: proposed {{ seed_class_label }} data as RDF using the {{ module_name }} ontology
+on_violation:
+  action: block
+  route_to: human review
+tests:
+  must_pass: examples/example-data.ttl
+  must_fail:
+    - tests/negative/nc-000-missing-reference-code.ttl   # {{ rule_prefix }}-R-000

@@ -1,0 +1,7 @@
+id: CQ-001
+question: Which business rules govern a self-directed insight, what do they say, and who owns them?
+query: cq-001-rules-and-owners.rq
+expect:
+  min_rows: 2
+  contains:
+    ruleId: IA-R-001

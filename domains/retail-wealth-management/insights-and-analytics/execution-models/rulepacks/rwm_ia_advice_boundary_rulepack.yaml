@@ -1,0 +1,23 @@
+# Rule pack: rwm_ia_advice_boundary_rulepack
+# Evaluated by the agent runtime against the RDF of every insight an agent proposes
+# for a self-directed customer, BEFORE delivery (control CTL-005).
+name: rwm_ia_advice_boundary_rulepack
+version: 0.1.0
+source_rules:            # the domain-owned SHACL shapes this pack executes (never copied)
+  - file: rules/business-rules.ttl
+    shapes:
+      - https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/rules/AdviceBoundaryRule        # IA-R-001
+      - https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/rules/InsightTraceabilityRule   # IA-R-003
+reusable_shapes:
+  - enterprise-semantic-governance/fabric/reusable-assets/common-shapes.ttl
+input:
+  graph: proposed insight(s) as RDF using the planning ontology
+on_violation:
+  action: block_delivery
+  route_to: advised channel hand-off
+  record: create InsightRecord with rule-pack result (CTL-008)
+tests:
+  must_pass: examples/example-data.ttl
+  must_fail:
+    - tests/negative/nc-001-buy-recommendation.ttl        # IA-R-001
+    - tests/negative/nc-003-insight-without-provenance.ttl # IA-R-003

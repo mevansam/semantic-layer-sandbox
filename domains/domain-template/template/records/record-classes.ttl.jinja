@@ -1,0 +1,38 @@
+@prefix {{ prefix }}:     <{{ base_iri }}domain/{{ namespace_path }}/{{ module_name }}/> .
+@prefix {{ prefix }}-rec: <{{ base_iri }}domain/{{ namespace_path }}/records/> .
+@prefix {{ prefix }}-m:   <{{ base_iri }}domain/{{ namespace_path }}/governance/> .
+@prefix ent-gov: <{{ base_iri }}governance/model/> .
+@prefix ent-av:  <{{ base_iri }}governance/annotations/> .
+@prefix ent-tax: <{{ base_iri }}taxonomy/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# {{ domain_name }} - RECORD KEEPING (owned by the records owner)
+# Regulatory citations below are PLACEHOLDERS to be confirmed with Legal &
+# Compliance before this module moves to Release maturity.
+# -----------------------------------------------------------------------------
+
+<{{ base_iri }}domain/{{ namespace_path }}/records/>
+    a owl:Ontology ;
+    rdfs:label "{{ domain_name }} - record classes"@en ;
+    dct:abstract "Record classes created by the {{ domain_name }} business domain with retention, disposition and legal hold."@en ;
+    owl:versionIRI <{{ base_iri }}domain/{{ namespace_path }}/records/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+{{ prefix }}-rec:{{ seed_class }}Record a ent-gov:RecordClass ;
+    rdfs:label "{{ seed_class_label }} record"@en ;
+    skos:definition "Placeholder record class for {{ seed_class_label }} data."@en ;
+    ent-gov:recordOf {{ prefix }}:{{ seed_class }} ;
+    ent-gov:retentionPeriod "P6Y"^^xsd:duration ;
+    ent-gov:retentionTrigger "creation of the record" ;
+    ent-gov:legalHoldApplicable true ;
+    ent-gov:dispositionMethod "secure deletion" ;
+    ent-gov:hasRecordsOwner {{ prefix }}-m:RecordsOwnerRole ;
+    ent-av:regulatoryCitation "PLACEHOLDER - confirm with Records / Legal" ;
+    ent-av:governedBy ent-tax:legal-risk-compliance-and-surveillance.enterprise-risk.content-retention-and-management .

@@ -1,0 +1,75 @@
+@prefix ent-proc: <https://ontology.example.com/governance/process/> .
+@prefix ent-fab:  <https://ontology.example.com/fabric/model/> .
+@prefix ent-av:   <https://ontology.example.com/governance/annotations/> .
+@prefix ent-cap:  <https://ontology.example.com/capability/> .
+@prefix ent-tax:  <https://ontology.example.com/taxonomy/> .
+@prefix ent-core: <https://ontology.example.com/fibo-ext/core/> .
+@prefix fibo-fbc-pas-caa:  <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/ClientsAndAccounts/> .
+@prefix fibo-fbc-pas-fpas: <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/FinancialProductsAndServices/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix pg:      <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> .
+@prefix pg-proc: <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/processes/> .
+@prefix fa:      <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/assessments/> .
+@prefix ia:      <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> .
+@prefix ia-proc: <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/processes/> .
+@prefix ia-rule: <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/rules/> .
+@prefix ia-api:  <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/apis/> .
+@prefix ia-rec:  <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/records/> .
+
+# -----------------------------------------------------------------------------
+# Insights and Analytics - PROCESSES (owned by the domain owner)
+# Starts where Planning and Guidance's goal planning cycle ends (hand-off:
+# pg:GoalProjection). Step 2 is the only agent-assisted step in Retail Wealth
+# Management; its output must pass the advice-boundary rule pack before step 3.
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/processes/>
+    a owl:Ontology ;
+    rdfs:label "Insights and Analytics - processes"@en ;
+    dct:abstract "The insight cycle: financial health scoring, agent-assisted insight generation, and delivery and retention of insights."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/processes/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+ia-proc:InsightCycle a ent-proc:BusinessProcess ;
+    rdfs:label "insight cycle"@en ;
+    skos:definition "Process by which a retail customer receives a financial health score and self-directed insights about their plan, without personalized advice."@en ;
+    ent-av:realizesCapability ent-cap:financial-planning.planning-insights-and-analytics ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics ;
+    ent-av:agentGuidance "An agent may only perform step 2 (generate insights), and its output must pass rwm_ia_advice_boundary_rulepack before step 3."@en ;
+    ent-proc:hasStep ia-proc:ScoreFinancialHealth , ia-proc:GenerateInsights , ia-proc:DeliverAndRetainInsight .
+
+ia-proc:ScoreFinancialHealth a ent-proc:ProcessStep ;
+    rdfs:label "score financial health"@en ;
+    ent-proc:stepOrder 1 ;
+    ent-proc:precededBy <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/processes/RunProjection> ;
+    skos:editorialNote "Cross-sub-domain hand-off: starts after Planning and Guidance has projected the customer's goals."@en ;
+    ent-proc:performedBy "financial health model (Financial Assessments)" ;
+    ent-proc:automationLevel ent-proc:SystemAutomated ;
+    ent-proc:usesConcept pg:GoalProjection ;
+    ent-proc:producesConcept fa:FinancialHealthScore ;
+    ent-proc:appliesRule ia-rule:HealthScoreRule .
+
+ia-proc:GenerateInsights a ent-proc:ProcessStep ;
+    rdfs:label "generate self-directed insights"@en ;
+    ent-proc:stepOrder 2 ;
+    ent-proc:precededBy ia-proc:ScoreFinancialHealth ;
+    ent-proc:performedBy ent-fab:CustomerFacingAgent ;
+    ent-proc:automationLevel ent-proc:AgentAssisted ;
+    ent-proc:usesConcept pg:GoalProjection , fa:FinancialHealthScore ;
+    ent-proc:producesConcept ia:SelfDirectedInsight ;
+    ent-proc:appliesRule ia-rule:AdviceBoundaryRule , ia-rule:InsightTraceabilityRule .
+
+ia-proc:DeliverAndRetainInsight a ent-proc:ProcessStep ;
+    rdfs:label "deliver and retain insight"@en ;
+    ent-proc:stepOrder 3 ;
+    ent-proc:precededBy ia-proc:GenerateInsights ;
+    ent-proc:performedBy "insights service" ;
+    ent-proc:automationLevel ent-proc:SystemAutomated ;
+    ent-proc:humanApprovalRequired false ;
+    ent-proc:invokesApi ia-api:InsightsApi ;
+    ent-proc:createsRecord ia-rec:InsightRecord .

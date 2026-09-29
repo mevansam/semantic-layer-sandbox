@@ -6,7 +6,7 @@
 #
 # Principle: the template's files are EDITED IN PLACE, never renamed or replaced.
 # Domains ADD files only where a pattern below allows it.
-version: 0.2.0
+version: 0.3.0
 
 # Files every domain repo must have (paths as generated from the template).
 required_files:
@@ -50,6 +50,9 @@ folders:
   examples:                     ['^[a-z][a-z0-9-]*\.ttl$']
   tests/negative:               ['^expectations\.yaml$', '^nc-[0-9]{3}-[a-z0-9-]+\.ttl$']
   docs:                         ['^[a-z0-9][a-z0-9-]*\.md$']
+
+# Folders that may be absent (e.g. a sub-domain without rule packs).
+optional_folders: [execution-models/rulepacks, execution-models/queries, execution-models/schemas]
 
 # Top-level entries allowed besides the folders above.
 top_level: [.copier-answers.yml, .github, .gitignore, CODEOWNERS, README.md, semantic.yaml,

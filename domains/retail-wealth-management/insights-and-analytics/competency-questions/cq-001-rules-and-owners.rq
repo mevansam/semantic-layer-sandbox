@@ -1,0 +1,15 @@
+PREFIX ia: <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/>
+PREFIX ent-av:  <https://ontology.example.com/governance/annotations/>
+PREFIX ent-gov: <https://ontology.example.com/governance/model/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+# Rules targeting SelfDirectedInsight or any of its superclasses
+SELECT DISTINCT ?ruleId ?statement ?owner ?policy WHERE {
+  ia:SelfDirectedInsight rdfs:subClassOf* ?cls .
+  ?rule sh:targetClass ?cls ;
+        ent-av:ruleIdentifier ?ruleId ;
+        ent-av:ruleStatement ?statement ;
+        ent-av:policySource ?policy ;
+        ent-gov:hasRuleOwner/ent-gov:heldBy ?owner .
+}
+ORDER BY ?ruleId

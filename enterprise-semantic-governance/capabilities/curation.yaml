@@ -29,22 +29,33 @@ suspicious_placements:
   "Finance, Accounting, & Procurement": "corporate finance is not an employee-operations concern"
   "Product & Services": "only mapped to benefits capabilities, which belong to Benefits Management"
 
-# Rule 4 - Capabilities proposed by domains that have no capabilities in the source map.
+# Rule 4 - Sub-domains. The source map stops at business domains; sub-domains are defined
+# here (ADR-0005). Each becomes an ent-gov:SubDomain of its parent business domain, in the
+# parent's ontology domain. Refer to a sub-domain elsewhere as "Parent > Sub-domain".
+sub_domains:
+  Retail Wealth Management:
+    - name: Planning and Guidance
+      slug: planning-and-guidance
+      note: "Name coincides with the capability map's ontology domain 'Planning and Guidance'; they are different things (this is a sub-domain of Retail Wealth Management)."
+    - name: Insights and Analytics
+      slug: insights-and-analytics
+
+# Rule 5 - Capabilities proposed for domains / sub-domains that have none in the source map.
 # Imported with capabilityStatus "Proposed" and an editorial note; to be added to the
 # authoritative map by its owners (then removed from here).
 proposed_capabilities:
   - path: Financial Planning
-    domain: Financial Plan Management
-    description: Helping retail customers set, plan for and track financial goals.
+    domain: Retail Wealth Management
+    description: Helping retail customers set, plan for and track financial goals, and understand how they are doing.
   - path: Financial Planning > Goal-Based Planning
-    domain: Financial Plan Management
+    domain: Retail Wealth Management > Planning and Guidance
     description: Customers define financial goals and build self-directed plans to reach them.
   - path: Financial Planning > Retirement Income Projection
-    domain: Financial Plan Management
+    domain: Retail Wealth Management > Planning and Guidance
     description: Projecting goal and retirement outcomes from balances, contributions and planning assumptions.
   - path: Financial Planning > Planning Insights & Analytics
-    domain: Financial Plan Management
-    description: Generating educational, non-personalized insights from a customer's plan and portfolio.
+    domain: Retail Wealth Management > Insights and Analytics
+    description: Generating educational, non-personalized insights and health scores from a customer's plan and portfolio.
   - path: Financial Assessment
     domain: Financial Assessments
     description: Assessing a customer's financial situation.

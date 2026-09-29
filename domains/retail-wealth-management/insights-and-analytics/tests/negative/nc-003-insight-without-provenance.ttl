@@ -1,0 +1,10 @@
+@prefix ent-core: <https://ontology.example.com/fibo-ext/core/> .
+@prefix ia:       <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> .
+@prefix ia-ex:    <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/examples/> .
+
+# NEGATIVE (IA-R-003): generated insight with no model provenance and no category.
+ia-ex:bad-insight-untraceable a ia:SelfDirectedInsight ;
+    ent-core:hasDeliveryModel ent-core:SelfDirected ;
+    ia:insightFor ia-ex:customer-001 ;
+    ia:suggestsAction ia:LearnMore ;
+    ia:insightText "Here is something you might find useful about emergency savings." .

@@ -1,0 +1,18 @@
+# Parent layer of a business domain with sub-domains (ADR-0005).
+repo_kind: business-domain
+governance: ../../enterprise-semantic-governance
+fibo_extensions: ../../fibo-extensions
+
+domain:
+  name: "Retail Wealth Management"
+  ontology_domain: "Investment Servicing"
+  code: rwm
+  namespace: https://ontology.example.com/domain/retail-wealth-management/
+
+paths:
+  ontology: [domain.ttl]
+
+# Sub-domain folders (kept last; new_domain.py appends to it)
+sub_domains:
+  - planning-and-guidance
+  - insights-and-analytics

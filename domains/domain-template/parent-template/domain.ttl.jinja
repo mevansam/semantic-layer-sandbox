@@ -1,0 +1,43 @@
+@prefix {{ parent_registry_code }}-p: <{{ base_iri }}domain/{{ parent_domain_slug }}/> .
+@prefix ent-gov: <{{ base_iri }}governance/model/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# {{ parent_domain_name }} - PARENT LAYER (business domain with sub-domains)
+#
+# Extension points at business-domain level:
+#   1. UMBRELLA  - imports each sub-domain's PUBLISHED module. `semtool verify`
+#                  reasons over it, so the sub-domains are checked to cohere
+#                  with each other and with FIBO.
+#   2. MANIFEST  - the business-domain owner and the sub-domains it includes.
+#                  Overlaps between sub-domains are settled here, before they
+#                  need an enterprise alignment decision.
+# Add a sub-domain: domains/domain-template/scripts/new_domain.py, then add it
+# to ent-gov:includesSubDomain and (once published) to owl:imports below.
+# -----------------------------------------------------------------------------
+
+<{{ base_iri }}domain/{{ parent_domain_slug }}/>
+    a owl:Ontology ;
+    rdfs:label "{{ parent_domain_name }}"@en ;
+    dct:abstract "Umbrella ontology of the {{ parent_domain_name }} business domain ({{ ontology_domain_name }} ontology domain): imports the published modules of its sub-domains."@en ;
+    owl:imports <{{ base_iri }}domain/{{ namespace_path }}/{{ module_name }}/> ;
+    owl:versionIRI <{{ base_iri }}domain/{{ parent_domain_slug }}/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+{{ parent_registry_code }}-p:ParentManifest a ent-gov:ParentDomainManifest ;
+    rdfs:label "{{ parent_domain_name }} parent manifest"@en ;
+    ent-gov:describesDomain <{{ capability_domain_iri.rsplit('/', 1)[0] }}> ;
+    ent-gov:namespace "{{ base_iri }}domain/{{ parent_domain_slug }}/"^^xsd:anyURI ;
+    ent-gov:hasDomainOwner {{ parent_registry_code }}-p:DomainOwnerRole ;
+    ent-gov:includesSubDomain <{{ capability_domain_iri }}> .
+
+{{ parent_registry_code }}-p:DomainOwnerRole a ent-gov:DomainOwner ;
+    rdfs:label "{{ parent_domain_name }} business-domain owner"@en ;
+    ent-gov:accountableFor ent-gov:Meaning ;
+    ent-gov:heldBy "{{ parent_domain_owner }}" ;
+    ent-gov:reviewTeam "{{ parent_domain_owner_team }}" .

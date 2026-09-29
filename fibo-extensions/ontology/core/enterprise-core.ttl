@@ -27,8 +27,8 @@
     dct:abstract "Enterprise-wide specializations of FIBO shared across business domains, each with a single owning domain."@en ;
     owl:imports <https://ontology.example.com/fibo-ext/profile/> ,
                 <https://ontology.example.com/governance/annotations/> ;
-    owl:versionIRI <https://ontology.example.com/fibo-ext/core/0.2.0/> ;
-    owl:versionInfo "0.2.0" ;
+    owl:versionIRI <https://ontology.example.com/fibo-ext/core/0.3.0/> ;
+    owl:versionInfo "0.3.0" ;
     fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
 
 # ---- Parties -------------------------------------------------------------------
@@ -49,7 +49,7 @@ ent-core:ServiceDeliveryModel a owl:Class ;
     rdfs:label "service delivery model"@en ;
     skos:definition "classifier that indicates whether a financial service is delivered to the customer on a self-directed basis or with personalized advice from a licensed or registered associate"@en ;
     ent-av:governedBy ent-tax:products-and-services ;
-    ent-av:owningDomain ent-dom:planning-and-guidance\/financial-plan-management ;
+    ent-av:owningDomain ent-dom:investment-servicing\/retail-wealth-management ;
     ent-av:agentGuidance "The delivery model decides which business rules apply. Anything classified as self-directed must not contain personalized recommendations."@en .
 
 ent-core:SelfDirected a owl:NamedIndividual , ent-core:ServiceDeliveryModel ;

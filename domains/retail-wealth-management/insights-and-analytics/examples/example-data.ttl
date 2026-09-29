@@ -1,0 +1,45 @@
+@prefix ent-core: <https://ontology.example.com/fibo-ext/core/> .
+@prefix ent-ra:   <https://ontology.example.com/fabric/assets/> .
+@prefix fa:       <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/assessments/> .
+@prefix ia:       <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> .
+@prefix ia-ex:    <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/examples/> .
+@prefix pg-ex:    <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/examples/> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+# POSITIVE EXAMPLES - Insights and Analytics (synthetic). Must pass every IA rule.
+# Insights refer to the goal in Planning and Guidance's examples (pg-ex:), as in production
+# they refer to goals owned by Planning and Guidance.
+
+ia-ex:customer-001 a ent-core:RetailCustomer ;
+    rdfs:label "Customer 001 (synthetic)" .
+
+# ---- Financial health score ----------------------------------------------------------------
+ia-ex:health-score-001 a fa:FinancialHealthScore ;
+    fa:scoresCustomer ia-ex:customer-001 ;
+    ent-ra:scoreValue 72.0 ;
+    ent-ra:generatedByModel "fin-health-model" ;
+    ent-ra:modelVersion "3.2.0" ;
+    ent-ra:generatedAt "2026-09-28T09:00:00Z"^^xsd:dateTime .
+
+# ---- Self-directed insights (both compliant with IA-R-001 and IA-R-003) -------------------
+ia-ex:insight-001 a ia:SelfDirectedInsight ;
+    ent-core:hasDeliveryModel ent-core:SelfDirected ;
+    ia:insightFor ia-ex:customer-001 ;
+    ia:relatesToGoal pg-ex:goal-retirement ;
+    ia:hasInsightCategory ia:SavingsRate , ia:RetirementReadiness ;
+    ia:suggestsAction ia:IncreaseContributions ;
+    ia:insightText "You're on track for about 78% of scenarios. Saving an extra 2% of salary each year would close most of the gap to your retirement goal." ;
+    ent-ra:generatedByModel "insight-generator" ;
+    ent-ra:modelVersion "1.4.0" ;
+    ent-ra:generatedAt "2026-09-28T09:00:05Z"^^xsd:dateTime .
+
+ia-ex:insight-002 a ia:SelfDirectedInsight ;
+    ent-core:hasDeliveryModel ent-core:SelfDirected ;
+    ia:insightFor ia-ex:customer-001 ;
+    ia:hasInsightCategory ia:DiversificationEducation ;
+    ia:suggestsAction ia:LearnMore ;
+    ia:insightText "Most of your retirement savings sit in one asset class. Learn how diversification can affect the range of outcomes in your plan." ;
+    ent-ra:generatedByModel "insight-generator" ;
+    ent-ra:modelVersion "1.4.0" ;
+    ent-ra:generatedAt "2026-09-28T09:00:06Z"^^xsd:dateTime .

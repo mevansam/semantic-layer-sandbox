@@ -1,0 +1,30 @@
+# Query tool: rwm_ia_customer_insights
+# Input: $customer (IRI of the authenticated customer; JSON Schema: ../schemas/rwm_ia_customer_insights.schema.json).
+# The runtime binds the input via VALUES; never concatenate user text into the query.
+# Output: one row per insight; cite insight and rule IRIs (CTL-002).
+PREFIX ia: <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/>
+PREFIX pg: <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/>
+PREFIX ent-av: <https://ontology.example.com/governance/annotations/>
+PREFIX ent-ra: <https://ontology.example.com/fabric/assets/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+SELECT ?insight ?text ?category ?suggestedAction ?goalReference ?model ?modelVersion ?generatedAt ?governingRules
+WHERE {
+  VALUES ?customer { $customer }
+  ?insight a ia:SelfDirectedInsight ;
+           ia:insightFor ?customer ;
+           ia:insightText ?text ;
+           ent-ra:generatedByModel ?model ;
+           ent-ra:modelVersion ?modelVersion ;
+           ent-ra:generatedAt ?generatedAt .
+  OPTIONAL { ?insight ia:hasInsightCategory/rdfs:label ?category }
+  OPTIONAL { ?insight ia:suggestsAction/rdfs:label ?suggestedAction }
+  OPTIONAL { ?insight ia:relatesToGoal/pg:hasGoalReference ?goalReference }
+  {
+    SELECT (GROUP_CONCAT(DISTINCT ?rid; separator=", ") AS ?governingRules) WHERE {
+      ?rule sh:targetClass ?cls ; ent-av:ruleIdentifier ?rid .
+      ia:SelfDirectedInsight rdfs:subClassOf* ?cls .
+    }
+  }
+}
+ORDER BY ?generatedAt ?category

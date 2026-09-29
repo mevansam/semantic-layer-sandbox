@@ -1,0 +1,16 @@
+# Parent layer of a business domain with sub-domains (ADR-0005).
+repo_kind: business-domain
+governance: ../../enterprise-semantic-governance
+fibo_extensions: ../../fibo-extensions
+
+domain:
+  name: "{{ parent_domain_name }}"
+  ontology_domain: "{{ ontology_domain_name }}"
+  code: {{ parent_registry_code }}
+  namespace: {{ base_iri }}domain/{{ parent_domain_slug }}/
+
+paths:
+  ontology: [domain.ttl]
+
+# Sub-domain folders (kept last; new_domain.py appends to it)
+sub_domains:

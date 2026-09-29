@@ -73,7 +73,7 @@ ent-av:ruleStatement
 ent-av:ruleIdentifier
     a owl:AnnotationProperty ;
     rdfs:label "rule identifier"@en ;
-    skos:definition "Stable business identifier of a rule, e.g. SDP-R-001."@en .
+    skos:definition "Stable business identifier of a rule, e.g. IA-R-001."@en .
 
 ent-av:policySource
     a owl:AnnotationProperty ;

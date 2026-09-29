@@ -47,14 +47,21 @@ Source: `capabilities/source/capability-map.csv` (308 rows). Rules: `capabilitie
 | Finance, Accounting, & Procurement | Employee Operations | corporate finance is not an employee-operations concern |
 | Product & Services | Planning and Guidance | only mapped to benefits capabilities, which belong to Benefits Management |
 
+## Sub-domains (defined by the enterprise; the source map has none)
+
+| Business domain | Sub-domain | Note |
+|---|---|---|
+| Retail Wealth Management | Planning and Guidance | Name coincides with the capability map's ontology domain 'Planning and Guidance'; they are different things (this is a sub-domain of Retail Wealth Management). |
+| Retail Wealth Management | Insights and Analytics |  |
+
 ## Proposed capabilities (to add to the authoritative map)
 
 | Domain | Capability |
 |---|---|
-| Financial Plan Management | Financial Planning |
-| Financial Plan Management | Financial Planning > Goal-Based Planning |
-| Financial Plan Management | Financial Planning > Retirement Income Projection |
-| Financial Plan Management | Financial Planning > Planning Insights & Analytics |
+| Retail Wealth Management | Financial Planning |
+| Retail Wealth Management > Planning and Guidance | Financial Planning > Goal-Based Planning |
+| Retail Wealth Management > Planning and Guidance | Financial Planning > Retirement Income Projection |
+| Retail Wealth Management > Insights and Analytics | Financial Planning > Planning Insights & Analytics |
 | Financial Assessments | Financial Assessment |
 | Financial Assessments | Financial Assessment > Financial Wellness Assessment |
 
@@ -72,6 +79,7 @@ Source: `capabilities/source/capability-map.csv` (308 rows). Rules: `capabilitie
 - Employer Management (Employee Operations)
 - Experience Management (Other)
 - Finance, Accounting, & Procurement (unplaced)
+- Financial Plan Management (Planning and Guidance)
 - Financial Profile Management (Investment Servicing)
 - Household Management (Planning and Guidance)
 - Human Resources & Workforce Management (Employee Operations)
@@ -84,6 +92,5 @@ Source: `capabilities/source/capability-map.csv` (308 rows). Rules: `capabilitie
 - Plan Management (Planning and Guidance)
 - Product & Services (unplaced)
 - Profiling Management (Investment Servicing)
-- Retail Wealth Management (Investment Servicing)
 - Tech & Service Management (Technology Management)
 - Trade Management (Investment Servicing)

@@ -1,0 +1,21 @@
+@prefix ent-core:       <https://ontology.example.com/fibo-ext/core/> .
+@prefix ent-ra:         <https://ontology.example.com/fabric/assets/> .
+@prefix fibo-fbc-fi-fi: <https://spec.edmcouncil.org/fibo/ontology/FBC/FinancialInstruments/FinancialInstruments/> .
+@prefix ia:             <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> .
+@prefix ia-ex:          <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/examples/> .
+@prefix xsd:            <http://www.w3.org/2001/XMLSchema#> .
+
+# NEGATIVE (IA-R-001): an agent-proposed "self-directed" insight recommending a
+# purchase of a named security. The advice-boundary rule pack must block it.
+ia-ex:security-xyz a fibo-fbc-fi-fi:Security .
+
+ia-ex:bad-insight-buy a ia:SelfDirectedInsight ;
+    ent-core:hasDeliveryModel ent-core:SelfDirected ;
+    ia:insightFor ia-ex:customer-001 ;
+    ia:hasInsightCategory ia:DiversificationEducation ;
+    ia:refersToSecurity ia-ex:security-xyz ;
+    ia:suggestsAction ia:BuySecurity ;
+    ia:insightText "You should buy XYZ Growth Fund now to diversify your retirement savings." ;
+    ent-ra:generatedByModel "insight-generator" ;
+    ent-ra:modelVersion "1.4.0" ;
+    ent-ra:generatedAt "2026-09-28T09:10:00Z"^^xsd:dateTime .

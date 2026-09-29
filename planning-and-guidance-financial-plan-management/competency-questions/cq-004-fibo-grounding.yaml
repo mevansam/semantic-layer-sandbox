@@ -1,7 +1,0 @@
-id: CQ-004
-question: Which FIBO concepts does each domain class specialize (directly or via enterprise core)?
-query: cq-004-fibo-grounding.rq
-expect:
-  min_rows: 8
-  contains:
-    fiboParent: https://spec.edmcouncil.org/fibo/ontology/FND/GoalsAndObjectives/Objectives/FinancialObjective
