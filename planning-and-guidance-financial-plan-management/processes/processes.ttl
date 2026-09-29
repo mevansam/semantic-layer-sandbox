@@ -1,0 +1,98 @@
+@prefix fa:  <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/assessments/> .
+@prefix sdp:      <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/planning/> .
+@prefix sdp-proc: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/processes/> .
+@prefix sdp-rule: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/rules/> .
+@prefix sdp-api:  <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/apis/> .
+@prefix sdp-rec:  <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/records/> .
+@prefix ent-proc: <https://ontology.example.com/governance/process/> .
+@prefix ent-fab:  <https://ontology.example.com/fabric/model/> .
+@prefix ent-av:   <https://ontology.example.com/governance/annotations/> .
+@prefix ent-cap:  <https://ontology.example.com/capability/> .
+@prefix ent-tax:  <https://ontology.example.com/taxonomy/> .
+@prefix ent-core: <https://ontology.example.com/fibo-ext/core/> .
+@prefix fibo-fbc-pas-caa: <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/ClientsAndAccounts/> .
+@prefix fibo-fbc-pas-fpas: <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/FinancialProductsAndServices/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+# -----------------------------------------------------------------------------
+# Financial Plan Management (self-directed wealth planning) - PROCESSES (owned by the domain owner)
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/processes/>
+    a owl:Ontology ;
+    rdfs:label "Financial Plan Management - processes"@en ;
+    dct:abstract "The self-directed plan creation and insight process, from goal capture to retained insight record."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/processes/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+sdp-proc:SelfDirectedPlanningCycle a ent-proc:BusinessProcess ;
+    rdfs:label "self-directed planning cycle"@en ;
+    skos:definition "Process by which a retail customer sets goals, sees projections and a financial health score, and receives self-directed insights, all without personalized advice."@en ;
+    ent-av:realizesCapability ent-cap:financial-planning.goal-based-planning , ent-cap:financial-planning.retirement-income-projection , ent-cap:financial-planning.planning-insights-and-analytics ;
+    ent-av:governedBy ent-tax:products-and-services.planning-and-guidance-services ;
+    ent-av:agentGuidance "An agent may only perform step 5 (generate insights), and its output must pass the advice-boundary rule pack before step 6."@en ;
+    ent-proc:hasStep sdp-proc:CaptureGoals , sdp-proc:AggregateBalances , sdp-proc:RunProjection ,
+                     sdp-proc:ScoreFinancialHealth , sdp-proc:GenerateInsights , sdp-proc:DeliverAndRetainInsight .
+
+sdp-proc:CaptureGoals a ent-proc:ProcessStep ;
+    rdfs:label "capture goals"@en ;
+    ent-proc:stepOrder 1 ;
+    ent-proc:performedBy ent-core:RetailCustomer ;
+    ent-proc:automationLevel ent-proc:CustomerSelfService ;
+    ent-proc:producesConcept sdp:FinancialGoal , sdp:SelfDirectedPlan ;
+    ent-proc:appliesRule sdp-rule:GoalCompletenessRule ;
+    ent-proc:invokesApi sdp-api:PlanningApi .
+
+sdp-proc:AggregateBalances a ent-proc:ProcessStep ;
+    rdfs:label "aggregate balances and positions"@en ;
+    ent-proc:stepOrder 2 ;
+    ent-proc:precededBy sdp-proc:CaptureGoals ;
+    ent-proc:performedBy "planning platform" ;
+    ent-proc:automationLevel ent-proc:SystemAutomated ;
+    ent-proc:usesConcept fibo-fbc-pas-caa:Account , fibo-fbc-pas-fpas:Holding .
+
+sdp-proc:RunProjection a ent-proc:ProcessStep ;
+    rdfs:label "run goal projection"@en ;
+    ent-proc:stepOrder 3 ;
+    ent-proc:precededBy sdp-proc:AggregateBalances ;
+    ent-proc:performedBy <https://ontology.example.com/capability/domain/investment-servicing/calculator-management> ;
+    skos:editorialNote "Projection calculations are provided by the Calculator Management business domain (Investment Servicing); this domain owns the scenarios, assumptions and resulting projections."@en ;
+    ent-proc:automationLevel ent-proc:SystemAutomated ;
+    ent-proc:usesConcept sdp:PlanningScenario , sdp:LifeExpectancyAssumption , ent-core:MortalityTable ;
+    ent-proc:producesConcept sdp:GoalProjection ;
+    ent-proc:appliesRule sdp-rule:LifeExpectancyProvenanceRule , sdp-rule:RetirementScenarioRule , sdp-rule:ProjectionValidityRule ;
+    ent-proc:invokesApi sdp-api:PlanningApi .
+
+sdp-proc:ScoreFinancialHealth a ent-proc:ProcessStep ;
+    rdfs:label "score financial health"@en ;
+    ent-proc:stepOrder 4 ;
+    ent-proc:precededBy sdp-proc:RunProjection ;
+    ent-proc:performedBy "financial health model (Financial Assessments)" ;
+    ent-proc:automationLevel ent-proc:SystemAutomated ;
+    ent-proc:producesConcept fa:FinancialHealthScore ;
+    ent-proc:appliesRule sdp-rule:HealthScoreRule .
+
+sdp-proc:GenerateInsights a ent-proc:ProcessStep ;
+    rdfs:label "generate self-directed insights"@en ;
+    ent-proc:stepOrder 5 ;
+    ent-proc:precededBy sdp-proc:ScoreFinancialHealth ;
+    ent-proc:performedBy ent-fab:CustomerFacingAgent ;
+    ent-proc:automationLevel ent-proc:AgentAssisted ;
+    ent-proc:usesConcept sdp:GoalProjection , fa:FinancialHealthScore ;
+    ent-proc:producesConcept sdp:SelfDirectedInsight ;
+    ent-proc:appliesRule sdp-rule:AdviceBoundaryRule , sdp-rule:InsightTraceabilityRule .
+
+sdp-proc:DeliverAndRetainInsight a ent-proc:ProcessStep ;
+    rdfs:label "deliver and retain insight"@en ;
+    ent-proc:stepOrder 6 ;
+    ent-proc:precededBy sdp-proc:GenerateInsights ;
+    ent-proc:performedBy "insights service" ;
+    ent-proc:automationLevel ent-proc:SystemAutomated ;
+    ent-proc:humanApprovalRequired false ;
+    ent-proc:invokesApi sdp-api:InsightsApi ;
+    ent-proc:createsRecord sdp-rec:InsightRecord .

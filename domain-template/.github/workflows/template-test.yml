@@ -21,6 +21,6 @@ jobs:
           pip install -r enterprise-semantic-governance/requirements.txt
           bash fibo-extensions/scripts/fetch-omg-dependencies.sh
           curl -sSL -o robot.jar https://github.com/ontodev/robot/releases/download/v1.9.10/robot.jar
-          python domain-template/scripts/new_domain.py --answers domain-template/answers/rwpa-sdp.yaml --out generated --no-git
+          python domain-template/scripts/new_domain.py --answers domain-template/answers/pg-fpm.yaml --out generated --no-git
           python enterprise-semantic-governance/tools/semtool.py codeowners --repo generated
           ROBOT_JAR=$PWD/robot.jar python enterprise-semantic-governance/tools/semtool.py verify --repo generated

@@ -1,0 +1,28 @@
+repo_kind: domain
+governance: ../enterprise-semantic-governance
+fibo_extensions: ../fibo-extensions
+
+domain:
+  name: "Financial Plan Management"
+  parent: "Planning and Guidance"
+  code: pg-fpm
+  namespace: https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/
+
+# Files by asset kind. Each kind has its own owner in CODEOWNERS (generated from
+# domain-manifest.ttl by `semtool codeowners`).
+paths:
+  manifest:    [domain-manifest.ttl]              # accountable roles, anchors, capabilities
+  ontology:    [ontology/*.ttl]                   # MEANING  - domain owner
+  rules:       [rules/*.ttl]                      # RULES    - rule owner
+  processes:   [processes/*.ttl]                  # process knowledge - domain owner
+  apis:        [apis/*.ttl]                       # APIs     - API owner
+  stewardship: [stewardship/*.ttl]                # DATA     - data steward
+  records:     [records/*.ttl]                    # RECORDS  - records owner
+  collections: [collections/*.ttl]                # fabric: knowledge collections (+ policy, risk)
+  execution:   [execution-models/*.ttl]           # fabric: published execution models
+
+examples:
+  positive: [examples/*.ttl]                      # must conform to all rules
+  negative: tests/negative/expectations.yaml      # must trip the listed rules
+
+competency_questions: competency-questions/*.yaml

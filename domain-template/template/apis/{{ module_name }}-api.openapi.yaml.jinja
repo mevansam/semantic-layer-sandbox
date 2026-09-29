@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: {{ subdomain_name }} - {{ module_name }} API
+  title: {{ domain_name }} - {{ module_name }} API
   version: 0.1.0
   description: |
     Placeholder contract. Every schema carries x-ontology-class and every
@@ -25,9 +25,9 @@ components:
   schemas:
     {{ seed_class }}:
       type: object
-      x-ontology-class: {{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/{{ seed_class }}
+      x-ontology-class: {{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/{{ module_name }}/{{ seed_class }}
       required: [referenceCode]
       properties:
         referenceCode:
           type: string
-          x-ontology-property: {{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/hasReferenceCode
+          x-ontology-property: {{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/{{ module_name }}/hasReferenceCode

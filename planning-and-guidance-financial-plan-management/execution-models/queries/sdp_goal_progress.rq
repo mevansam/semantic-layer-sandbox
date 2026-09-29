@@ -1,0 +1,35 @@
+# Query tool: sdp_goal_progress
+# Input: $goalReference (JSON Schema: ../schemas/sdp_goal_progress.schema.json). The runtime binds
+# the input as a typed literal via VALUES; never concatenate user text into the query.
+# Output: one row per assumption; goal/projection columns repeat. Cite goal and rule IRIs (CTL-002).
+PREFIX sdp: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/planning/>
+PREFIX ent-core: <https://ontology.example.com/fibo-ext/core/>
+PREFIX ent-av: <https://ontology.example.com/governance/annotations/>
+PREFIX fibo-fnd-acc-cur: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+SELECT ?goal ?goalReference ?targetAmount ?targetDate ?projectedAmount ?probabilityOfSuccess
+       ?assumption ?assumedValue ?mortalityTable ?tableVersion ?governingRules
+WHERE {
+  VALUES ?goalReference { $goalReference }
+  ?goal sdp:hasGoalReference ?goalReference ;
+        sdp:hasTargetDate ?targetDate ;
+        sdp:hasTargetAmount/fibo-fnd-acc-cur:hasAmount ?targetAmount .
+  OPTIONAL {
+    ?projection sdp:projectsGoal ?goal ;
+                sdp:probabilityOfSuccess ?probabilityOfSuccess ;
+                sdp:hasProjectedAmount/fibo-fnd-acc-cur:hasAmount ?projectedAmount ;
+                sdp:producedByScenario ?scenario .
+    OPTIONAL {
+      ?scenario sdp:usesAssumption ?a .
+      ?a rdfs:label ?assumption ; sdp:assumedValue ?assumedValue .
+      OPTIONAL { ?a sdp:sourcedFromTable ?t . ?t rdfs:label ?mortalityTable ; ent-core:tableVersion ?tableVersion . }
+    }
+  }
+  {
+    SELECT (GROUP_CONCAT(DISTINCT ?rid; separator=", ") AS ?governingRules) WHERE {
+      ?rule sh:targetClass sdp:FinancialGoal ; ent-av:ruleIdentifier ?rid .
+    }
+  }
+}
+ORDER BY ?assumption

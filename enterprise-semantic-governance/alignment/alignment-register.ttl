@@ -27,18 +27,19 @@
 
 ent-aln:ALN-001 a ent-gov:AlignmentDecision ;
     rdfs:label "Retail customer is shared enterprise-core meaning"@en ;
-    skos:definition "Wealth planning and customer management both need 'the retail person we serve'. Agreed as one concept, promoted to enterprise core as ent-core:RetailCustomer (a FIBO Customer). Customer & Client Management remains the owning domain."@en ;
+    skos:definition "Financial plan management and customer management both need 'the retail person we serve'. Agreed as one concept, promoted to enterprise core as ent-core:RetailCustomer (a FIBO Customer). Customer Management remains the owning domain."@en ;
     ent-gov:alignsTerm <https://ontology.example.com/fibo-ext/core/RetailCustomer> ;
     ent-gov:alignmentType ent-gov:Equivalent ;
-    ent-gov:consultedDomain ent-dom:customer-and-client-management ,
-        ent-dom:retail-wealth-planning-and-advisory ;
+    ent-gov:consultedDomain ent-dom:customer-management\/customer-management ,
+        ent-dom:planning-and-guidance\/financial-plan-management ;
     prov:generatedAtTime "2026-09-28T00:00:00Z"^^xsd:dateTime ;
     ent-av:changeNote "Seed decision created with the sandbox baseline."@en .
 
 ent-aln:ALN-002 a ent-gov:AlignmentDecision ;
     rdfs:label "Self-directed insight is not an advice recommendation"@en ;
-    skos:definition "A self-directed planning insight (educational, non-personalized) and an advised-planning recommendation (personalized, supervised) look alike but are different regulated activities. They must never be treated as equivalent; agents keep them distinct (CTL-007). The advised sub-domain term is to be created by Advised Planning & Advice."@en ;
-    ent-gov:alignsTerm <https://ontology.example.com/domain/rwpa/self-directed-planning/planning/SelfDirectedInsight> ;
+    skos:definition "A self-directed planning insight (educational, non-personalized) and an advised-planning recommendation (personalized, supervised) look alike but are different regulated activities. They must never be treated as equivalent; agents keep them distinct (CTL-007). The advised-side term is to be created by Retail Wealth Management (Investment Servicing)."@en ;
+    ent-gov:alignsTerm <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/planning/SelfDirectedInsight> ;
     ent-gov:alignmentType ent-gov:RelatedNotEquivalent ;
-    ent-gov:consultedDomain ent-dom:retail-wealth-planning-and-advisory ;
+    ent-gov:consultedDomain ent-dom:planning-and-guidance\/financial-plan-management ,
+        ent-dom:investment-servicing\/retail-wealth-management ;
     prov:generatedAtTime "2026-09-28T00:00:00Z"^^xsd:dateTime .

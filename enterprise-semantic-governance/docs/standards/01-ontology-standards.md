@@ -16,9 +16,11 @@ Owner: Semantic review board. Enforced by: `shapes/meta-common.ttl`, `shapes/met
 | Enterprise meta-model | `{base}governance/{module}/` | `…/governance/model/` |
 | Semantic fabric | `{base}fabric/{module}/` | `…/fabric/model/` |
 | Taxonomy | `{base}taxonomy/{path}` | `…/taxonomy/customers.customer-profile` |
-| Capability map | `{base}capability/{id}` | `…/capability/cap-rwpa-01` |
+| Capability map | `{base}capability/{path}` | `…/capability/investment-management.portfolio-management` |
+| Ontology / business domains | `{base}capability/ontology-domain/{od}`, `{base}capability/domain/{od}/{domain}` | `…/capability/domain/planning-and-guidance/financial-plan-management` |
 | Enterprise FIBO extensions | `{base}fibo-ext/{module}/` | `…/fibo-ext/core/` |
-| Domain modules | `{base}domain/{domain-code}/{sub-domain}/{module}/` | `…/domain/rwpa/self-directed-planning/planning/` |
+| Domain modules | `{base}domain/{ontology-domain}/{business-domain}/{module}/` | `…/domain/planning-and-guidance/financial-plan-management/planning/` |
+| Ontology-domain umbrella | `{base}domain/{ontology-domain}/` | `…/domain/planning-and-guidance/` |
 | Knowledge-graph named graphs | `{base}graph/{publisher}/{collection}/v{semver}/{partition}` | see standard 08 |
 
 - `{base}` is set once in `semantic.yaml` (`https://ontology.example.com/`, a neutral placeholder) and changed with `semtool rebase --to … --all`.

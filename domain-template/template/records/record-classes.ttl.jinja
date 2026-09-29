@@ -1,6 +1,6 @@
-@prefix {{ prefix }}:     <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/> .
-@prefix {{ prefix }}-rec: <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/records/> .
-@prefix {{ prefix }}-m:   <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/governance/> .
+@prefix {{ prefix }}:     <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/{{ module_name }}/> .
+@prefix {{ prefix }}-rec: <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/records/> .
+@prefix {{ prefix }}-m:   <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/governance/> .
 @prefix ent-gov: <{{ base_iri }}governance/model/> .
 @prefix ent-av:  <{{ base_iri }}governance/annotations/> .
 @prefix ent-tax: <{{ base_iri }}taxonomy/> .
@@ -12,16 +12,16 @@
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 
 # -----------------------------------------------------------------------------
-# {{ subdomain_name }} - RECORD KEEPING (owned by the records owner)
+# {{ domain_name }} - RECORD KEEPING (owned by the records owner)
 # Regulatory citations below are PLACEHOLDERS to be confirmed with Legal &
 # Compliance before this module moves to Release maturity.
 # -----------------------------------------------------------------------------
 
-<{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/records/>
+<{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/records/>
     a owl:Ontology ;
-    rdfs:label "{{ subdomain_name }} - record classes"@en ;
-    dct:abstract "Record classes created by the {{ subdomain_name }} sub-domain with retention, disposition and legal hold."@en ;
-    owl:versionIRI <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/records/0.1.0/> ;
+    rdfs:label "{{ domain_name }} - record classes"@en ;
+    dct:abstract "Record classes created by the {{ domain_name }} business domain with retention, disposition and legal hold."@en ;
+    owl:versionIRI <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/records/0.1.0/> ;
     owl:versionInfo "0.1.0" ;
     fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
 

@@ -18,3 +18,5 @@ paths:
     - profile/*.ttl
   registry:
     - registry/*.ttl
+  umbrellas:                      # ontology-domain umbrella ontologies (KG only, not reasoned per domain)
+    - ontology/ontology-domains/*.ttl

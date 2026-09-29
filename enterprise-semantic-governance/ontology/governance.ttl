@@ -112,9 +112,6 @@ ent-gov:realizesCapability a owl:ObjectProperty ; rdfs:label "realizes capabilit
     rdfs:range skos:Concept ;
     skos:definition "Capability-map capability supported by a domain or asset."@en .
 
-ent-gov:hasDataOntology a owl:DatatypeProperty ; rdfs:label "has data ontology"@en ;
-    skos:definition "Name of the data ontology assigned to the domain in the capability map."@en .
-
 ent-gov:hasOntologyModule a owl:ObjectProperty ; rdfs:label "has ontology module"@en ;
     rdfs:range owl:Ontology ;
     skos:definition "An ontology module published by the domain."@en .
@@ -144,7 +141,7 @@ ent-gov:heldBy a owl:DatatypeProperty ; rdfs:label "held by"@en ;
     skos:definition "Name or mailbox of the person or team currently holding the role."@en .
 
 ent-gov:reviewTeam a owl:DatatypeProperty ; rdfs:label "review team"@en ;
-    skos:definition "Source-control team handle (e.g. @example-org/rwpa-owners) used to generate CODEOWNERS."@en .
+    skos:definition "Source-control team handle (e.g. @example-org/fpm-domain-owners) used to generate CODEOWNERS."@en .
 
 ent-gov:DomainOwner a owl:Class ; rdfs:subClassOf ent-gov:AccountableRole ; rdfs:label "domain owner"@en ;
     skos:definition "Business executive accountable for the meaning of the domain's concepts and for approving its semantic changes."@en .
@@ -279,10 +276,39 @@ ent-gov:registersDomain a owl:ObjectProperty ; rdfs:label "registers domain"@en 
     skos:definition "The capability-map domain being registered."@en .
 ent-gov:domainCode a owl:DatatypeProperty ; rdfs:label "domain code"@en ;
     rdfs:domain ent-gov:DomainRegistration ;
-    skos:definition "Short stable code used in graph names and rule identifiers (e.g. rwpa-sdp)."@en .
+    skos:definition "Short stable code used in graph names and rule identifiers (e.g. pg-fpm)."@en .
 ent-gov:publishedModule a owl:ObjectProperty ; rdfs:label "published module"@en ;
     rdfs:domain ent-gov:DomainRegistration ; rdfs:range owl:Ontology ;
     skos:definition "An ontology module the domain publishes for import by other domains. Unpublished modules are private to the domain."@en .
 ent-gov:registrationStatus a owl:DatatypeProperty ; rdfs:label "registration status"@en ;
     rdfs:domain ent-gov:DomainRegistration ;
     skos:definition "Active, Provisional or Retired."@en .
+
+# =============================================================================
+# Capability map structure (ADR-0004)
+#   ontology domain (named data ontology) > business domain > capability tree
+# =============================================================================
+
+ent-gov:OntologyDomain a owl:Class ;
+    rdfs:label "ontology domain"@en ;
+    skos:definition "A named data ontology from the enterprise capability map that groups related business domains, e.g. Planning and Guidance. Each ontology domain has an umbrella ontology importing its domains' published modules."@en .
+
+ent-gov:inOntologyDomain a owl:ObjectProperty ; rdfs:label "in ontology domain"@en ;
+    rdfs:domain ent-gov:BusinessDomain ; rdfs:range ent-gov:OntologyDomain ;
+    skos:definition "The ontology domain a business domain belongs to."@en .
+
+ent-gov:accountableDomain a owl:ObjectProperty ; rdfs:label "accountable domain"@en ;
+    rdfs:range ent-gov:BusinessDomain ;
+    skos:definition "The single business domain accountable for a capability (and, unless overridden deeper, its sub-capabilities)."@en .
+
+ent-gov:participatesInCapability a owl:ObjectProperty ; rdfs:label "participates in capability"@en ;
+    rdfs:domain ent-gov:BusinessDomain ; rdfs:range skos:Concept ;
+    skos:definition "A capability a business domain contributes to or consumes without being accountable for it."@en .
+
+ent-gov:TechnologyCapability a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "technology capability"@en ;
+    skos:definition "A capability-map node that describes shared software or technology rather than a business capability; business meaning is never anchored to it."@en .
+
+ent-gov:capabilityStatus a owl:DatatypeProperty ; rdfs:label "capability status"@en ;
+    skos:definition "Provenance of a capability or mapping: Authoritative (from the enterprise capability map) or Proposed (suggested by a domain, pending addition to the map)."@en .

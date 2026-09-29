@@ -1,8 +1,0 @@
-id: CQ-004
-question: Which API and data product serve financial health scores, who stewards the data, and which rule checks its quality?
-query: cq-004-serving-and-stewardship.rq
-expect:
-  min_rows: 1
-  contains:
-    api: Planning Insights API
-    qualityRule: SDP-R-004

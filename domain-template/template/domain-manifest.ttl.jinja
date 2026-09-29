@@ -1,4 +1,4 @@
-@prefix {{ prefix }}-m: <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/governance/> .
+@prefix {{ prefix }}-m: <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/governance/> .
 @prefix ent-gov: <{{ base_iri }}governance/model/> .
 @prefix ent-tax: <{{ base_iri }}taxonomy/> .
 @prefix ent-cap: <{{ base_iri }}capability/> .
@@ -9,28 +9,28 @@
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 
 # -----------------------------------------------------------------------------
-# DOMAIN MANIFEST - {{ subdomain_name }}
+# DOMAIN MANIFEST - {{ domain_name }}
 #
 # The machine-readable statement of what this domain is accountable for and
 # who holds each accountability. CI validates it (ent-ms:DomainManifestShape)
 # and generates CODEOWNERS from it. Keep role holders current.
 # -----------------------------------------------------------------------------
 
-<{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/governance/>
+<{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/governance/>
     a owl:Ontology ;
-    rdfs:label "{{ subdomain_name }} - domain governance"@en ;
-    dct:abstract "Domain manifest, accountable roles, knowledge collections and execution models of the {{ subdomain_name }} sub-domain."@en ;
+    rdfs:label "{{ domain_name }} - domain governance"@en ;
+    dct:abstract "Domain manifest, accountable roles, knowledge collections and execution models of the {{ domain_name }} business domain."@en ;
     owl:imports <{{ base_iri }}governance/model/> ;
-    owl:versionIRI <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/governance/0.1.0/> ;
+    owl:versionIRI <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/governance/0.1.0/> ;
     owl:versionInfo "0.1.0" ;
     fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
 
 {{ prefix }}-m:Manifest a ent-gov:DomainManifest ;
-    rdfs:label "{{ subdomain_name }} domain manifest"@en ;
+    rdfs:label "{{ domain_name }} domain manifest"@en ;
     ent-gov:describesDomain <{{ capability_domain_iri }}> ;
-    ent-gov:namespace "{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/"^^xsd:anyURI ;
+    ent-gov:namespace "{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/"^^xsd:anyURI ;
     ent-gov:codeRepository "https://github.com/{{ github_org }}/{{ repo_name }}"^^xsd:anyURI ;
-    ent-gov:hasOntologyModule <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/> ;
+    ent-gov:hasOntologyModule <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/{{ module_name }}/> ;
 {%- for a in taxonomy_anchors %}
     ent-gov:anchoredTo ent-tax:{{ a }} ;
 {%- endfor %}
@@ -47,38 +47,38 @@
 # ---- Accountable roles (MEANING, RULES, APIs, DATA, RECORDS) -------------------
 
 {{ prefix }}-m:DomainOwnerRole a ent-gov:DomainOwner ;
-    rdfs:label "{{ subdomain_name }} domain owner"@en ;
+    rdfs:label "{{ domain_name }} domain owner"@en ;
     ent-gov:accountableFor ent-gov:Meaning ;
     ent-gov:heldBy "{{ domain_owner }}" ;
     ent-gov:reviewTeam "{{ domain_owner_team }}" .
 
 {{ prefix }}-m:RuleOwnerRole a ent-gov:RuleOwner ;
-    rdfs:label "{{ subdomain_name }} rule owner"@en ;
+    rdfs:label "{{ domain_name }} rule owner"@en ;
     ent-gov:accountableFor ent-gov:Rules ;
     ent-gov:heldBy "{{ rule_owner }}" ;
     ent-gov:reviewTeam "{{ rule_owner_team }}" .
 
 {{ prefix }}-m:ApiOwnerRole a ent-gov:ApiOwner ;
-    rdfs:label "{{ subdomain_name }} API owner"@en ;
+    rdfs:label "{{ domain_name }} API owner"@en ;
     ent-gov:accountableFor ent-gov:Apis ;
     ent-gov:heldBy "{{ api_owner }}" ;
     ent-gov:reviewTeam "{{ api_owner_team }}" .
 
 {{ prefix }}-m:DataStewardRole a ent-gov:DataSteward ;
-    rdfs:label "{{ subdomain_name }} data steward"@en ;
+    rdfs:label "{{ domain_name }} data steward"@en ;
     ent-gov:accountableFor ent-gov:Data ;
     ent-gov:heldBy "{{ data_steward }}" ;
     ent-gov:reviewTeam "{{ data_steward_team }}" .
 
 {{ prefix }}-m:RecordsOwnerRole a ent-gov:RecordsOwner ;
-    rdfs:label "{{ subdomain_name }} records owner"@en ;
+    rdfs:label "{{ domain_name }} records owner"@en ;
     ent-gov:accountableFor ent-gov:Records ;
     ent-gov:heldBy "{{ records_owner }}" ;
     ent-gov:reviewTeam "{{ records_owner_team }}" .
 
 # Enterprise role referenced by this domain's risk assessments (approver, not owner)
 {{ prefix }}-m:AIRiskApprover a ent-gov:AIRiskOwner ;
-    rdfs:label "AI risk approver for {{ subdomain_name }}"@en ;
+    rdfs:label "AI risk approver for {{ domain_name }}"@en ;
     ent-gov:accountableFor ent-gov:AIRiskAndControls ;
     ent-gov:heldBy "{{ ai_risk_owner }}" ;
     ent-gov:reviewTeam "{{ ai_risk_owner_team }}" .

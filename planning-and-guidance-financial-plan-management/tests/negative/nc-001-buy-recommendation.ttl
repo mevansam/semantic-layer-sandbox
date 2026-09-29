@@ -1,0 +1,21 @@
+@prefix sdp:    <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/planning/> .
+@prefix sdp-ex: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/examples/> .
+@prefix ent-core: <https://ontology.example.com/fibo-ext/core/> .
+@prefix ent-ra:   <https://ontology.example.com/fabric/assets/> .
+@prefix fibo-fbc-fi-fi: <https://spec.edmcouncil.org/fibo/ontology/FBC/FinancialInstruments/FinancialInstruments/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# NEGATIVE (SDP-R-001): an agent-proposed "self-directed" insight recommending a
+# purchase of a named security. The advice-boundary rule pack must block it.
+sdp-ex:security-xyz a fibo-fbc-fi-fi:Security .
+
+sdp-ex:bad-insight-buy a sdp:SelfDirectedInsight ;
+    ent-core:hasDeliveryModel ent-core:SelfDirected ;
+    sdp:insightFor sdp-ex:customer-001 ;
+    sdp:hasInsightCategory sdp:DiversificationEducation ;
+    sdp:refersToSecurity sdp-ex:security-xyz ;
+    sdp:suggestsAction sdp:BuySecurity ;
+    sdp:insightText "You should buy XYZ Growth Fund now to diversify your retirement savings." ;
+    ent-ra:generatedByModel "insight-generator" ;
+    ent-ra:modelVersion "1.4.0" ;
+    ent-ra:generatedAt "2026-09-28T09:10:00Z"^^xsd:dateTime .

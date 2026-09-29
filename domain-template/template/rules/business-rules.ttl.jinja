@@ -1,6 +1,6 @@
-@prefix {{ prefix }}:      <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/> .
-@prefix {{ prefix }}-rule: <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/rules/> .
-@prefix {{ prefix }}-m:    <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/governance/> .
+@prefix {{ prefix }}:      <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/{{ module_name }}/> .
+@prefix {{ prefix }}-rule: <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/rules/> .
+@prefix {{ prefix }}-m:    <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/governance/> .
 @prefix ent-gov: <{{ base_iri }}governance/model/> .
 @prefix ent-av:  <{{ base_iri }}governance/annotations/> .
 @prefix ent-tax: <{{ base_iri }}taxonomy/> .
@@ -12,16 +12,16 @@
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 
 # -----------------------------------------------------------------------------
-# {{ subdomain_name }} - BUSINESS RULES (owned by the rule owner)
+# {{ domain_name }} - BUSINESS RULES (owned by the rule owner)
 # Standard: docs/standards/02-business-rules.md. One rule = one shape = one id,
 # with ruleStatement (authoritative), policySource, owner and a negative test.
 # -----------------------------------------------------------------------------
 
-<{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/rules/>
+<{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/rules/>
     a owl:Ontology ;
-    rdfs:label "{{ subdomain_name }} - business rules"@en ;
-    dct:abstract "Executable business rules of the {{ subdomain_name }} sub-domain."@en ;
-    owl:versionIRI <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/rules/0.1.0/> ;
+    rdfs:label "{{ domain_name }} - business rules"@en ;
+    dct:abstract "Executable business rules of the {{ domain_name }} business domain."@en ;
+    owl:versionIRI <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/rules/0.1.0/> ;
     owl:versionInfo "0.1.0" ;
     fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
 

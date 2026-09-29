@@ -6,7 +6,7 @@ The baseline that sets **how** enterprise knowledge is represented, shared and c
 enterprise-semantic-governance/     ← you are here: standards + fabric
 fibo-extensions/                    ← pinned FIBO, enterprise FIBO profile, core extensions, domain registry
 domain-template/                    ← Copier template every domain repo is created from
-rwpa-self-directed-planning/        ← first domain: Self-Directed Wealth Planning, Insights & Analytics
+planning-and-guidance-financial-plan-management/  ← first domain: Financial Plan Management (self-directed wealth planning slice)
 ```
 
 ## What's in this repo
@@ -19,8 +19,9 @@ rwpa-self-directed-planning/        ← first domain: Self-Directed Wealth Plann
 | `ontology/process.ttl` | Ontology standards | Process vocabulary (PROV-aligned) |
 | `ontology/controls.ttl` | AI risks & controls | Risk and control model, control catalog CTL-001…008, sensitivity classes |
 | `shapes/meta-*.ttl` | Ontology standards | Meta-shapes: the machine-checked standards every repo must pass |
+| `standards/domain-repo-structure.yaml` | Ontology standards | Domain repository structure standard: required files, naming conventions (`semtool structure`) |
 | `taxonomy/` | Governance | Enterprise taxonomy source (markdown) → SKOS (476 concepts) |
-| `capabilities/` | Governance | Capability map importer + **provisional** map (ADR-0003) |
+| `capabilities/` | Governance | Enterprise capability map (8 ontology domains, 38 business domains): curated import, taxonomy crosswalk, data-quality report (ADR-0004) |
 | `alignment/` | Cross-domain alignment | Alignment decision register |
 | `fabric/fabric.ttl` | Semantic fabric | Knowledge collections, graph partitions, agent classes, purposes, execution models |
 | `fabric/reusable-assets/` | Semantic fabric | Shared shapes and patterns (monetary amount, model provenance, 0–100 score…) |
@@ -36,7 +37,7 @@ rwpa-self-directed-planning/        ← first domain: Self-Directed Wealth Plann
 pip install -r requirements.txt                       # rdflib, pyshacl, pyyaml, openpyxl
 export ROBOT_JAR=/path/to/robot.jar                   # https://github.com/ontodev/robot/releases
 python tools/semtool.py verify                        # this repo
-python tools/semtool.py verify --repo ../rwpa-self-directed-planning   # a domain, all gates
+python tools/semtool.py verify --repo ../planning-and-guidance-financial-plan-management   # a domain, all gates
 ```
 
 ## Common tasks
@@ -44,7 +45,7 @@ python tools/semtool.py verify --repo ../rwpa-self-directed-planning   # a domai
 | Task | Command |
 |---|---|
 | Regenerate taxonomy after editing `taxonomy/source/enterprise-taxonomy.md` | `python tools/semtool.py taxonomy` |
-| Import the authoritative capability map | put it at `capabilities/capability-map.csv` (or `.xlsx`), map headers in `capabilities/columns.yaml`, run `python tools/semtool.py capabilities` |
+| Re-import the capability map | replace `capabilities/source/capability-map.csv`, review `capabilities/curation.yaml`, run `python tools/semtool.py capabilities` |
 | Adopt the real enterprise namespace | `python tools/semtool.py rebase --to https://ontology.<company>.com/ --all` |
 | Add a control | edit `ontology/controls.ttl`, update `docs/standards/06`, raise an ADR |
 

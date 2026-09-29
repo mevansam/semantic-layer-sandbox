@@ -1,4 +1,4 @@
-@prefix {{ prefix }}: <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/> .
+@prefix {{ prefix }}: <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/{{ module_name }}/> .
 @prefix ent-av:   <{{ base_iri }}governance/annotations/> .
 @prefix ent-tax:  <{{ base_iri }}taxonomy/> .
 @prefix ent-core: <{{ base_iri }}fibo-ext/core/> .
@@ -20,17 +20,17 @@
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 
 # -----------------------------------------------------------------------------
-# {{ subdomain_name }} - {{ module_name }} module
+# {{ domain_name }} - {{ module_name }} module
 # MEANING owned by the domain owner. Standards: enterprise-semantic-governance/docs/standards/01.
 # Every class: FIBO (or enterprise-core) parent, taxonomy anchor, label, definition, agent guidance.
 # -----------------------------------------------------------------------------
 
-<{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/>
+<{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/{{ module_name }}/>
     a owl:Ontology ;
-    rdfs:label "{{ subdomain_name }} - {{ module_name }}"@en ;
-    dct:abstract "Business concepts of the {{ subdomain_name }} sub-domain of {{ domain_name }}, specializing FIBO."@en ;
+    rdfs:label "{{ domain_name }} - {{ module_name }}"@en ;
+    dct:abstract "Business concepts of the {{ domain_name }} business domain ({{ ontology_domain_name }} ontology domain), specializing FIBO."@en ;
     owl:imports <{{ base_iri }}fibo-ext/core/> ;
-    owl:versionIRI <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/0.1.0/> ;
+    owl:versionIRI <{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/{{ module_name }}/0.1.0/> ;
     owl:versionInfo "0.1.0" ;
     fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
 

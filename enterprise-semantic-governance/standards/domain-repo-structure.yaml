@@ -1,0 +1,63 @@
+# DOMAIN REPOSITORY STRUCTURE STANDARD
+#
+# Every domain repository is generated from domain-template and must keep its
+# structure. `semtool structure` checks a domain repo against this file (part of
+# gate G1); domain-template's own CI checks that a freshly generated repo passes.
+#
+# Principle: the template's files are EDITED IN PLACE, never renamed or replaced.
+# Domains ADD files only where a pattern below allows it.
+version: 0.2.0
+
+# Files every domain repo must have (paths as generated from the template).
+required_files:
+  - .copier-answers.yml               # proves the repo was generated from domain-template
+  - semantic.yaml
+  - README.md
+  - domain-manifest.ttl
+  - rules/business-rules.ttl
+  - processes/processes.ttl
+  - apis/api-registry.ttl
+  - stewardship/data-products.ttl
+  - records/record-classes.ttl
+  - collections/collections.ttl
+  - execution-models/execution-models.ttl
+  - examples/example-data.ttl
+  - tests/negative/expectations.yaml
+  - mappings/README.md
+  - docs/modeling-notes.md
+  - competency-questions/cq-001-rules-and-owners.yaml
+  - competency-questions/cq-002-accountability.yaml
+  - competency-questions/cq-003-capability-governance.yaml
+  - competency-questions/cq-004-fibo-grounding.yaml
+  - competency-questions/cq-005-query-tool.yaml
+
+# Allowed contents per folder (regular expressions on the file name). Anything
+# else in these folders is a structure violation.
+folders:
+  ontology:                     ['^[a-z][a-z0-9-]*\.ttl$']                       # one file per module
+  rules:                        ['^business-rules\.ttl$', '^[a-z][a-z0-9-]*-rules\.ttl$']
+  processes:                    ['^processes\.ttl$', '^[a-z][a-z0-9-]*-process\.ttl$']
+  apis:                         ['^api-registry\.ttl$', '^[a-z][a-z0-9-]*-api\.openapi\.yaml$']
+  stewardship:                  ['^data-products\.ttl$']
+  records:                      ['^record-classes\.ttl$']
+  mappings:                     ['^README\.md$', '^[a-z][a-z0-9-]*\.rml\.ttl$', '^samples$']
+  collections:                  ['^collections\.ttl$']
+  execution-models:             ['^execution-models\.ttl$', '^queries$', '^schemas$', '^rulepacks$']
+  execution-models/queries:     ['^[a-z][a-z0-9_]*\.rq$']                        # named <toolName>.rq
+  execution-models/schemas:     ['^[a-z][a-z0-9_]*\.schema\.json$']              # named <toolName>.schema.json
+  execution-models/rulepacks:   ['^[a-z][a-z0-9_]*\.yaml$']                      # named <toolName>.yaml
+  competency-questions:         ['^cq-[0-9]{3}-[a-z0-9-]+\.(yaml|rq)$']
+  examples:                     ['^[a-z][a-z0-9-]*\.ttl$']
+  tests/negative:               ['^expectations\.yaml$', '^nc-[0-9]{3}-[a-z0-9-]+\.ttl$']
+  docs:                         ['^[a-z0-9][a-z0-9-]*\.md$']
+
+# Top-level entries allowed besides the folders above.
+top_level: [.copier-answers.yml, .github, .gitignore, CODEOWNERS, README.md, semantic.yaml,
+            domain-manifest.ttl, build]
+
+# Numbering conventions.
+competency_questions:
+  template_owned: [1, 5]        # cq-001..cq-005 come from the template; edit them in place
+  domain_start: 101             # domain-specific questions are cq-101 and up
+negative_tests:
+  rule_number_matches_file: true   # nc-NNN tests rule {PREFIX}-R-NNN (it may also trip others)

@@ -1,0 +1,79 @@
+@prefix fa:  <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/assessments/> .
+@prefix sdp:      <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/planning/> .
+@prefix sdp-data: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/stewardship/> .
+@prefix sdp-rule: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/rules/> .
+@prefix sdp-m:    <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/governance/> .
+@prefix ent-gov:  <https://ontology.example.com/governance/model/> .
+@prefix ent-av:   <https://ontology.example.com/governance/annotations/> .
+@prefix ent-tax:  <https://ontology.example.com/taxonomy/> .
+@prefix ent-ra:   <https://ontology.example.com/fabric/assets/> .
+@prefix ent-ctl:  <https://ontology.example.com/governance/controls/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix dprod: <https://ekgf.github.io/dprod/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+# -----------------------------------------------------------------------------
+# Financial Plan Management (self-directed wealth planning) - DATA STEWARDSHIP (owned by the data steward)
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/stewardship/>
+    a owl:Ontology ;
+    rdfs:label "Financial Plan Management - data stewardship"@en ;
+    dct:abstract "Data products and critical data elements for goals, plans, projections, health scores and insights."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/stewardship/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# ---- Data products ------------------------------------------------------------------
+
+sdp-data:GoalsAndPlans a dcat:Dataset , dprod:DataProduct ;
+    rdfs:label "customer goals and plans"@en ;
+    dct:description "Authoritative data product of retail customers' financial goals and self-directed plans."@en ;
+    ent-gov:servesConcept sdp:FinancialGoal , sdp:SelfDirectedPlan ;
+    ent-gov:hasDataSteward sdp-m:DataStewardRole ;
+    ent-av:sensitivity ent-ctl:RestrictedPersonal ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+sdp-data:PlanningInsights a dcat:Dataset , dprod:DataProduct ;
+    rdfs:label "planning insights and scores"@en ;
+    dct:description "Goal projections, financial health scores and self-directed insights produced for retail customers."@en ;
+    ent-gov:servesConcept sdp:GoalProjection , fa:FinancialHealthScore , sdp:SelfDirectedInsight ;
+    ent-gov:hasDataSteward sdp-m:DataStewardRole ;
+    ent-av:sensitivity ent-ctl:RestrictedPersonal ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics .
+
+# ---- Critical data elements --------------------------------------------------------
+
+sdp-data:GoalTargetAmount a ent-gov:CriticalDataElement ;
+    rdfs:label "goal target amount"@en ;
+    ent-gov:elementOf sdp:hasTargetAmount ;
+    ent-gov:hasDataSteward sdp-m:DataStewardRole ;
+    ent-gov:hasQualityRule sdp-rule:GoalCompletenessRule .
+
+sdp-data:GoalTargetDate a ent-gov:CriticalDataElement ;
+    rdfs:label "goal target date"@en ;
+    ent-gov:elementOf sdp:hasTargetDate ;
+    ent-gov:hasDataSteward sdp-m:DataStewardRole ;
+    ent-gov:hasQualityRule sdp-rule:GoalCompletenessRule .
+
+sdp-data:ProbabilityOfSuccess a ent-gov:CriticalDataElement ;
+    rdfs:label "probability of success"@en ;
+    ent-gov:elementOf sdp:probabilityOfSuccess ;
+    ent-gov:hasDataSteward sdp-m:DataStewardRole ;
+    ent-gov:hasQualityRule sdp-rule:ProjectionValidityRule .
+
+sdp-data:HealthScoreValue a ent-gov:CriticalDataElement ;
+    rdfs:label "financial health score value"@en ;
+    ent-gov:elementOf ent-ra:scoreValue ;
+    ent-gov:hasDataSteward sdp-m:DataStewardRole ;
+    ent-gov:hasQualityRule sdp-rule:HealthScoreRule .
+
+sdp-data:LifeExpectancy a ent-gov:CriticalDataElement ;
+    rdfs:label "life expectancy assumption"@en ;
+    ent-gov:elementOf sdp:LifeExpectancyAssumption ;
+    ent-gov:hasDataSteward sdp-m:DataStewardRole ;
+    ent-gov:hasQualityRule sdp-rule:LifeExpectancyProvenanceRule , sdp-rule:RetirementScenarioRule .

@@ -9,7 +9,8 @@ The enterprise's governed use of FIBO, and the mechanism through which business 
 | `profile/enterprise-fibo-profile.ttl` | **Enterprise FIBO profile**: the FIBO modules the enterprise adopts. Domains may import only these. | semantic review board |
 | `ontology/core/` | **Enterprise core**: FIBO specializations shared by several domains (each with one owning domain) | semantic review board hosts; owning domain decides meaning |
 | `ontology/alignment/` | Cross-domain alignment axioms (implements decisions from the governance alignment register) | semantic review board |
-| `registry/domain-registry.ttl` | **Domain registry**: reserved namespaces, domain codes, repositories, published modules | semantic review board |
+| `ontology/ontology-domains/` | One umbrella ontology per capability-map ontology domain, importing its domains' published modules | semantic review board |
+| `registry/domain-registry.ttl` | **Domain registry**: reserved namespaces `{base}domain/{ontology-domain}/{business-domain}/`, domain codes, repositories, published modules | semantic review board |
 | `docs/` | Extension rules, registering a domain, upgrading FIBO | |
 
 ## Setup

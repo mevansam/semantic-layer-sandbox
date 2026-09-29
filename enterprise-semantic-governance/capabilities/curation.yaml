@@ -1,0 +1,53 @@
+# CAPABILITY MAP CURATION RULES (ADR-0004)
+#
+# The source map (capabilities/source/capability-map.csv) contains mappings that are
+# inconsistent - e.g. the complete Benefits Management capability tree is copied onto four
+# different domains. Only mappings that are business-specific and correct are imported.
+# Every excluded mapping is listed, with its reason, in capabilities/data-quality-report.md
+# (generated). Owners: semantic review board, with the capability-map owners.
+
+# Rule 1 - A domain <-> capability mapping is kept only when a capability on the mapped path
+# is the domain's own capability: its name equals the domain name (case-insensitive), or it
+# is listed here as an explicit, reviewed alias. The deepest such node becomes the domain's
+# ANCHOR; the domain is accountable for the anchor and its sub-capabilities (unless another
+# domain anchors deeper). All other mappings of the domain are excluded as "copied tree".
+anchor_aliases:
+  # domain name: [capability path, levels separated by " > "]
+  Digital Assets: ["Investment Management > Digital Asset Management"]
+  Brokerage Asset Servicing: ["Brokerage Recordkeeping Services"]
+
+# Rule 2 - Technology groupings are not business capabilities. These nodes and their
+# sub-trees are typed ent-gov:TechnologyCapability; nothing may be anchored to them.
+technology_capability_names:
+  - Shared Software & Technology
+  - Retail Brokerage Shared Software & Technologies
+
+# Rule 3 - Domain -> ontology-domain placements that look incorrect are NOT imported; the
+# domain is imported without an ontology domain (placement pending review).
+suspicious_placements:
+  "Legal, Risk, Compliance & Surveillance": "Employee Operations is a workforce grouping; legal, risk, compliance & surveillance is an enterprise control function"
+  "Finance, Accounting, & Procurement": "corporate finance is not an employee-operations concern"
+  "Product & Services": "only mapped to benefits capabilities, which belong to Benefits Management"
+
+# Rule 4 - Capabilities proposed by domains that have no capabilities in the source map.
+# Imported with capabilityStatus "Proposed" and an editorial note; to be added to the
+# authoritative map by its owners (then removed from here).
+proposed_capabilities:
+  - path: Financial Planning
+    domain: Financial Plan Management
+    description: Helping retail customers set, plan for and track financial goals.
+  - path: Financial Planning > Goal-Based Planning
+    domain: Financial Plan Management
+    description: Customers define financial goals and build self-directed plans to reach them.
+  - path: Financial Planning > Retirement Income Projection
+    domain: Financial Plan Management
+    description: Projecting goal and retirement outcomes from balances, contributions and planning assumptions.
+  - path: Financial Planning > Planning Insights & Analytics
+    domain: Financial Plan Management
+    description: Generating educational, non-personalized insights from a customer's plan and portfolio.
+  - path: Financial Assessment
+    domain: Financial Assessments
+    description: Assessing a customer's financial situation.
+  - path: Financial Assessment > Financial Wellness Assessment
+    domain: Financial Assessments
+    description: Scoring and explaining a customer's overall financial health.

@@ -1,9 +1,0 @@
-id: CQ-003
-question: "Query tool {{ registry_code | replace('-', '_') }}_{{ module_name }}_lookup returns governed facts for a known reference code"
-query: ../execution-models/queries/{{ module_name }}-lookup.rq
-bindings:
-  referenceCode: '"EX-0001"'
-expect:
-  min_rows: 1
-  contains:
-    ruleId: {{ rule_prefix }}-R-000

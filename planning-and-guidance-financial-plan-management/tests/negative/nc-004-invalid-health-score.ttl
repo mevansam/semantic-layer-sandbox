@@ -1,0 +1,11 @@
+@prefix fa:  <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/assessments/> .
+@prefix sdp:    <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/planning/> .
+@prefix sdp-ex: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/examples/> .
+@prefix ent-ra: <https://ontology.example.com/fabric/assets/> .
+
+# NEGATIVE (SDP-R-004): score out of range and no model version.
+sdp-ex:bad-score a fa:FinancialHealthScore ;
+    fa:scoresCustomer sdp-ex:customer-001 ;
+    ent-ra:scoreValue 130.0 ;
+    ent-ra:generatedByModel "fin-health-model" ;
+    ent-ra:generatedAt "2026-09-28T09:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .

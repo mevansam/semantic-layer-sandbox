@@ -1,0 +1,20 @@
+domain,taxonomy_anchors,status
+Financial Plan Management,customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans;products-and-services.planning-and-guidance-services,proposed
+Financial Assessments,customers.customer-intelligence-and-analytics.customer-financial-health-scores;products-and-services.financial-wellness-services,proposed
+Household Management,customers.customer-to-customer-relationships.customer-household-relationships,proposed
+Retail Wealth Management,products-and-services.personalized-planning-and-guidance-services;clients.client-products-and-services.client-personalized-planning-and-advice,proposed
+Calculator Management,customers.customer-intelligence-and-analytics.customer-portfolio-analytics,proposed
+Retail Brokerage Services,products-and-services.retail-brokerage-services;accounts.brokerage-accounts,proposed
+Brokerage Asset Servicing,accounts.brokerage-accounts.account-balances-and-positions;portfolios.holdings-and-assets,proposed
+Investment Management,portfolios,proposed
+Portfolio Management,portfolios.portfolio-reference;portfolios.holdings-and-assets,proposed
+Investment Operations,portfolios.portfolio-performance-characteristics-and-attributions;portfolios.portfolio-cash,proposed
+Market Data Management,securities.securities-prices;portfolios.index-reference,proposed
+Benefits Management,products-and-services.defined-contributions-administrative-services;products-and-services.health-and-welfare-administrative-services,proposed
+Charitable Giving,accounts.retail-charitable-giving-accounts;products-and-services.workplace-giving-services,proposed
+Customer Management,customers,proposed
+Common Reference Data,common-reference,proposed
+Document Management,legal-risk-compliance-and-surveillance.enterprise-risk.content-retention-and-management,proposed
+"Legal, Risk, Compliance & Surveillance",legal-risk-compliance-and-surveillance,proposed
+Human Resources & Workforce Management,workforce,proposed
+Identity & Access Management,customers.customer-identity-and-access,proposed

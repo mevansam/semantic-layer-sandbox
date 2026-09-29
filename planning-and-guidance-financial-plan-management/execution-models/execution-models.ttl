@@ -1,0 +1,91 @@
+@prefix sdp-m:    <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/governance/> .
+@prefix sdp-rule: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/rules/> .
+@prefix sdp-proc: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/processes/> .
+@prefix ent-fab: <https://ontology.example.com/fabric/model/> .
+@prefix ent-ctl: <https://ontology.example.com/governance/controls/> .
+@prefix ent-av:  <https://ontology.example.com/governance/annotations/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# Financial Plan Management (self-directed wealth planning) - PUBLISHED EXECUTION MODELS
+# Owned by the domain; published by the semantic fabric; risk approved by the
+# AI risk office. Every model traces to domain rules / processes.
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/governance/execution-models/>
+    a owl:Ontology ;
+    rdfs:label "Financial Plan Management - execution models"@en ;
+    dct:abstract "Advice-boundary rule pack, goal-progress query tool and planning-cycle process model published for AI agents."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/governance/execution-models/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# ---- Rule pack: advice boundary (guards a regulated boundary -> CTL-005) -----------
+
+sdp-m:AdviceBoundaryRulePack a ent-fab:RulePack ;
+    rdfs:label "advice boundary rule pack"@en ;
+    skos:definition "Runtime check applied to every insight an agent proposes for a self-directed customer, before delivery: blocks personalized buy/sell recommendations and untraceable insights."@en ;
+    ent-fab:toolName "sdp_advice_boundary_rulepack" ;
+    ent-fab:artifactPath "execution-models/rulepacks/sdp_advice_boundary_rulepack.yaml" ;
+    ent-fab:derivedFromRule sdp-rule:AdviceBoundaryRule , sdp-rule:InsightTraceabilityRule ;
+    ent-fab:implementsProcess sdp-proc:SelfDirectedPlanningCycle ;
+    ent-fab:groundedIn sdp-m:Collection ;
+    ent-fab:subjectToControl ent-ctl:CTL-005 , ent-ctl:CTL-006 , ent-ctl:CTL-008 ;
+    ent-fab:hasRiskAssessment sdp-m:AdviceBoundaryRiskAssessment ;
+    ent-av:agentGuidance "Call before delivering ANY insight. On a violation, do not deliver; tell the customer this needs a conversation with an advisor and offer the advised channel."@en .
+
+sdp-m:AdviceBoundaryRiskAssessment a ent-ctl:RiskAssessment ;
+    rdfs:label "AI risk assessment - advice boundary rule pack"@en ;
+    ent-ctl:assesses sdp-m:AdviceBoundaryRulePack ;
+    ent-ctl:identifiedRisk ent-ctl:RSK-004 , ent-ctl:RSK-005 ;
+    ent-ctl:residualRiskRating ent-ctl:Medium ;
+    ent-ctl:approvedBy sdp-m:AIRiskApprover ;
+    ent-ctl:assessmentDate "2026-09-28"^^xsd:date .
+
+# ---- Query tool: goal progress ------------------------------------------------------
+
+sdp-m:GoalProgressTool a ent-fab:QueryTool ;
+    rdfs:label "goal progress tool"@en ;
+    skos:definition "Returns a goal's target, latest projection, probability of success, the scenario's assumptions (with mortality-table provenance) and the rules that govern goals, for a goal reference."@en ;
+    ent-fab:toolName "sdp_goal_progress" ;
+    ent-fab:artifactPath "execution-models/queries/sdp_goal_progress.rq" ;
+    ent-fab:inputSchemaPath "execution-models/schemas/sdp_goal_progress.schema.json" ;
+    ent-fab:derivedFromRule sdp-rule:GoalCompletenessRule , sdp-rule:ProjectionValidityRule ;
+    ent-fab:implementsProcess sdp-proc:SelfDirectedPlanningCycle ;
+    ent-fab:groundedIn sdp-m:Collection ;
+    ent-fab:subjectToControl ent-ctl:CTL-006 , ent-ctl:CTL-002 , ent-ctl:CTL-004 ;
+    ent-fab:hasRiskAssessment sdp-m:GoalProgressRiskAssessment ;
+    ent-av:agentGuidance "Only call for the authenticated customer's own goals. Present probability of success as an estimate and always list the assumptions returned."@en .
+
+sdp-m:GoalProgressRiskAssessment a ent-ctl:RiskAssessment ;
+    rdfs:label "AI risk assessment - goal progress tool"@en ;
+    ent-ctl:assesses sdp-m:GoalProgressTool ;
+    ent-ctl:identifiedRisk ent-ctl:RSK-001 , ent-ctl:RSK-003 ;
+    ent-ctl:residualRiskRating ent-ctl:Low ;
+    ent-ctl:approvedBy sdp-m:AIRiskApprover ;
+    ent-ctl:assessmentDate "2026-09-28"^^xsd:date .
+
+# ---- Process model: planning cycle ---------------------------------------------------
+
+sdp-m:PlanningCycleProcessModel a ent-fab:ProcessModel ;
+    rdfs:label "self-directed planning cycle process model"@en ;
+    skos:definition "Orchestration of the agent-assisted part of the self-directed planning cycle: generate insights (step 5), check them with the advice-boundary rule pack, then hand over for delivery and retention (step 6)."@en ;
+    ent-fab:toolName "sdp_planning_cycle" ;
+    ent-fab:artifactPath "processes/processes.ttl" ;
+    ent-fab:implementsProcess sdp-proc:SelfDirectedPlanningCycle ;
+    ent-fab:groundedIn sdp-m:Collection ;
+    ent-fab:subjectToControl ent-ctl:CTL-006 , ent-ctl:CTL-005 , ent-ctl:CTL-008 ;
+    ent-fab:hasRiskAssessment sdp-m:PlanningCycleRiskAssessment .
+
+sdp-m:PlanningCycleRiskAssessment a ent-ctl:RiskAssessment ;
+    rdfs:label "AI risk assessment - planning cycle process model"@en ;
+    ent-ctl:assesses sdp-m:PlanningCycleProcessModel ;
+    ent-ctl:identifiedRisk ent-ctl:RSK-004 , ent-ctl:RSK-005 ;
+    ent-ctl:residualRiskRating ent-ctl:Medium ;
+    ent-ctl:approvedBy sdp-m:AIRiskApprover ;
+    ent-ctl:assessmentDate "2026-09-28"^^xsd:date .

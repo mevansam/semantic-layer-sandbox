@@ -1,0 +1,14 @@
+PREFIX fa: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/assessments/>
+PREFIX sdp: <https://ontology.example.com/domain/planning-and-guidance/financial-plan-management/planning/>
+PREFIX ent-gov: <https://ontology.example.com/governance/model/>
+PREFIX ent-av:  <https://ontology.example.com/governance/annotations/>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+SELECT ?api ?spec ?dataProduct ?steward ?qualityRule WHERE {
+  ?a a ent-gov:DomainApi ; ent-gov:servesConcept fa:FinancialHealthScore ;
+     rdfs:label ?api ; ent-gov:apiSpecification ?spec .
+  ?d a dcat:Dataset ; ent-gov:servesConcept fa:FinancialHealthScore ;
+     rdfs:label ?dataProduct ; ent-gov:hasDataSteward/ent-gov:heldBy ?steward .
+  OPTIONAL { ?r sh:targetClass fa:FinancialHealthScore ; ent-av:ruleIdentifier ?qualityRule . }
+}

@@ -1,0 +1,8 @@
+id: CQ-102
+question: Which execution models enforce the advice boundary, which AI controls apply, and who approved their risk assessment?
+query: cq-102-execution-model-controls.rq
+expect:
+  min_rows: 1
+  contains:
+    tool: sdp_advice_boundary_rulepack
+    control: Regulated-boundary rule pack

@@ -1,6 +1,6 @@
-# {{ subdomain_name }}
+# {{ domain_name }}
 
-Semantic repository of the **{{ subdomain_name }}** sub-domain of **{{ domain_name }}**. It was generated from `domain-template`.
+Semantic repository of the **{{ domain_name }}** business domain in the **{{ ontology_domain_name }}** ontology domain. It was generated from `domain-template`.
 
 This domain is accountable for **meaning, rules, data, records and APIs**. The enterprise governs how that knowledge is represented, shared and consumed by AI (see `enterprise-semantic-governance`).
 
@@ -16,12 +16,15 @@ This domain is accountable for **meaning, rules, data, records and APIs**. The e
 | `records/` | **Records**: record classes, retention, legal hold | records owner |
 | `collections/` | fabric: governed knowledge collection, ODRL usage policy, AI risk assessment | domain owner + fabric + AI risk |
 | `execution-models/` | fabric: rule packs, process models, query tools for agents | domain owner + fabric + AI risk |
-| `competency-questions/` | questions the knowledge graph must answer (gate G6) | domain owner |
+| `competency-questions/` | questions the knowledge graph must answer (gate G6): cq-001…005 from the template, cq-101+ domain-specific | domain owner |
 | `examples/`, `tests/negative/` | positive and negative test data for rules (gate G5) | rule owner |
+| `docs/modeling-notes.md` | semantic review record: FIBO parent choices, rules ↔ tests ↔ tools, open items | domain owner |
+
+Structure: this repository follows the enterprise domain repository standard (`semtool structure`, gate G1). Edit files in place; add files only where the naming conventions allow (`<toolName>.rq`, `cq-101-…`, `nc-NNN-…`).
 
 ## Namespace
 
-`{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/` (registered as `{{ registry_code }}` in `fibo-extensions/registry`).
+`{{ base_iri }}domain/{{ ontology_domain_slug }}/{{ domain_slug }}/` (registered as `{{ registry_code }}` in `fibo-extensions/registry`).
 
 ## Working locally
 

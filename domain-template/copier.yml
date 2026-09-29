@@ -7,23 +7,43 @@ _subdirectory: template
 _templates_suffix: .jinja
 _answers_file: .copier-answers.yml
 
-# ---- Identity (must match the capability map and the domain registry) ----------
+# Domain-owned content: generated once, then edited in place by the domain.
+# `copier update` never overwrites these, so template improvements to them are
+# applied by hand (see CHANGELOG). Everything else - CI, .gitignore, mappings
+# conventions, semantic.yaml wiring - is template-owned and updates cleanly.
+_skip_if_exists:
+  - README.md
+  - domain-manifest.ttl
+  - ontology/*.ttl
+  - rules/*.ttl
+  - processes/*.ttl
+  - apis/*
+  - stewardship/*.ttl
+  - records/*.ttl
+  - collections/*.ttl
+  - execution-models/**
+  - competency-questions/*
+  - examples/*.ttl
+  - tests/negative/*
+  - docs/*.md
+
+# ---- Identity (must match the capability map and the domain registry; ADR-0004) ----
+ontology_domain_name:
+  type: str
+  help: Ontology domain (named data ontology) as in the capability map, e.g. Planning and Guidance
+  default: "Example Ontology Domain"
+ontology_domain_slug:
+  type: str
+  help: IRI path segment of the ontology domain (slug of its name)
+  default: "example-ontology-domain"
 domain_name:
   type: str
-  help: Parent business domain name as in the capability map
+  help: Business domain name exactly as in the capability map, e.g. Financial Plan Management
   default: "Example Business Domain"
-domain_code:
+domain_slug:
   type: str
-  help: Short code of the parent domain (IRI path segment)
-  default: "exd"
-subdomain_name:
-  type: str
-  help: Sub-domain name as in the capability map
-  default: "Example Sub-Domain"
-subdomain_slug:
-  type: str
-  help: IRI path segment for the sub-domain
-  default: "example-subdomain"
+  help: IRI path segment of the business domain (slug of its name)
+  default: "example-business-domain"
 registry_code:
   type: str
   help: Domain code registered in fibo-extensions/registry (used in graph names and rule ids)
@@ -42,12 +62,12 @@ module_name:
   default: "core"
 capability_domain_iri:
   type: str
-  help: IRI of the (sub-)domain in the capability map
-  default: "https://ontology.example.com/capability/domain/example-business-domain/example-sub-domain"
+  help: IRI of the business domain in the capability map ({base}capability/domain/{ontology-domain}/{domain})
+  default: "https://ontology.example.com/capability/domain/example-ontology-domain/example-business-domain"
 capabilities:
   type: yaml
-  help: Capability-map capability local names realized by this domain
-  default: [cap-example-01]
+  help: Capability local names (path IDs) from capabilities/capability-map.ttl realized by this domain
+  default: [example-capability]
 taxonomy_anchors:
   type: yaml
   help: Enterprise taxonomy local names this domain elaborates

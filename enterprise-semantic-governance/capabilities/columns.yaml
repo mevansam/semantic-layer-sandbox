@@ -1,15 +1,10 @@
-# Column mapping for the capability map importer.
-#
-# Map each field the importer needs (left) to the column header used in YOUR
-# capability map file (right). When the authoritative capability map arrives,
-# only this file should need to change. Leave a value empty ("") if your file
-# has no such column.
+# Column mapping for the enterprise capability map (capabilities/source/capability-map.csv).
+# Map the importer's fields (left) to the headers used in the source file (right).
 columns:
-  capability_id: capability_id            # stable id, e.g. CAP-RWPA-01
-  capability_name: capability_name
-  parent_capability_id: parent_capability_id
-  business_domain: business_domain        # accountable business domain
-  sub_domain: sub_domain                  # optional sub-domain
-  data_ontology: data_ontology            # named data ontology for the domain
-  taxonomy_anchors: taxonomy_anchors      # ';'-separated taxonomy notations, labels or local names
-  description: description
+  domain: Domain Name                # business (API) domain
+  ontology_domain: Ontology Domain   # named data ontology grouping the domains
+  levels:                            # capability hierarchy, top to bottom
+    - capability l1 name
+    - capability l2 name
+    - capability l3 name
+    - capability l4 name

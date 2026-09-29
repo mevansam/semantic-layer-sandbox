@@ -27,8 +27,8 @@
     dct:abstract "Enterprise-wide specializations of FIBO shared across business domains, each with a single owning domain."@en ;
     owl:imports <https://ontology.example.com/fibo-ext/profile/> ,
                 <https://ontology.example.com/governance/annotations/> ;
-    owl:versionIRI <https://ontology.example.com/fibo-ext/core/0.1.0/> ;
-    owl:versionInfo "0.1.0" ;
+    owl:versionIRI <https://ontology.example.com/fibo-ext/core/0.2.0/> ;
+    owl:versionInfo "0.2.0" ;
     fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
 
 # ---- Parties -------------------------------------------------------------------
@@ -38,7 +38,7 @@ ent-core:RetailCustomer a owl:Class ;
     rdfs:label "retail customer"@en ;
     skos:definition "customer who is a natural person, or a household acting through natural persons, and who receives retail financial products or services for personal rather than business purposes"@en ;
     ent-av:governedBy ent-tax:customers ;
-    ent-av:owningDomain ent-dom:customer-and-client-management ;
+    ent-av:owningDomain ent-dom:customer-management\/customer-management ;
     ent-av:agentGuidance "Use for individual investors served through retail channels. Institutional clients and their representatives are Clients, not RetailCustomers."@en ;
     ent-av:changeNote "Promoted to core by alignment decision ALN-001."@en .
 
@@ -49,7 +49,7 @@ ent-core:ServiceDeliveryModel a owl:Class ;
     rdfs:label "service delivery model"@en ;
     skos:definition "classifier that indicates whether a financial service is delivered to the customer on a self-directed basis or with personalized advice from a licensed or registered associate"@en ;
     ent-av:governedBy ent-tax:products-and-services ;
-    ent-av:owningDomain ent-dom:retail-wealth-planning-and-advisory ;
+    ent-av:owningDomain ent-dom:planning-and-guidance\/financial-plan-management ;
     ent-av:agentGuidance "The delivery model decides which business rules apply. Anything classified as self-directed must not contain personalized recommendations."@en .
 
 ent-core:SelfDirected a owl:NamedIndividual , ent-core:ServiceDeliveryModel ;
@@ -74,7 +74,7 @@ ent-core:MortalityTable a owl:Class ;
     skos:definition "published actuarial table giving, for a defined population, the probability of death or remaining life expectancy at each age"@en ;
     skos:editorialNote "FIBO-GAP: FIBO has no reference-data table concept; Report is the closest parent."@en ;
     ent-av:governedBy ent-tax:common-reference.mortality-tables ;
-    ent-av:owningDomain ent-dom:enterprise-reference-data ;
+    ent-av:owningDomain ent-dom:other\/common-reference-data ;
     ent-av:agentGuidance "Life-expectancy assumptions in projections must name the mortality table (and its version) they come from."@en .
 
 ent-core:tableVersion a owl:DatatypeProperty ;

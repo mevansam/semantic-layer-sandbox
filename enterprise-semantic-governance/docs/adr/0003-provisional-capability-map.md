@@ -1,6 +1,6 @@
 # ADR-0003: Provisional capability map until the authoritative map is imported
 
-- **Status:** Accepted (temporary)
+- **Status:** Superseded by ADR-0004 (2026-09-28)
 - **Date:** 2026-09-28
 - **Change class:** Additive
 

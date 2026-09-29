@@ -1,8 +1,0 @@
-id: CQ-007
-question: Which process steps are agent-assisted, which agent class performs them, and which rules and rule packs guard them?
-query: cq-007-agent-steps.rq
-expect:
-  min_rows: 1
-  contains:
-    ruleId: SDP-R-001
-    rulePack: sdp_advice_boundary_rulepack

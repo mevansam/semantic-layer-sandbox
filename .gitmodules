@@ -1,0 +1,5 @@
+[submodule "fibo-extensions/vendor/fibo"]
+	path = fibo-extensions/vendor/fibo
+	url = https://github.com/edmcouncil/fibo
+	branch = master_2026Q2
+	shallow = true

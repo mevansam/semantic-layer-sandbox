@@ -6,6 +6,7 @@ and in CI. Each repository declares what it contains in its own `semantic.yaml`.
 
 Commands
   syntax        parse every governed RDF file
+  structure     check a domain repo against the domain repository structure standard
   taxonomy      generate the SKOS enterprise taxonomy from its markdown source
   capabilities  import a capability map (CSV/XLSX) into SKOS + domain register
   meta          validate governed assets against the enterprise meta-shapes
@@ -254,88 +255,296 @@ def read_table(path: Path) -> list[dict]:
 
 
 def cmd_capabilities(repo: Repo, args) -> bool:
+    """Import the enterprise capability map, applying capabilities/curation.yaml (ADR-0004).
+
+    Structure produced:  ontology domain (ent-gov:OntologyDomain)
+                           > business domain (ent-gov:BusinessDomain, ent-gov:inOntologyDomain)
+                           > capability tree (skos:Concept, ent-gov:accountableDomain)
+    Only business-specific, correct mappings are kept; everything excluded is written to
+    capabilities/data-quality-report.md with its reason.
+    """
     gov = repo.governance
     cap_dir = gov.root / "capabilities"
-    colmap = yaml.safe_load((cap_dir / "columns.yaml").read_text())["columns"]
+    cols = yaml.safe_load((cap_dir / "columns.yaml").read_text())["columns"]
+    cur = yaml.safe_load((cap_dir / "curation.yaml").read_text())
     src = Path(args.source) if args.source else next(
-        (p for p in (cap_dir / "capability-map.csv", cap_dir / "capability-map.xlsx") if p.exists()),
-        cap_dir / "capability-map.provisional.csv")
+        (p for p in (cap_dir / "source/capability-map.csv", cap_dir / "source/capability-map.xlsx") if p.exists()), None)
+    if not src:
+        fail("capabilities: no source map in capabilities/source/")
+        return False
     rows = read_table(src)
-    missing = [c for c in colmap.values() if c and rows and c not in rows[0]]
+    need = [cols["domain"], cols["ontology_domain"], *cols["levels"]]
+    missing = [c for c in need if rows and c not in rows[0]]
     if missing:
         fail(f"capabilities: columns {missing} not found in {src.name}; adjust capabilities/columns.yaml")
         return False
 
-    def col(row, key):
-        name = colmap.get(key)
-        return row.get(name, "") if name else ""
-
     base = gov.base_iri
-    CAP = Namespace(base + "capability/")
-    DOM = Namespace(base + "capability/domain/")
-    GOV = Namespace(base + "governance/model/")
-    AV = Namespace(base + "governance/annotations/")
-    TAX = Namespace(base + "taxonomy/")
+    CAP, OD, DOM = Namespace(base + "capability/"), Namespace(base + "capability/ontology-domain/"), Namespace(base + "capability/domain/")
+    GOV, AV, TAX = Namespace(base + "governance/model/"), Namespace(base + "governance/annotations/"), Namespace(base + "taxonomy/")
     tax = Graph().parse(str(gov.root / "taxonomy/enterprise-taxonomy.ttl"))
-    by_label = {str(o).lower(): s for s, o in tax.subject_objects(SKOS.prefLabel)}
-    by_notation = {str(o): s for s, o in tax.subject_objects(SKOS.notation)}
 
+    norm = lambda s: re.sub(r"\s+", " ", s.strip()).lower()
+    parse_path = lambda s: tuple(p.strip() for p in s.split(">"))
+    tech_names = {norm(n) for n in cur.get("technology_capability_names", [])}
+    aliases = {norm(d): [parse_path(p) for p in ps] for d, ps in (cur.get("anchor_aliases") or {}).items()}
+    suspicious = {norm(d): why for d, why in (cur.get("suspicious_placements") or {}).items()}
+
+    # ---- read source -----------------------------------------------------------------
+    domains: dict[str, dict] = {}          # domain name -> {od, paths[]}
+    nodes: set[tuple] = set()
+    for r in rows:
+        d, od = r[cols["domain"]].strip(), r[cols["ontology_domain"]].strip()
+        path = tuple(v.strip() for v in (r[c] for c in cols["levels"]))
+        path = tuple(v for v in path if v)
+        info_ = domains.setdefault(d, {"od": od, "paths": []})
+        if path:
+            info_["paths"].append(path)
+            for i in range(len(path)):
+                nodes.add(path[:i + 1])
+
+    def is_tech(path):
+        return any(norm(p) in tech_names for p in path)
+
+    # ---- rule 1: anchors ------------------------------------------------------------------
+    anchors: dict[str, set] = {}
+    excluded: dict[str, list] = {}
+    for d, info_ in domains.items():
+        for path in info_["paths"]:
+            cand = [path[:i + 1] for i in range(len(path)) if norm(path[i]) == norm(d)]
+            cand += [a for a in aliases.get(norm(d), []) if path[:len(a)] == a]
+            cand = [c for c in cand if not is_tech(c)]
+            if cand:
+                anchors.setdefault(d, set()).add(max(cand, key=len))
+            else:
+                excluded.setdefault(d, []).append(path)
+    # accountable domain per node = domain with the deepest anchor that is ancestor-or-self
+    anchor_owner = {a: d for d, ans in anchors.items() for a in ans}
+    def accountable(node):
+        for i in range(len(node), 0, -1):
+            if node[:i] in anchor_owner:
+                return anchor_owner[node[:i]]
+        return None
+    # keep only nodes on or under an anchor (the curated, business-correct part of the map)
+    kept = {n for n in nodes if accountable(n) and not is_tech(n)}
+    kept |= {n[:i] for n in kept for i in range(1, len(n))}   # ancestors for hierarchy
+    tech_kept = {n for n in nodes if is_tech(n) and any(n[:i] in kept for i in range(1, len(n)))}
+
+    # ---- graph ---------------------------------------------------------------------------------
     g = Graph()
-    for p, ns in (("ent-cap", CAP), ("ent-dom", DOM), ("ent-gov", GOV), ("ent-av", AV), ("ent-tax", TAX), ("skos", SKOS)):
+    for p, ns in (("ent-cap", CAP), ("ent-od", OD), ("ent-dom", DOM), ("ent-gov", GOV), ("ent-av", AV),
+                  ("ent-tax", TAX), ("skos", SKOS), ("dct", DCTERMS)):
         g.bind(p, ns)
     scheme = CAP["CapabilityMap"]
     g.add((scheme, RDF.type, SKOS.ConceptScheme))
     g.add((scheme, SKOS.prefLabel, Literal("Enterprise Capability Map", lang="en")))
-    g.add((scheme, DCTERMS.source, Literal(src.name)))
-    provisional = "provisional" in src.name.lower() or args.provisional
-    if provisional:
-        g.add((scheme, SKOS.editorialNote, Literal(
-            "PROVISIONAL: seeded from the enterprise taxonomy. Replace with the authoritative capability map "
-            "(python tools/semtool.py capabilities --source <file>).", lang="en")))
-    errors = 0
-    for row in rows:
-        cid = col(row, "capability_id")
-        c = CAP[slug(cid)]
+    g.add((scheme, DCTERMS.source, Literal(f"capabilities/source/{src.name}")))
+    g.add((scheme, SKOS.editorialNote, Literal(
+        "Curated import (ADR-0004): only business-specific mappings are included; see capabilities/data-quality-report.md.",
+        lang="en")))
+
+    cap_iri = lambda path: CAP[".".join(slug(p) for p in path)]
+    od_iri = lambda name: OD[slug(name)]
+    dom_iri = lambda d, od: DOM[(slug(od) + "/" if od else "unplaced/") + slug(d)]
+
+    placements = {}
+    for d, info_ in domains.items():
+        od = None if norm(d) in suspicious else info_["od"]
+        placements[d] = od
+        di = dom_iri(d, od)
+        g.add((di, RDF.type, GOV.BusinessDomain))
+        g.add((di, RDFS.label, Literal(d, lang="en")))
+        if od:
+            g.add((od_iri(od), RDF.type, GOV.OntologyDomain))
+            g.add((od_iri(od), RDFS.label, Literal(od, lang="en")))
+            g.add((di, GOV.inOntologyDomain, od_iri(od)))
+        else:
+            g.add((di, SKOS.editorialNote, Literal(f"Ontology-domain placement '{info_['od']}' not imported: {suspicious[norm(d)]}.", lang="en")))
+        for a in anchors.get(d, ()):
+            g.add((di, GOV.realizesCapability, cap_iri(a)))
+
+    def add_node(path, status="Authoritative", description=None, tech=False):
+        c = cap_iri(path)
         g.add((c, RDF.type, SKOS.Concept))
+        if tech:
+            g.add((c, RDF.type, GOV.TechnologyCapability))
         g.add((c, SKOS.inScheme, scheme))
-        g.add((c, SKOS.notation, Literal(cid)))
-        g.add((c, SKOS.prefLabel, Literal(col(row, "capability_name"), lang="en")))
-        if col(row, "description"):
-            g.add((c, SKOS.definition, Literal(col(row, "description"), lang="en")))
-        parent = col(row, "parent_capability_id")
-        if parent:
-            g.add((c, SKOS.broader, CAP[slug(parent)]))
+        g.add((c, SKOS.prefLabel, Literal(path[-1], lang="en")))
+        g.add((c, SKOS.notation, Literal(" > ".join(path))))
+        g.add((c, GOV.capabilityStatus, Literal(status)))
+        if description:
+            g.add((c, SKOS.definition, Literal(description, lang="en")))
+        if len(path) > 1:
+            g.add((c, SKOS.broader, cap_iri(path[:-1])))
         else:
             g.add((c, SKOS.topConceptOf, scheme))
-        dom_name, sub_name = col(row, "business_domain"), col(row, "sub_domain")
-        if dom_name:
-            d = DOM[slug(dom_name)]
-            g.add((d, RDF.type, GOV.BusinessDomain))
-            g.add((d, RDFS.label, Literal(dom_name, lang="en")))
-            owner = d
-            if sub_name:
-                sd = DOM[slug(dom_name) + "/" + slug(sub_name)]
-                g.add((sd, RDF.type, GOV.SubDomain))
-                g.add((sd, RDFS.label, Literal(sub_name, lang="en")))
-                g.add((sd, GOV.isSubDomainOf, d))
-                owner = sd
-            g.add((owner, GOV.realizesCapability, c))
-            if col(row, "data_ontology"):
-                g.add((owner, GOV.hasDataOntology, Literal(col(row, "data_ontology"))))
-        for anchor in filter(None, (a.strip() for a in re.split(r"[;|]", col(row, "taxonomy_anchors")))):
-            t = by_notation.get(anchor) or by_label.get(anchor.lower()) or (
-                TAX[anchor] if (TAX[anchor], None, None) in tax else None)
-            if t is None:
-                warn(f"capabilities: {cid}: taxonomy anchor '{anchor}' not found")
+        return c
+
+    for n in sorted(kept):
+        c = add_node(n)
+        owner = accountable(n)
+        if owner:
+            g.add((c, GOV.accountableDomain, dom_iri(owner, placements[owner])))
+    for n in sorted(tech_kept):
+        add_node(n, tech=True)
+
+    # ---- rule 4: proposed capabilities ------------------------------------------------------------
+    proposed = []
+    for pc in cur.get("proposed_capabilities") or []:
+        path, d = parse_path(pc["path"]), pc["domain"]
+        if d not in domains:
+            warn(f"capabilities: proposed capability for unknown domain '{d}'")
+            continue
+        c = add_node(path, status="Proposed", description=pc.get("description"))
+        g.add((c, SKOS.editorialNote, Literal("PROPOSED by the domain; not yet in the authoritative capability map.", lang="en")))
+        g.add((c, GOV.accountableDomain, dom_iri(d, placements[d])))
+        g.add((dom_iri(d, placements[d]), GOV.realizesCapability, c))
+        proposed.append((d, pc["path"]))
+
+    # ---- taxonomy crosswalk ------------------------------------------------------------------------
+    errors = 0
+    xw = cap_dir / "taxonomy-crosswalk.csv"
+    if xw.exists():
+        for r in read_table(xw):
+            d = r["domain"]
+            if d not in domains:
+                warn(f"capabilities: crosswalk domain '{d}' not in capability map")
                 errors += 1
                 continue
-            g.add((c, AV.governedBy, t))
+            for a in filter(None, (x.strip() for x in r["taxonomy_anchors"].split(";"))):
+                if (TAX[a], None, None) not in tax:
+                    warn(f"capabilities: crosswalk {d}: taxonomy node '{a}' not found")
+                    errors += 1
+                    continue
+                g.add((dom_iri(d, placements[d]), AV.governedBy, TAX[a]))
+
     out = cap_dir / "capability-map.ttl"
-    out.write_text(f"# GENERATED by tools/semtool.py capabilities from capabilities/{src.name}. Do not hand-edit.\n"
+    out.write_text("# GENERATED by tools/semtool.py capabilities (curated per capabilities/curation.yaml). Do not hand-edit.\n"
                    + g.serialize(format="turtle"))
-    (ok if not errors else warn)(f"capabilities: {len(rows)} rows -> {out.relative_to(gov.root)}"
-                                 + (" (PROVISIONAL)" if provisional else ""))
+
+    # ---- data-quality report ---------------------------------------------------------------------------
+    gaps = sorted(d for d in domains if not anchors.get(d) and d not in {p[0] for p in proposed})
+    lines = [
+        "# Capability map: data-quality report (GENERATED)",
+        "",
+        f"Source: `capabilities/source/{src.name}` ({len(rows)} rows). Rules: `capabilities/curation.yaml` (ADR-0004).",
+        "",
+        "| | Count |", "|---|---|",
+        f"| Ontology domains imported | {len({o for o in placements.values() if o})} |",
+        f"| Business domains imported | {len(domains)} |",
+        f"| Capability nodes in source | {len(nodes)} |",
+        f"| Business capability nodes imported | {len(kept)} |",
+        f"| Technology nodes (typed, not anchorable) | {len(tech_kept)} |",
+        f"| Domain→capability mappings kept (anchors) | {sum(len(v) for v in anchors.values())} |",
+        f"| Domain→capability rows excluded | {sum(len(v) for v in excluded.values())} |",
+        f"| Proposed capabilities (not in source) | {len(proposed)} |",
+        f"| Domains with no capability (gap) | {len(gaps)} |",
+        "", "## Kept mappings (domain → anchor capability; accountable for its sub-tree)", "",
+        "| Domain | Ontology domain | Anchor capability |", "|---|---|---|",
+    ]
+    for d in sorted(anchors):
+        for a in sorted(anchors[d]):
+            lines.append(f"| {d} | {placements[d] or '_unplaced_'} | {' > '.join(a)} |")
+    lines += ["", "## Excluded mappings (copied capability trees that do not belong to the domain)", "",
+              "| Domain | Rows excluded | Capability trees (L1) |", "|---|---|---|"]
+    for d in sorted(excluded):
+        l1 = sorted({p[0] for p in excluded[d]})
+        lines.append(f"| {d} | {len(excluded[d])} | {', '.join(l1)} |")
+    lines += ["", "## Ontology-domain placements not imported (suspicious)", "",
+              "| Domain | Source placement | Reason |", "|---|---|---|"]
+    for d, why in cur.get("suspicious_placements", {}).items():
+        lines.append(f"| {d} | {domains.get(d, {}).get('od', '?')} | {why} |")
+    lines += ["", "## Proposed capabilities (to add to the authoritative map)", "", "| Domain | Capability |", "|---|---|"]
+    lines += [f"| {d} | {p} |" for d, p in proposed]
+    lines += ["", "## Capability gaps (domains with no business capability in the map)", ""]
+    lines += [f"- {d} ({placements[d] or 'unplaced'})" for d in gaps]
+    (cap_dir / "data-quality-report.md").write_text("\n".join(lines) + "\n")
+
+    ok(f"capabilities: {len(domains)} domains in {len({o for o in placements.values() if o})} ontology domains, "
+       f"{len(kept)} business capabilities kept, {sum(len(v) for v in excluded.values())} copied mappings excluded, "
+       f"{len(proposed)} proposed -> capability-map.ttl + data-quality-report.md")
     return errors == 0
+
+
+# =============================================================================
+# structure  (domain repository structure standard)
+# =============================================================================
+
+def cmd_structure(repo: Repo, args) -> bool:
+    """Check a domain repo against standards/domain-repo-structure.yaml (part of gate G1)."""
+    if repo.kind != "domain":
+        return True
+    std = yaml.safe_load((repo.governance.root / "standards/domain-repo-structure.yaml").read_text())
+    root, problems = repo.root, []
+
+    for f in std["required_files"]:
+        if not (root / f).is_file():
+            problems.append(f"missing required file {f}")
+    for folder, patterns in std["folders"].items():
+        d = root / folder
+        if not d.is_dir():
+            problems.append(f"missing folder {folder}/")
+            continue
+        for entry in sorted(p.name for p in d.iterdir() if p.name != ".DS_Store"):
+            if not any(re.match(pt, entry) for pt in patterns):
+                problems.append(f"{folder}/{entry} does not follow the naming standard ({' | '.join(patterns)})")
+    folder_tops = {f.split("/")[0] for f in std["folders"]}
+    for entry in sorted(p.name for p in root.iterdir() if p.name not in (".git", ".DS_Store")):
+        if entry not in folder_tops and entry not in std["top_level"]:
+            problems.append(f"unexpected top-level entry {entry}")
+
+    # competency questions: numbering + id matches file name
+    cq = std["competency_questions"]
+    lo, hi = cq["template_owned"]
+    for y in sorted((root / "competency-questions").glob("cq-*.yaml")):
+        n = int(y.name[3:6])
+        if not (lo <= n <= hi or n >= cq["domain_start"]):
+            problems.append(f"{y.name}: domain-specific questions start at cq-{cq['domain_start']}")
+        spec = yaml.safe_load(y.read_text())
+        if spec.get("id") != f"CQ-{n:03d}":
+            problems.append(f"{y.name}: id is {spec.get('id')}, expected CQ-{n:03d}")
+        if not (y.parent / spec["query"]).is_file():
+            problems.append(f"{y.name}: query file {spec['query']} not found")
+
+    # execution models: files are named after the tool and every file belongs to a tool
+    FAB = Namespace(repo.base_iri + "fabric/model/")
+    em = load(repo.files("execution"))
+    tools = {str(t): m for m, t in em.subject_objects(FAB.toolName)}
+    for kind, sub, suffix, prop in (("query tool", "queries", ".rq", FAB.artifactPath),
+                                    ("input schema", "schemas", ".schema.json", FAB.inputSchemaPath),
+                                    ("rule pack", "rulepacks", ".yaml", FAB.artifactPath)):
+        for f in sorted((root / "execution-models" / sub).glob("*" + suffix)):
+            name = f.name[: -len(suffix)]
+            if name not in tools:
+                problems.append(f"execution-models/{sub}/{f.name}: no execution model with toolName '{name}'")
+            elif str(em.value(tools[name], prop) or "") != f"execution-models/{sub}/{f.name}":
+                problems.append(f"execution-models/{sub}/{f.name}: {prop.split('/')[-1]} of '{name}' does not point at it")
+    for name, m in tools.items():
+        for p in (em.value(m, FAB.artifactPath), em.value(m, FAB.inputSchemaPath)):
+            if p and not (root / str(p)).exists():
+                problems.append(f"execution model '{name}' points at missing file {p}")
+
+    # negative tests: file number = rule number, and every rule has at least one negative case
+    AV = Namespace(repo.base_iri + "governance/annotations/")
+    rules = load(repo.files("rules"))
+    rule_ids = {str(o) for o in rules.objects(None, AV.ruleIdentifier)}
+    spec = yaml.safe_load((root / "tests/negative/expectations.yaml").read_text())
+    covered = set()
+    for case in spec.get("cases", []):
+        covered |= set(case["expect_violations"])
+        m = re.match(r"nc-(\d{3})-", case["file"])
+        if m and not any(r.endswith(f"-R-{m.group(1)}") for r in case["expect_violations"]):
+            problems.append(f"tests/negative/{case['file']}: nc-{m.group(1)} must test rule *-R-{m.group(1)}")
+        if not (root / "tests/negative" / case["file"]).is_file():
+            problems.append(f"tests/negative/expectations.yaml: {case['file']} not found")
+    for rid in sorted(rule_ids - covered):
+        problems.append(f"business rule {rid} has no negative test case")
+
+    for p in problems:
+        info(p)
+    (fail if problems else ok)(f"structure: {len(problems)} deviation(s) from the domain repository standard"
+                               if problems else "structure: conforms to the domain repository standard")
+    return not problems
 
 
 # =============================================================================
@@ -665,6 +874,7 @@ def build_dataset(repo: Repo, include_examples=True) -> Dataset:
         load(fx.files("ontology"), ds.graph(graph_name(fx, "enterprise", "fibo-extensions", ver, "ontology")))
         load(fx.files("registry"), ds.graph(graph_name(fx, "enterprise", "fibo-extensions", ver, "registry")))
         load(fx.files("profile"), ds.graph(graph_name(fx, "enterprise", "fibo-extensions", ver, "profile")))
+        load(fx.files("umbrellas"), ds.graph(graph_name(fx, "enterprise", "fibo-extensions", ver, "ontology-domains")))
     if repo.kind == "domain":
         for coll, version, part, gname, files in collection_partitions(repo):
             load(files, ds.graph(gname))
@@ -921,7 +1131,7 @@ def cmd_rebase(repo: Repo, args) -> bool:
 
 def cmd_verify(repo: Repo, args) -> bool:
     print(f"{BOLD}== verify {repo.root.name} ({repo.kind}){RESET}")
-    steps = [cmd_syntax, cmd_meta]
+    steps = [cmd_syntax, cmd_structure, cmd_meta]
     if repo.kind in ("fibo-extensions", "domain"):
         steps += [cmd_extensions, cmd_closure, cmd_reason]
     if repo.kind == "domain":

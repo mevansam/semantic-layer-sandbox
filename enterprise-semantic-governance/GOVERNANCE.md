@@ -45,7 +45,7 @@ The enterprise key never changes what a term means. If the representation cannot
 
 | Gate | Check | Command |
 |---|---|---|
-| G1 Syntax | all RDF parses | `semtool syntax` |
+| G1 Syntax & structure | all RDF parses; domain repos keep the template structure (`standards/domain-repo-structure.yaml`) | `semtool syntax`, `semtool structure` |
 | G2 Standards | meta-shapes (headers, definitions, naming, taxonomy anchoring, FIBO parentage, manifest completeness, rule metadata, record classes, collections, execution models) | `semtool meta` |
 | G3 FIBO extension rules | no FIBO redefinition; namespace registered; imports within the enterprise FIBO profile | `semtool extensions` |
 | G4 Logical coherence | import closure with FIBO classifies with no unsatisfiable classes | `semtool closure && semtool reason` |

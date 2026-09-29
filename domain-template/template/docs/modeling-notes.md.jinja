@@ -1,0 +1,31 @@
+# Modelling notes: {{ domain_name }}
+
+Owned by the domain owner. This is the semantic review record for the domain: why concepts are modelled the way they are. Keep it current; reviewers read it before approving a change.
+
+## Place in the capability map
+
+| | |
+|---|---|
+| Ontology domain | **{{ ontology_domain_name }}** |
+| Business domain (accountable) | **{{ domain_name }}** (`{{ registry_code }}`) |
+| Capabilities realized | {% for c in capabilities %}`{{ c }}`{% if not loop.last %} · {% endif %}{% endfor %} |
+| Related domains | _list domains whose terms this domain uses or aligns with_ |
+
+## FIBO parent choices
+
+| Class | FIBO parent | Note |
+|---|---|---|
+| {{ seed_class }} | `{{ seed_class_parent }}` | seed concept from the template; replace |
+
+Record any gap with `skos:editorialNote "FIBO-GAP: ..."` on the class, and list it here.
+
+## Rules, tools and tests
+
+| Rule | Negative test | Enforced at runtime by |
+|---|---|---|
+| {{ rule_prefix }}-R-000 | `tests/negative/nc-000-missing-reference-code.ttl` | `{{ registry_code | replace('-', '_') }}_{{ module_name }}_rulepack` |
+
+## Open items
+
+- Replace the seed concept, rule, tool and tests with the domain's first real slice (keep the file names).
+- Replace placeholder role holders in `domain-manifest.ttl` and policy/retention placeholders in `rules/` and `records/`.
