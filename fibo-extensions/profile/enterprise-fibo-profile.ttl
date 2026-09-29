@@ -1,0 +1,53 @@
+@prefix ent-prof: <https://ontology.example.com/fibo-ext/profile/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+# -----------------------------------------------------------------------------
+# ENTERPRISE FIBO PROFILE
+#
+# The explicit list of FIBO modules the enterprise adopts. Domains may import
+# ONLY modules listed here (rule E3). To adopt another module: PR to this file
+# with the rationale, reviewed by the semantic review board. FIBO's own imports
+# (other FIBO modules, OMG Commons, LCC) come along transitively.
+#
+# Pinned FIBO release: master_2026Q2 (vendor/fibo submodule).
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/fibo-ext/profile/>
+    a owl:Ontology ;
+    rdfs:label "Enterprise FIBO Profile"@en ;
+    dct:abstract "FIBO production modules adopted by the enterprise, pinned to FIBO release master_2026Q2. Importing this ontology gives the enterprise's approved slice of FIBO."@en ;
+    dct:source <https://github.com/edmcouncil/fibo/tree/master_2026Q2> ;
+    owl:versionIRI <https://ontology.example.com/fibo-ext/profile/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional ;
+
+    # --- FND: foundations -----------------------------------------------------------
+    # Goals, objectives, strategies                     -> financial goals and plans
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FND/GoalsAndObjectives/Objectives/> ;
+    # Assessments, expected / observed values           -> projections, valuations
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Assessments/> ;
+    # Statistical measures, KPIs                        -> scores, analytics
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/Analytics/> ;
+    # Monetary amounts, currencies, prices              -> all amounts
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> ;
+    # Customers, clients, products, services
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FND/ProductsAndServices/ProductsAndServices/> ;
+    # People, dates of birth, ages
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FND/AgentsAndPeople/People/> ;
+    # Dates, periods, schedules
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FND/DatesAndTimes/FinancialDates/> ;
+    # Reports and records
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Reporting/> ;
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Documents/> ;
+
+    # --- FBC: financial business and commerce -------------------------------------------
+    # Accounts, account holders, balances, statements
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/ClientsAndAccounts/> ;
+    # Financial products and services, holdings, positions, portfolios
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/FinancialProductsAndServices/> ;
+    # Financial instruments and securities
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/FBC/FinancialInstruments/FinancialInstruments/> .

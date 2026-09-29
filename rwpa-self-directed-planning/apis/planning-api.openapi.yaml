@@ -1,0 +1,109 @@
+openapi: 3.1.0
+info:
+  title: Self-Directed Planning API
+  version: 0.1.0
+  description: |
+    Goals, self-directed plans and goal projections. Owned by the RWPA-SDP API owner.
+    Schemas carry x-ontology-class / x-ontology-property (full IRIs) linking them to
+    the domain ontology, so the knowledge graph knows what this API serves.
+paths:
+  /customers/{customerId}/goals:
+    get:
+      operationId: listGoals
+      parameters:
+        - { name: customerId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: The customer's financial goals
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/FinancialGoal" } }
+    post:
+      operationId: createGoal
+      parameters:
+        - { name: customerId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FinancialGoal" }
+      responses:
+        "201": { description: Created }
+        "422": { description: Violates SDP-R-002 (goal completeness) }
+  /goals/{goalReference}/projection:
+    get:
+      operationId: getGoalProjection
+      parameters:
+        - { name: goalReference, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Latest projection of the goal
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GoalProjection" }
+components:
+  schemas:
+    MonetaryAmount:
+      type: object
+      x-ontology-class: https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/MonetaryAmount
+      required: [amount, currency]
+      properties:
+        amount:
+          type: number
+          x-ontology-property: https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/hasAmount
+        currency:
+          type: string
+          description: ISO 4217 alphabetic code
+          x-ontology-property: https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/hasCurrency
+    FinancialGoal:
+      type: object
+      x-ontology-class: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/FinancialGoal
+      required: [goalReference, targetAmount, targetDate]
+      properties:
+        goalReference:
+          type: string
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/hasGoalReference
+        goalType:
+          type: string
+          enum: [retirement, other]
+          x-ontology-class-map:
+            retirement: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/RetirementGoal
+            other: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/FinancialGoal
+        targetAmount:
+          $ref: "#/components/schemas/MonetaryAmount"
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/hasTargetAmount
+        targetDate:
+          type: string
+          format: date
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/hasTargetDate
+        fundingAccountIds:
+          type: array
+          items: { type: string }
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/isFundedBy
+    GoalProjection:
+      type: object
+      x-ontology-class: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/GoalProjection
+      required: [goalReference, projectedAmount, probabilityOfSuccess]
+      properties:
+        goalReference:
+          type: string
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/projectsGoal
+        projectedAmount:
+          $ref: "#/components/schemas/MonetaryAmount"
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/hasProjectedAmount
+        probabilityOfSuccess:
+          type: number
+          minimum: 0
+          maximum: 1
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/probabilityOfSuccess
+        assumptions:
+          type: array
+          description: Scenario assumptions (always shown with the projection)
+          items:
+            type: object
+            x-ontology-class: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/PlanningAssumption
+            properties:
+              label: { type: string }
+              value:
+                type: number
+                x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/assumedValue

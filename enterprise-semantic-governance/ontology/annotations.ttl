@@ -1,0 +1,101 @@
+@prefix ent-av:  <https://ontology.example.com/governance/annotations/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:     <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# Enterprise Annotation Profile
+#
+# Owned by: Enterprise Semantic Governance (representation standard).
+# Every enterprise and domain ontology term MUST use these annotations as
+# required by shapes/meta-shapes.ttl. The profile deliberately reuses FIBO's
+# own annotation vocabulary (maturity levels, adapted-from, etc.) plus SKOS and
+# Dublin Core, and only adds what the enterprise needs for governance and for
+# AI grounding / GraphRAG retrieval.
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/governance/annotations/>
+    a owl:Ontology ;
+    rdfs:label "Enterprise Annotation Profile"@en ;
+    dct:abstract "Annotation properties that every governed term must carry: taxonomy anchoring, accountable ownership, AI grounding text and rule provenance. Reuses FIBO AnnotationVocabulary and SKOS wherever possible."@en ;
+    owl:versionIRI <https://ontology.example.com/governance/annotations/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional ;
+    dct:license "Proprietary - internal use (placeholder)" .
+
+# ---- Governance anchoring ---------------------------------------------------
+
+ent-av:governedBy
+    a owl:AnnotationProperty ;
+    rdfs:label "governed by"@en ;
+    skos:definition "Links a term, rule, API, dataset or record class to the enterprise taxonomy node that governs its meaning. Mandatory for every governed term."@en ;
+    ent-av:agentGuidance "Follow this link to find the taxonomy context and the accountable business domain for a term."@en .
+
+ent-av:realizesCapability
+    a owl:AnnotationProperty ;
+    rdfs:label "realizes capability"@en ;
+    skos:definition "Links a governed asset to the business capability (capability map) it supports."@en .
+
+ent-av:owningDomain
+    a owl:AnnotationProperty ;
+    rdfs:label "owning domain"@en ;
+    skos:definition "The business (sub-)domain accountable for the meaning of the annotated term. Set automatically by CI from the domain manifest; may be stated explicitly for shared/core terms."@en .
+
+# ---- AI grounding / retrieval ----------------------------------------------
+
+ent-av:agentGuidance
+    a owl:AnnotationProperty ;
+    rdfs:subPropertyOf skos:note ;
+    rdfs:label "agent guidance"@en ;
+    skos:definition "Plain-language guidance for AI agents on how and when to use a term, rule or tool, including what NOT to infer from it. Exported into GraphRAG concept cards."@en .
+
+ent-av:businessExample
+    a owl:AnnotationProperty ;
+    rdfs:subPropertyOf skos:example ;
+    rdfs:label "business example"@en ;
+    skos:definition "A short, realistic business example of the term in use."@en .
+
+ent-av:sensitivity
+    a owl:AnnotationProperty ;
+    rdfs:label "sensitivity"@en ;
+    skos:definition "Information sensitivity classification of the data described by a term (see ent-ctl sensitivity scheme). Drives which knowledge collections and agents may expose it."@en .
+
+# ---- Business rules ---------------------------------------------------------
+
+ent-av:ruleStatement
+    a owl:AnnotationProperty ;
+    rdfs:label "rule statement"@en ;
+    skos:definition "The authoritative plain-language statement of a business rule, as approved by the rule owner. The SHACL shape is the executable form; this text is the meaning."@en .
+
+ent-av:ruleIdentifier
+    a owl:AnnotationProperty ;
+    rdfs:label "rule identifier"@en ;
+    skos:definition "Stable business identifier of a rule, e.g. SDP-R-001."@en .
+
+ent-av:policySource
+    a owl:AnnotationProperty ;
+    rdfs:label "policy source"@en ;
+    skos:definition "Citation of the policy, procedure, regulation or contract from which a rule is derived."@en .
+
+# ---- Records ---------------------------------------------------------------
+
+ent-av:regulatoryCitation
+    a owl:AnnotationProperty ;
+    rdfs:label "regulatory citation"@en ;
+    skos:definition "Citation of a regulation that imposes a record-keeping or conduct requirement (e.g. 'SEC Rule 17a-4'). Placeholder citations must be confirmed by the Records owner."@en .
+
+# ---- Lifecycle -------------------------------------------------------------
+
+ent-av:taxonomyStatus
+    a owl:AnnotationProperty ;
+    rdfs:label "taxonomy status"@en ;
+    skos:definition "Status of a taxonomy node as shown in the source taxonomy diagram: Active, Proposed (orange in source) or ReferenceOnly (grey in source)."@en .
+
+ent-av:changeNote
+    a owl:AnnotationProperty ;
+    rdfs:subPropertyOf skos:changeNote ;
+    rdfs:label "change note"@en ;
+    skos:definition "Record of a semantically relevant change, referencing the semantic review (ADR / PR) that approved it."@en .

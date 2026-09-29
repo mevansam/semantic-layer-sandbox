@@ -1,0 +1,46 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ent-ms: <https://ontology.example.com/governance/shapes/> .
+@prefix ent-av: <https://ontology.example.com/governance/annotations/> .
+@prefix ent-tax: <https://ontology.example.com/taxonomy/> .
+
+# -----------------------------------------------------------------------------
+# META-SHAPES (business terms) - apply to enterprise-core FIBO extensions and
+# to every domain ontology. These enforce "governed by the enterprise
+# taxonomy" and "based on FIBO".
+# -----------------------------------------------------------------------------
+
+ent-ms:BusinessClassShape a sh:NodeShape ;
+    rdfs:label "Business class standard" ;
+    sh:targetClass owl:Class ;
+    sh:property [
+        sh:path ent-av:governedBy ; sh:minCount 1 ; sh:node ent-ms:TaxonomyNode ;
+        sh:message "Every business class must be governed by (anchored to) an enterprise taxonomy node." ] ;
+    sh:property [
+        sh:path rdfs:subClassOf ; sh:minCount 1 ;
+        sh:message "Every business class must specialize a FIBO class or an enterprise/domain class that does." ] ;
+    sh:property [
+        sh:path ent-av:agentGuidance ; sh:minCount 1 ; sh:severity sh:Warning ;
+        sh:message "Add agentGuidance so GraphRAG cards tell agents how (not) to use this concept." ] ;
+    sh:sparql [
+        sh:message "Direct parents must be FIBO/OMG classes or enterprise classes (no other external upper ontologies)." ;
+        sh:select """
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?value WHERE {
+              $this rdfs:subClassOf ?value .
+              FILTER(isIRI(?value))
+              FILTER(!STRSTARTS(STR(?value), "https://spec.edmcouncil.org/fibo/")
+                  && !STRSTARTS(STR(?value), "https://www.omg.org/spec/")
+                  && !STRSTARTS(STR(?value), "https://ontology.example.com/"))
+            }""" ] .
+
+ent-ms:BusinessPropertyShape a sh:NodeShape ;
+    rdfs:label "Business property standard" ;
+    sh:targetClass owl:ObjectProperty , owl:DatatypeProperty ;
+    sh:property [ sh:path rdfs:domain ; sh:minCount 1 ; sh:severity sh:Warning ;
+                  sh:message "State an rdfs:domain (or document why the property is domain-independent)." ] ;
+    sh:property [ sh:path rdfs:range ; sh:minCount 1 ; sh:severity sh:Warning ;
+                  sh:message "State an rdfs:range." ] .

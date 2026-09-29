@@ -1,0 +1,85 @@
+@prefix ent-core: <https://ontology.example.com/fibo-ext/core/> .
+@prefix ent-av:   <https://ontology.example.com/governance/annotations/> .
+@prefix ent-tax:  <https://ontology.example.com/taxonomy/> .
+@prefix ent-dom:  <https://ontology.example.com/capability/domain/> .
+@prefix fibo-fnd-pas-pas: <https://spec.edmcouncil.org/fibo/ontology/FND/ProductsAndServices/ProductsAndServices/> .
+@prefix fibo-fnd-arr-rep: <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Reporting/> .
+@prefix fibo-fnd-utl-av:  <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix cmns-cls: <https://www.omg.org/spec/Commons/Classifiers/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# ENTERPRISE CORE - FIBO extensions shared by more than one domain.
+#
+# A term belongs here ONLY when an alignment decision (governance/alignment)
+# agrees that several domains mean the same thing. Core terms still have ONE
+# owning domain (ent-av:owningDomain) accountable for their meaning; the
+# enterprise only hosts them. Keep this module small.
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/fibo-ext/core/>
+    a owl:Ontology ;
+    rdfs:label "Enterprise Core FIBO Extensions"@en ;
+    dct:abstract "Enterprise-wide specializations of FIBO shared across business domains, each with a single owning domain."@en ;
+    owl:imports <https://ontology.example.com/fibo-ext/profile/> ,
+                <https://ontology.example.com/governance/annotations/> ;
+    owl:versionIRI <https://ontology.example.com/fibo-ext/core/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# ---- Parties -------------------------------------------------------------------
+
+ent-core:RetailCustomer a owl:Class ;
+    rdfs:subClassOf fibo-fnd-pas-pas:Customer ;
+    rdfs:label "retail customer"@en ;
+    skos:definition "customer who is a natural person, or a household acting through natural persons, and who receives retail financial products or services for personal rather than business purposes"@en ;
+    ent-av:governedBy ent-tax:customers ;
+    ent-av:owningDomain ent-dom:customer-and-client-management ;
+    ent-av:agentGuidance "Use for individual investors served through retail channels. Institutional clients and their representatives are Clients, not RetailCustomers."@en ;
+    ent-av:changeNote "Promoted to core by alignment decision ALN-001."@en .
+
+# ---- Service delivery model (shared by self-directed and advised planning) ------
+
+ent-core:ServiceDeliveryModel a owl:Class ;
+    rdfs:subClassOf cmns-cls:Classifier ;
+    rdfs:label "service delivery model"@en ;
+    skos:definition "classifier that indicates whether a financial service is delivered to the customer on a self-directed basis or with personalized advice from a licensed or registered associate"@en ;
+    ent-av:governedBy ent-tax:products-and-services ;
+    ent-av:owningDomain ent-dom:retail-wealth-planning-and-advisory ;
+    ent-av:agentGuidance "The delivery model decides which business rules apply. Anything classified as self-directed must not contain personalized recommendations."@en .
+
+ent-core:SelfDirected a owl:NamedIndividual , ent-core:ServiceDeliveryModel ;
+    rdfs:label "self-directed"@en ;
+    skos:definition "delivery model in which the customer uses tools, education and generic insights to make their own decisions, without a personalized recommendation"@en .
+
+ent-core:Advised a owl:NamedIndividual , ent-core:ServiceDeliveryModel ;
+    rdfs:label "advised"@en ;
+    skos:definition "delivery model in which a licensed or registered associate, or a supervised advice service, provides recommendations tailored to the customer"@en .
+
+ent-core:hasDeliveryModel a owl:ObjectProperty ;
+    rdfs:label "has delivery model"@en ;
+    skos:definition "indicates the service delivery model under which something is produced or provided"@en ;
+    rdfs:range ent-core:ServiceDeliveryModel ;
+    ent-av:governedBy ent-tax:products-and-services .
+
+# ---- Common reference ---------------------------------------------------------------
+
+ent-core:MortalityTable a owl:Class ;
+    rdfs:subClassOf fibo-fnd-arr-rep:Report ;
+    rdfs:label "mortality table"@en ;
+    skos:definition "published actuarial table giving, for a defined population, the probability of death or remaining life expectancy at each age"@en ;
+    skos:editorialNote "FIBO-GAP: FIBO has no reference-data table concept; Report is the closest parent."@en ;
+    ent-av:governedBy ent-tax:common-reference.mortality-tables ;
+    ent-av:owningDomain ent-dom:enterprise-reference-data ;
+    ent-av:agentGuidance "Life-expectancy assumptions in projections must name the mortality table (and its version) they come from."@en .
+
+ent-core:tableVersion a owl:DatatypeProperty ;
+    rdfs:label "table version"@en ;
+    skos:definition "version or edition identifier of a published reference table"@en ;
+    rdfs:domain ent-core:MortalityTable ;
+    rdfs:range xsd:string ;
+    ent-av:governedBy ent-tax:common-reference .

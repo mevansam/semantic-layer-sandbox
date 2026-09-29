@@ -1,0 +1,83 @@
+@prefix {{ prefix }}-m: <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/governance/> .
+@prefix ent-fab: <{{ base_iri }}fabric/model/> .
+@prefix ent-ctl: <{{ base_iri }}governance/controls/> .
+@prefix ent-gov: <{{ base_iri }}governance/model/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# {{ subdomain_name }} - GOVERNED KNOWLEDGE COLLECTION(S)
+# The only route by which this domain's knowledge reaches AI agents.
+# Owned by the domain owner; published by the semantic fabric; risk approved by
+# the AI risk office. Standard: docs/standards/08-semantic-fabric.md
+# -----------------------------------------------------------------------------
+
+<{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/governance/collections/>
+    a owl:Ontology ;
+    rdfs:label "{{ subdomain_name }} - knowledge collections"@en ;
+    dct:abstract "Knowledge collections published by {{ subdomain_name }}, their named-graph partitions, usage policies and risk assessments."@en ;
+    owl:versionIRI <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/governance/collections/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+{{ prefix }}-m:Collection a ent-fab:KnowledgeCollection ;
+    rdfs:label "{{ subdomain_name }} knowledge"@en ;
+    dct:description "Ontology, rules, processes, APIs, stewardship, records and execution models of {{ subdomain_name }}."@en ;
+    ent-fab:publishedBy <{{ capability_domain_iri }}> ;
+    owl:versionInfo "0.1.0" ;
+    ent-fab:sensitivity ent-ctl:Internal ;
+    ent-fab:usagePolicy {{ prefix }}-m:CollectionPolicy ;
+    ent-fab:subjectToControl ent-ctl:CTL-001 , ent-ctl:CTL-002 , ent-ctl:CTL-003 ;
+    ent-fab:hasRiskAssessment {{ prefix }}-m:CollectionRiskAssessment ;
+    ent-gov:hasDataSteward {{ prefix }}-m:DataStewardRole ;
+{%- for part, kind, src in [
+    ("ontology", "OntologyPartition", ["ontology/*.ttl"]),
+    ("rules", "RulesPartition", ["rules/*.ttl"]),
+    ("processes", "ProcessesPartition", ["processes/*.ttl"]),
+    ("apis", "ApisPartition", ["apis/*.ttl"]),
+    ("stewardship", "StewardshipPartition", ["stewardship/*.ttl"]),
+    ("records", "RecordsPartition", ["records/*.ttl"]),
+    ("manifest", "ManifestPartition", ["domain-manifest.ttl", "collections/*.ttl"]),
+    ("execution", "ExecutionPartition", ["execution-models/*.ttl"]) ] %}
+    ent-fab:hasPartition [
+        a ent-fab:GraphPartition ;
+        ent-fab:partitionKind ent-fab:{{ kind }} ;
+        ent-fab:graphName "{{ base_iri }}graph/{{ registry_code }}/{{ subdomain_slug }}/v0.1.0/{{ part }}"^^xsd:anyURI ;
+        {%- for s in src %}
+        ent-fab:sourcePath "{{ s }}" ;
+        {%- endfor %}
+    ] {{ "." if loop.last else ";" }}
+{%- endfor %}
+
+{{ prefix }}-m:CollectionPolicy a odrl:Policy , odrl:Set ;
+    rdfs:label "usage policy for {{ subdomain_name }} knowledge"@en ;
+    odrl:uid <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/governance/CollectionPolicy> ;
+    odrl:permission [
+        odrl:target {{ prefix }}-m:Collection ;
+        odrl:assignee ent-fab:InternalAnalystAgent , ent-fab:AssociateAssistAgent ;
+        odrl:action odrl:use ;
+        odrl:constraint [ odrl:leftOperand odrl:purpose ; odrl:operator odrl:isAnyOf ;
+                          odrl:rightOperand ent-fab:InternalAnalytics ]
+    ] ;
+    odrl:prohibition [
+        odrl:target {{ prefix }}-m:Collection ;
+        odrl:assignee ent-fab:ExternalModelProvider ;
+        odrl:action odrl:use
+    ] , [
+        odrl:target {{ prefix }}-m:Collection ;
+        odrl:action odrl:use ;
+        odrl:constraint [ odrl:leftOperand odrl:purpose ; odrl:operator odrl:eq ; odrl:rightOperand ent-fab:ModelTraining ]
+    ] .
+
+{{ prefix }}-m:CollectionRiskAssessment a ent-ctl:RiskAssessment ;
+    rdfs:label "AI risk assessment - {{ subdomain_name }} knowledge collection"@en ;
+    ent-ctl:assesses {{ prefix }}-m:Collection ;
+    ent-ctl:identifiedRisk ent-ctl:RSK-001 , ent-ctl:RSK-002 ;
+    ent-ctl:residualRiskRating ent-ctl:Low ;
+    ent-ctl:approvedBy {{ prefix }}-m:AIRiskApprover ;
+    ent-ctl:assessmentDate "{{ created }}"^^xsd:date .

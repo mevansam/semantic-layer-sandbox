@@ -1,0 +1,27 @@
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+
+# -----------------------------------------------------------------------------
+# CROSS-DOMAIN ALIGNMENT AXIOMS
+#
+# Implements "Specialization" / "Equivalent" decisions recorded in
+# enterprise-semantic-governance/alignment/alignment-register.ttl.
+# Axioms here are the ONLY place one domain's term may be related to another
+# domain's term. Each axiom block cites its ALN-nnn decision.
+#
+# Current decisions:
+#   ALN-001  Equivalent -> implemented by promotion to ent-core:RetailCustomer (no axiom needed)
+#   ALN-002  RelatedNotEquivalent -> no axiom; agents keep terms distinct (CTL-007).
+#            When Advised Planning & Advice publishes its Recommendation class, add:
+#            [] a owl:AllDisjointClasses ; owl:members ( <...SelfDirectedInsight> <...advised/Recommendation> ) .
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/fibo-ext/alignment/>
+    a owl:Ontology ;
+    rdfs:label "Cross-domain Alignment Axioms"@en ;
+    dct:abstract "Logical axioms relating terms of different business domains, each justified by a recorded alignment decision."@en ;
+    owl:versionIRI <https://ontology.example.com/fibo-ext/alignment/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .

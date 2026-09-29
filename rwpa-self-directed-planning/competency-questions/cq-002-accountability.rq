@@ -1,0 +1,13 @@
+PREFIX ent-gov: <https://ontology.example.com/governance/model/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?domain ?area ?heldBy ?reviewTeam WHERE {
+  ?m a ent-gov:DomainManifest ;
+     ent-gov:describesDomain ?d ;
+     ent-gov:hasDomainOwner|ent-gov:hasRuleOwner|ent-gov:hasApiOwner|ent-gov:hasDataSteward|ent-gov:hasRecordsOwner ?role .
+  ?d rdfs:label ?domain .
+  ?role ent-gov:accountableFor/skos:prefLabel ?area ;
+        ent-gov:heldBy ?heldBy ;
+        ent-gov:reviewTeam ?reviewTeam .
+}
+ORDER BY ?area

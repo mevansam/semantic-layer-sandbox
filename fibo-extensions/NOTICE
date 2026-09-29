@@ -1,0 +1,6 @@
+This repository references, but does not modify, the Financial Industry Business Ontology (FIBO),
+Copyright (c) 2020 Enterprise Data Management Council, licensed under the MIT License
+(see vendor/fibo/LICENSE), included as a git submodule pinned to release master_2026Q2.
+
+FIBO depends on the OMG Commons Ontology Library and the OMG Languages, Countries and Codes (LCC)
+specification, fetched into vendor/omg by scripts/fetch-omg-dependencies.sh under their own licences.

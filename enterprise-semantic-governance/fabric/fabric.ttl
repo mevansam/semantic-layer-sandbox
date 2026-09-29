@@ -1,0 +1,165 @@
+@prefix ent-fab: <https://ontology.example.com/fabric/model/> .
+@prefix ent-gov: <https://ontology.example.com/governance/model/> .
+@prefix ent-ctl: <https://ontology.example.com/governance/controls/> .
+@prefix ent-proc: <https://ontology.example.com/governance/process/> .
+@prefix ent-av:  <https://ontology.example.com/governance/annotations/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# Semantic Fabric Model
+#
+# How domain knowledge is packaged, shared and consumed by AI:
+#   * Governed knowledge collections (dcat:Dataset of named graphs + ODRL policy)
+#   * Knowledge graph management (named graphs, versions, provenance)
+#   * Reusable semantic assets
+#   * Published execution models (rule packs, process models, query tools)
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/fabric/model/>
+    a owl:Ontology ;
+    rdfs:label "Semantic Fabric Model"@en ;
+    dct:abstract "Knowledge collections, named-graph partitions, agent classes and purposes for usage policies, reusable semantic assets and published execution models."@en ;
+    owl:imports <https://ontology.example.com/governance/controls/> , <https://ontology.example.com/governance/process/> ;
+    owl:versionIRI <https://ontology.example.com/fabric/model/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# =============================================================================
+# Governed knowledge collections
+# =============================================================================
+
+ent-fab:KnowledgeCollection a owl:Class ;
+    rdfs:subClassOf dcat:Dataset ;
+    rdfs:label "knowledge collection"@en ;
+    skos:definition "A released, versioned bundle of named graphs published by one domain, with an owner, a sensitivity class and an ODRL usage policy stating which agent classes may use it and for which purposes."@en ;
+    ent-av:agentGuidance "Only ground answers in collections your agent class is permitted to use for the current purpose (control CTL-001)."@en .
+
+ent-fab:publishedBy a owl:ObjectProperty ; rdfs:label "published by"@en ;
+    rdfs:domain ent-fab:KnowledgeCollection ; rdfs:range ent-gov:BusinessDomain ;
+    skos:definition "Domain accountable for the collection's content."@en .
+
+ent-fab:hasPartition a owl:ObjectProperty ; rdfs:label "has partition"@en ;
+    rdfs:domain ent-fab:KnowledgeCollection ; rdfs:range ent-fab:GraphPartition ;
+    skos:definition "A named-graph partition of the collection."@en .
+
+ent-fab:GraphPartition a owl:Class ; rdfs:label "graph partition"@en ;
+    skos:definition "A named graph within a knowledge collection holding one kind of governed asset."@en .
+
+ent-fab:graphName a owl:DatatypeProperty ; rdfs:label "graph name"@en ;
+    rdfs:domain ent-fab:GraphPartition ; rdfs:range xsd:anyURI ;
+    skos:definition "IRI of the named graph in the knowledge graph (see naming convention in docs/standards)."@en .
+
+ent-fab:partitionKind a owl:ObjectProperty ; rdfs:label "partition kind"@en ;
+    rdfs:domain ent-fab:GraphPartition ; rdfs:range skos:Concept ;
+    skos:definition "Kind of asset the partition holds."@en .
+
+ent-fab:sourcePath a owl:DatatypeProperty ; rdfs:label "source path"@en ;
+    rdfs:domain ent-fab:GraphPartition ;
+    skos:definition "Repository-relative glob of source files assembled into the partition; repeatable."@en .
+
+ent-fab:sensitivity a owl:ObjectProperty ; rdfs:label "sensitivity"@en ;
+    rdfs:range ent-ctl:SensitivityClass ;
+    skos:definition "Sensitivity class of a collection."@en .
+
+ent-fab:usagePolicy a owl:ObjectProperty ; rdfs:label "usage policy"@en ;
+    rdfs:range odrl:Policy ;
+    skos:definition "ODRL policy governing AI consumption of the collection."@en .
+
+ent-fab:subjectToControl a owl:ObjectProperty ; rdfs:label "subject to control"@en ;
+    rdfs:range ent-ctl:AIControl ;
+    skos:definition "AI control that applies to a collection or execution model."@en .
+
+ent-fab:hasRiskAssessment a owl:ObjectProperty ; rdfs:label "has risk assessment"@en ;
+    rdfs:range ent-ctl:RiskAssessment ;
+    skos:definition "Approved AI risk assessment for a collection or execution model."@en .
+
+ent-fab:PartitionKinds a skos:ConceptScheme ; skos:prefLabel "Graph partition kinds"@en .
+ent-fab:OntologyPartition a skos:Concept ; skos:inScheme ent-fab:PartitionKinds ; skos:prefLabel "ontology"@en .
+ent-fab:RulesPartition a skos:Concept ; skos:inScheme ent-fab:PartitionKinds ; skos:prefLabel "rules"@en .
+ent-fab:ProcessesPartition a skos:Concept ; skos:inScheme ent-fab:PartitionKinds ; skos:prefLabel "processes"@en .
+ent-fab:ApisPartition a skos:Concept ; skos:inScheme ent-fab:PartitionKinds ; skos:prefLabel "apis"@en .
+ent-fab:StewardshipPartition a skos:Concept ; skos:inScheme ent-fab:PartitionKinds ; skos:prefLabel "stewardship"@en .
+ent-fab:RecordsPartition a skos:Concept ; skos:inScheme ent-fab:PartitionKinds ; skos:prefLabel "records"@en .
+ent-fab:ManifestPartition a skos:Concept ; skos:inScheme ent-fab:PartitionKinds ; skos:prefLabel "manifest"@en .
+ent-fab:ExecutionPartition a skos:Concept ; skos:inScheme ent-fab:PartitionKinds ; skos:prefLabel "execution models"@en .
+
+# ---- Consumers and purposes (used as ODRL assignees / purpose constraints) -----
+
+ent-fab:AgentClass a owl:Class ; rdfs:subClassOf odrl:Party ; rdfs:label "agent class"@en ;
+    skos:definition "A class of AI agent that consumes enterprise knowledge under a common entitlement."@en .
+
+ent-fab:CustomerFacingAgent a ent-fab:AgentClass ; rdfs:label "customer-facing agent"@en ;
+    skos:definition "Agents that interact directly with customers in digital channels."@en .
+ent-fab:AssociateAssistAgent a ent-fab:AgentClass ; rdfs:label "associate-assist agent"@en ;
+    skos:definition "Agents that assist licensed or registered associates; outputs are reviewed by the associate."@en .
+ent-fab:InternalAnalystAgent a ent-fab:AgentClass ; rdfs:label "internal analyst agent"@en ;
+    skos:definition "Agents used internally for analysis, operations or engineering; never customer-facing."@en .
+ent-fab:ExternalModelProvider a ent-fab:AgentClass ; rdfs:label "external model provider"@en ;
+    skos:definition "Any model or service operated outside the enterprise boundary."@en .
+
+ent-fab:Purposes a skos:ConceptScheme ; skos:prefLabel "Knowledge usage purposes"@en .
+ent-fab:SelfDirectedGuidance a skos:Concept ; skos:inScheme ent-fab:Purposes ; skos:prefLabel "self-directed guidance"@en ;
+    skos:definition "Helping customers understand their own situation and tools without making personalized recommendations."@en .
+ent-fab:PersonalizedAdvice a skos:Concept ; skos:inScheme ent-fab:Purposes ; skos:prefLabel "personalized advice"@en ;
+    skos:definition "Recommendations tailored to a specific customer's circumstances, a regulated activity."@en .
+ent-fab:InternalAnalytics a skos:Concept ; skos:inScheme ent-fab:Purposes ; skos:prefLabel "internal analytics"@en ;
+    skos:definition "Internal analysis and reporting."@en .
+ent-fab:ModelTraining a skos:Concept ; skos:inScheme ent-fab:Purposes ; skos:prefLabel "model training"@en ;
+    skos:definition "Use of knowledge to train or fine-tune models."@en .
+
+# =============================================================================
+# Reusable semantic assets
+# =============================================================================
+
+ent-fab:ReusableAsset a owl:Class ; rdfs:subClassOf prov:Entity ; rdfs:label "reusable semantic asset"@en ;
+    skos:definition "A shape, modelling pattern, vocabulary or query template published by the fabric for reuse across domains."@en .
+ent-fab:assetKind a owl:ObjectProperty ; rdfs:label "asset kind"@en ; rdfs:range skos:Concept ;
+    skos:definition "Kind of reusable asset."@en .
+ent-fab:AssetKinds a skos:ConceptScheme ; skos:prefLabel "Reusable asset kinds"@en .
+ent-fab:ShapeAsset a skos:Concept ; skos:inScheme ent-fab:AssetKinds ; skos:prefLabel "shape"@en .
+ent-fab:PatternAsset a skos:Concept ; skos:inScheme ent-fab:AssetKinds ; skos:prefLabel "modelling pattern"@en .
+ent-fab:VocabularyAsset a skos:Concept ; skos:inScheme ent-fab:AssetKinds ; skos:prefLabel "vocabulary"@en .
+ent-fab:QueryTemplateAsset a skos:Concept ; skos:inScheme ent-fab:AssetKinds ; skos:prefLabel "query template"@en .
+
+# =============================================================================
+# Published execution models
+# =============================================================================
+
+ent-fab:ExecutionModel a owl:Class ; rdfs:subClassOf prov:Entity ;
+    rdfs:label "execution model"@en ;
+    skos:definition "A published, versioned artefact that an AI agent executes: a rule pack, a process model or a query tool. Always traceable to domain-owned source rules or processes, grounded in a collection, and subject to AI controls."@en ;
+    ent-av:agentGuidance "Invoke execution models by toolName; never re-implement their logic in free text."@en .
+
+ent-fab:RulePack a owl:Class ; rdfs:subClassOf ent-fab:ExecutionModel ; rdfs:label "rule pack"@en ;
+    skos:definition "A bundle of domain SHACL business rules compiled for runtime evaluation of agent inputs or outputs."@en .
+ent-fab:ProcessModel a owl:Class ; rdfs:subClassOf ent-fab:ExecutionModel ; rdfs:label "process model"@en ;
+    skos:definition "An executable form of a domain business process used to orchestrate agent-assisted steps."@en .
+ent-fab:QueryTool a owl:Class ; rdfs:subClassOf ent-fab:ExecutionModel ; rdfs:label "query tool"@en ;
+    skos:definition "A parameterized SPARQL query over governed collections exposed to agents as a tool with a JSON input schema."@en .
+
+ent-fab:derivedFromRule a owl:ObjectProperty ; rdfs:label "derived from rule"@en ;
+    rdfs:domain ent-fab:ExecutionModel ; rdfs:range ent-gov:BusinessRule ;
+    skos:definition "Source business rule the execution model implements."@en .
+ent-fab:implementsProcess a owl:ObjectProperty ; rdfs:label "implements process"@en ;
+    rdfs:domain ent-fab:ExecutionModel ; rdfs:range ent-proc:BusinessProcess ;
+    skos:definition "Source business process the execution model implements or supports."@en .
+ent-fab:groundedIn a owl:ObjectProperty ; rdfs:label "grounded in"@en ;
+    rdfs:domain ent-fab:ExecutionModel ; rdfs:range ent-fab:KnowledgeCollection ;
+    skos:definition "Collection(s) the execution model reads."@en .
+ent-fab:toolName a owl:DatatypeProperty ; rdfs:label "tool name"@en ;
+    rdfs:domain ent-fab:ExecutionModel ;
+    skos:definition "Stable name under which agents invoke the execution model."@en .
+ent-fab:artifactPath a owl:DatatypeProperty ; rdfs:label "artifact path"@en ;
+    rdfs:domain ent-fab:ExecutionModel ;
+    skos:definition "Repository-relative path of the executable artefact (query template, compiled rule pack, input schema)."@en .
+ent-fab:inputSchemaPath a owl:DatatypeProperty ; rdfs:label "input schema path"@en ;
+    rdfs:domain ent-fab:QueryTool ;
+    skos:definition "Repository-relative path of the tool's JSON Schema for inputs."@en .

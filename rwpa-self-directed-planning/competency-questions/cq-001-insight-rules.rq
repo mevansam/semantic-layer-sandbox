@@ -1,0 +1,15 @@
+PREFIX sdp: <https://ontology.example.com/domain/rwpa/self-directed-planning/planning/>
+PREFIX ent-av:  <https://ontology.example.com/governance/annotations/>
+PREFIX ent-gov: <https://ontology.example.com/governance/model/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+# Rules targeting SelfDirectedInsight or any of its superclasses
+SELECT DISTINCT ?ruleId ?statement ?owner ?policy WHERE {
+  sdp:SelfDirectedInsight rdfs:subClassOf* ?cls .
+  ?rule sh:targetClass ?cls ;
+        ent-av:ruleIdentifier ?ruleId ;
+        ent-av:ruleStatement ?statement ;
+        ent-av:policySource ?policy ;
+        ent-gov:hasRuleOwner/ent-gov:heldBy ?owner .
+}
+ORDER BY ?ruleId

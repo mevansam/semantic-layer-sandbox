@@ -1,0 +1,10 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  semantic:
+    # Gates G1-G7: syntax, standards, FIBO extension rules, coherence with FIBO,
+    # business rules, competency questions, knowledge-graph + GraphRAG export.
+    uses: example-org/enterprise-semantic-governance/.github/workflows/semantic-ci.yml@main

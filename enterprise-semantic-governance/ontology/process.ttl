@@ -1,0 +1,97 @@
+@prefix ent-proc: <https://ontology.example.com/governance/process/> .
+@prefix ent-gov:  <https://ontology.example.com/governance/model/> .
+@prefix ent-av:   <https://ontology.example.com/governance/annotations/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# Enterprise Process Vocabulary
+#
+# A deliberately small vocabulary for describing business processes so that
+# agents can be grounded in "what happens, in what order, by whom, under which
+# rules, touching which data, APIs and records". Aligned to PROV-O (a process
+# is a prov:Plan; executions are prov:Activity). BPMN remains the modelling
+# notation of record where it exists; this vocabulary links to it.
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/governance/process/>
+    a owl:Ontology ;
+    rdfs:label "Enterprise Process Vocabulary"@en ;
+    dct:abstract "Business processes, ordered steps, performing roles, consumed and produced concepts, applied rules, invoked APIs and created records."@en ;
+    owl:imports <https://ontology.example.com/governance/model/> ;
+    owl:versionIRI <https://ontology.example.com/governance/process/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+ent-proc:BusinessProcess a owl:Class ;
+    rdfs:subClassOf prov:Plan ;
+    rdfs:label "business process"@en ;
+    skos:definition "A domain-owned, repeatable sequence of steps that realizes a business capability."@en ;
+    ent-av:agentGuidance "Use the ordered steps and their applied rules to explain or orchestrate a process; never skip a step that has humanApprovalRequired true."@en .
+
+ent-proc:ProcessStep a owl:Class ;
+    rdfs:subClassOf prov:Plan ;
+    rdfs:label "process step"@en ;
+    skos:definition "A single step within a business process."@en .
+
+ent-proc:hasStep a owl:ObjectProperty ; rdfs:label "has step"@en ;
+    rdfs:domain ent-proc:BusinessProcess ; rdfs:range ent-proc:ProcessStep ;
+    skos:definition "Relates a process to one of its steps."@en .
+
+ent-proc:stepOrder a owl:DatatypeProperty ; rdfs:label "step order"@en ;
+    rdfs:domain ent-proc:ProcessStep ; rdfs:range xsd:integer ;
+    skos:definition "Ordinal position of a step within its process."@en .
+
+ent-proc:precededBy a owl:ObjectProperty ; rdfs:label "preceded by"@en ;
+    rdfs:domain ent-proc:ProcessStep ; rdfs:range ent-proc:ProcessStep ;
+    skos:definition "A step that must complete before this step starts."@en .
+
+ent-proc:performedBy a owl:ObjectProperty ; rdfs:label "performed by"@en ;
+    rdfs:domain ent-proc:ProcessStep ;
+    skos:definition "The party role, system or agent class that performs the step."@en .
+
+ent-proc:usesConcept a owl:ObjectProperty ; rdfs:label "uses concept"@en ;
+    rdfs:domain ent-proc:ProcessStep ;
+    skos:definition "An ontology class whose instances the step consumes."@en .
+
+ent-proc:producesConcept a owl:ObjectProperty ; rdfs:label "produces concept"@en ;
+    rdfs:domain ent-proc:ProcessStep ;
+    skos:definition "An ontology class whose instances the step creates or updates."@en .
+
+ent-proc:appliesRule a owl:ObjectProperty ; rdfs:label "applies rule"@en ;
+    rdfs:domain ent-proc:ProcessStep ; rdfs:range ent-gov:BusinessRule ;
+    skos:definition "A business rule evaluated during the step."@en .
+
+ent-proc:invokesApi a owl:ObjectProperty ; rdfs:label "invokes API"@en ;
+    rdfs:domain ent-proc:ProcessStep ; rdfs:range ent-gov:DomainApi ;
+    skos:definition "A domain API called during the step."@en .
+
+ent-proc:createsRecord a owl:ObjectProperty ; rdfs:label "creates record"@en ;
+    rdfs:domain ent-proc:ProcessStep ; rdfs:range ent-gov:RecordClass ;
+    skos:definition "A record class whose records the step creates."@en .
+
+ent-proc:automationLevel a owl:ObjectProperty ; rdfs:label "automation level"@en ;
+    rdfs:domain ent-proc:ProcessStep ; rdfs:range skos:Concept ;
+    skos:definition "Degree to which the step is automated or agent-assisted."@en .
+
+ent-proc:humanApprovalRequired a owl:DatatypeProperty ; rdfs:label "human approval required"@en ;
+    rdfs:domain ent-proc:ProcessStep ; rdfs:range xsd:boolean ;
+    skos:definition "Whether a human must approve the step's outcome before the process continues."@en .
+
+ent-proc:bpmnReference a owl:DatatypeProperty ; rdfs:label "BPMN reference"@en ; rdfs:range xsd:anyURI ;
+    skos:definition "Link to the BPMN model of record for the process, where one exists."@en .
+
+ent-proc:AutomationLevels a skos:ConceptScheme ; skos:prefLabel "Automation levels"@en .
+ent-proc:Manual a skos:Concept ; skos:inScheme ent-proc:AutomationLevels ; skos:prefLabel "Manual"@en ;
+    skos:definition "Performed by a person without system assistance."@en .
+ent-proc:SystemAutomated a skos:Concept ; skos:inScheme ent-proc:AutomationLevels ; skos:prefLabel "System automated"@en ;
+    skos:definition "Performed by deterministic systems."@en .
+ent-proc:AgentAssisted a skos:Concept ; skos:inScheme ent-proc:AutomationLevels ; skos:prefLabel "Agent assisted"@en ;
+    skos:definition "Performed by an AI agent within published execution models, subject to AI controls."@en .
+ent-proc:CustomerSelfService a skos:Concept ; skos:inScheme ent-proc:AutomationLevels ; skos:prefLabel "Customer self-service"@en ;
+    skos:definition "Performed by the customer through a digital channel."@en .

@@ -1,0 +1,6 @@
+# Negative test cases: each file MUST trigger the listed business rules (gate G5).
+# Every business rule should appear in at least one case.
+cases:
+  - name: missing reference code
+    file: nc-000-missing-reference-code.ttl
+    expect_violations: [{{ rule_prefix }}-R-000]

@@ -1,0 +1,6 @@
+*                         @example-org/semantic-review-board
+/profile/                 @example-org/semantic-review-board @example-org/ontology-standards
+/registry/                @example-org/semantic-review-board
+/ontology/alignment/      @example-org/semantic-review-board
+/vendor/                  @example-org/ontology-standards
+/scripts/                 @example-org/semantic-fabric-platform

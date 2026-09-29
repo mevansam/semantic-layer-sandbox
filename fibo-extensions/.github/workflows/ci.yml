@@ -1,0 +1,8 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  semantic:
+    uses: example-org/enterprise-semantic-governance/.github/workflows/semantic-ci.yml@main

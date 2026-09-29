@@ -1,0 +1,51 @@
+@prefix sdp:     <https://ontology.example.com/domain/rwpa/self-directed-planning/planning/> .
+@prefix sdp-rec: <https://ontology.example.com/domain/rwpa/self-directed-planning/records/> .
+@prefix sdp-m:   <https://ontology.example.com/domain/rwpa/self-directed-planning/governance/> .
+@prefix ent-gov: <https://ontology.example.com/governance/model/> .
+@prefix ent-av:  <https://ontology.example.com/governance/annotations/> .
+@prefix ent-tax: <https://ontology.example.com/taxonomy/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# Self-Directed Wealth Planning - RECORD KEEPING (owned by the records owner)
+# Retention periods and citations are PLACEHOLDERS pending confirmation by the
+# records owner with Legal & Compliance (module stays Provisional until then).
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/domain/rwpa/self-directed-planning/records/>
+    a owl:Ontology ;
+    rdfs:label "Self-Directed Wealth Planning - record classes"@en ;
+    dct:abstract "Records created by self-directed planning: delivered insights and self-directed plans."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/rwpa/self-directed-planning/records/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+sdp-rec:InsightRecord a ent-gov:RecordClass ;
+    rdfs:label "delivered insight record"@en ;
+    skos:definition "Record of each self-directed insight delivered to a customer, with its text, category, suggested action, model provenance and the rule-pack result, retained as a communication with the customer."@en ;
+    ent-gov:recordOf sdp:SelfDirectedInsight ;
+    ent-gov:retentionPeriod "P6Y"^^xsd:duration ;
+    ent-gov:retentionTrigger "delivery of the insight to the customer" ;
+    ent-gov:legalHoldApplicable true ;
+    ent-gov:dispositionMethod "secure deletion after retention unless under legal hold" ;
+    ent-gov:storageRequirement "non-rewriteable, non-erasable storage (placeholder - confirm)" ;
+    ent-gov:hasRecordsOwner sdp-m:RecordsOwnerRole ;
+    ent-av:regulatoryCitation "PLACEHOLDER: SEC Rule 17a-4 / FINRA Rules 2210 and 4511 (communications with the public) - confirm applicability and period with Legal & Compliance" ;
+    ent-av:governedBy ent-tax:legal-risk-compliance-and-surveillance.enterprise-risk.content-retention-and-management .
+
+sdp-rec:PlanRecord a ent-gov:RecordClass ;
+    rdfs:label "self-directed plan record"@en ;
+    skos:definition "Record of each version of a customer's self-directed plan, its goals, scenarios, assumptions and projections."@en ;
+    ent-gov:recordOf sdp:SelfDirectedPlan , sdp:GoalProjection ;
+    ent-gov:retentionPeriod "P6Y"^^xsd:duration ;
+    ent-gov:retentionTrigger "plan superseded or customer relationship ended" ;
+    ent-gov:legalHoldApplicable true ;
+    ent-gov:dispositionMethod "secure deletion after retention unless under legal hold" ;
+    ent-gov:hasRecordsOwner sdp-m:RecordsOwnerRole ;
+    ent-av:regulatoryCitation "PLACEHOLDER: firm records retention schedule class WM-PLAN - confirm with Records" ;
+    ent-av:governedBy ent-tax:legal-risk-compliance-and-surveillance.enterprise-risk.content-retention-and-management .

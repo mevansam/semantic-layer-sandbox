@@ -1,0 +1,49 @@
+@prefix {{ prefix }}: <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/> .
+@prefix ent-av:   <{{ base_iri }}governance/annotations/> .
+@prefix ent-tax:  <{{ base_iri }}taxonomy/> .
+@prefix ent-core: <{{ base_iri }}fibo-ext/core/> .
+@prefix fibo-fnd-utl-av:  <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix fibo-fnd-pas-pas: <https://spec.edmcouncil.org/fibo/ontology/FND/ProductsAndServices/ProductsAndServices/> .
+@prefix fibo-fnd-gao-obj: <https://spec.edmcouncil.org/fibo/ontology/FND/GoalsAndObjectives/Objectives/> .
+@prefix fibo-fnd-acc-cur: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> .
+@prefix fibo-fnd-arr-asmt: <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Assessments/> .
+@prefix fibo-fnd-arr-rep: <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Reporting/> .
+@prefix fibo-fnd-utl-alx: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/Analytics/> .
+@prefix fibo-fnd-dt-fd:   <https://spec.edmcouncil.org/fibo/ontology/FND/DatesAndTimes/FinancialDates/> .
+@prefix fibo-fbc-pas-caa: <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/ClientsAndAccounts/> .
+@prefix fibo-fbc-pas-fpas: <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/FinancialProductsAndServices/> .
+@prefix fibo-fbc-fi-fi:   <https://spec.edmcouncil.org/fibo/ontology/FBC/FinancialInstruments/FinancialInstruments/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# {{ subdomain_name }} - {{ module_name }} module
+# MEANING owned by the domain owner. Standards: enterprise-semantic-governance/docs/standards/01.
+# Every class: FIBO (or enterprise-core) parent, taxonomy anchor, label, definition, agent guidance.
+# -----------------------------------------------------------------------------
+
+<{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/>
+    a owl:Ontology ;
+    rdfs:label "{{ subdomain_name }} - {{ module_name }}"@en ;
+    dct:abstract "Business concepts of the {{ subdomain_name }} sub-domain of {{ domain_name }}, specializing FIBO."@en ;
+    owl:imports <{{ base_iri }}fibo-ext/core/> ;
+    owl:versionIRI <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+{{ prefix }}:{{ seed_class }} a owl:Class ;
+    rdfs:subClassOf {{ seed_class_parent }} ;
+    rdfs:label "{{ seed_class_label }}"@en ;
+    skos:definition "{{ seed_class_definition }}"@en ;
+    ent-av:governedBy ent-tax:{{ seed_class_anchor }} ;
+    ent-av:agentGuidance "Replace with guidance for agents: when to use this concept and what not to infer from it."@en .
+
+{{ prefix }}:hasReferenceCode a owl:DatatypeProperty ;
+    rdfs:label "has reference code"@en ;
+    skos:definition "business identifier by which the domain refers to an instance"@en ;
+    rdfs:domain {{ prefix }}:{{ seed_class }} ;
+    rdfs:range xsd:string ;
+    ent-av:governedBy ent-tax:{{ seed_class_anchor }} .

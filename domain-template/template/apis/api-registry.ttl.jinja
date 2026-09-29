@@ -1,0 +1,35 @@
+@prefix {{ prefix }}:     <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/> .
+@prefix {{ prefix }}-api: <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/apis/> .
+@prefix {{ prefix }}-m:   <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/governance/> .
+@prefix ent-gov: <{{ base_iri }}governance/model/> .
+@prefix ent-av:  <{{ base_iri }}governance/annotations/> .
+@prefix ent-tax: <{{ base_iri }}taxonomy/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# {{ subdomain_name }} - DOMAIN API REGISTRY (owned by the API owner)
+# Contracts live next to this file as OpenAPI with x-ontology-* annotations.
+# Standard: docs/standards/04-apis-data-records.md
+# -----------------------------------------------------------------------------
+
+<{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/apis/>
+    a owl:Ontology ;
+    rdfs:label "{{ subdomain_name }} - domain APIs"@en ;
+    dct:abstract "Registry of domain APIs and the ontology concepts they serve."@en ;
+    owl:versionIRI <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/apis/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+{{ prefix }}-api:{{ module_name | capitalize }}Api a ent-gov:DomainApi ;
+    rdfs:label "{{ subdomain_name }} {{ module_name }} API"@en ;
+    skos:definition "Placeholder API serving {{ seed_class_label }} data."@en ;
+    ent-gov:apiSpecification "apis/{{ module_name }}-api.openapi.yaml"^^xsd:anyURI ;
+    ent-gov:servesConcept {{ prefix }}:{{ seed_class }} ;
+    ent-gov:hasApiOwner {{ prefix }}-m:ApiOwnerRole ;
+    ent-av:governedBy ent-tax:{{ seed_class_anchor }} .

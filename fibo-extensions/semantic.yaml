@@ -1,0 +1,20 @@
+repo_kind: fibo-extensions
+governance: ../enterprise-semantic-governance
+
+# FIBO is a pinned, read-only git submodule (see .gitmodules / ADR-0001).
+fibo_dir: vendor/fibo
+
+# XML catalogs used to resolve FIBO and its OMG dependencies offline.
+# vendor/omg is populated by scripts/fetch-omg-dependencies.sh.
+catalogs:
+  - vendor/fibo/catalog-v001.xml
+  - vendor/omg/catalog-v001.xml
+
+paths:
+  ontology:
+    - ontology/core/*.ttl
+    - ontology/alignment/*.ttl
+  profile:
+    - profile/*.ttl
+  registry:
+    - registry/*.ttl

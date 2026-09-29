@@ -1,0 +1,130 @@
+# Copier template for a business (sub-)domain semantic repository.
+#   copier copy domain-template ../<new-repo>          (Copier >= 9)
+#   python scripts/new_domain.py --answers answers.yaml --out ../<new-repo>   (no Copier needed)
+# Later template improvements can be pulled into existing domains with `copier update`.
+
+_subdirectory: template
+_templates_suffix: .jinja
+_answers_file: .copier-answers.yml
+
+# ---- Identity (must match the capability map and the domain registry) ----------
+domain_name:
+  type: str
+  help: Parent business domain name as in the capability map
+  default: "Example Business Domain"
+domain_code:
+  type: str
+  help: Short code of the parent domain (IRI path segment)
+  default: "exd"
+subdomain_name:
+  type: str
+  help: Sub-domain name as in the capability map
+  default: "Example Sub-Domain"
+subdomain_slug:
+  type: str
+  help: IRI path segment for the sub-domain
+  default: "example-subdomain"
+registry_code:
+  type: str
+  help: Domain code registered in fibo-extensions/registry (used in graph names and rule ids)
+  default: "exd-sub"
+rule_prefix:
+  type: str
+  help: Prefix for business rule identifiers
+  default: "EXD"
+prefix:
+  type: str
+  help: Turtle prefix for the domain's terms
+  default: "exd"
+module_name:
+  type: str
+  help: Name of the first ontology module
+  default: "core"
+capability_domain_iri:
+  type: str
+  help: IRI of the (sub-)domain in the capability map
+  default: "https://ontology.example.com/capability/domain/example-business-domain/example-sub-domain"
+capabilities:
+  type: yaml
+  help: Capability-map capability local names realized by this domain
+  default: [cap-example-01]
+taxonomy_anchors:
+  type: yaml
+  help: Enterprise taxonomy local names this domain elaborates
+  default: [customers.customer-profile]
+
+# ---- Seed concept (replace with real modelling after generation) -----------------
+seed_class:
+  type: str
+  default: "ExampleConcept"
+seed_class_label:
+  type: str
+  default: "example concept"
+seed_class_definition:
+  type: str
+  default: "placeholder concept to be replaced by the first real concept of the domain"
+seed_class_parent:
+  type: str
+  help: FIBO parent as a CURIE from the enterprise profile
+  default: "fibo-fnd-pas-pas:Product"
+seed_class_anchor:
+  type: str
+  default: "customers.customer-profile"
+
+# ---- Accountable roles (become CODEOWNERS) ------------------------------------------
+github_org:
+  type: str
+  default: example-org
+repo_name:
+  type: str
+  default: "example-domain-repo"
+domain_owner:
+  type: str
+  default: "Domain Owner (name)"
+domain_owner_team:
+  type: str
+  default: "@example-org/exd-domain-owners"
+rule_owner:
+  type: str
+  default: "Rule Owner (name)"
+rule_owner_team:
+  type: str
+  default: "@example-org/exd-rule-owners"
+api_owner:
+  type: str
+  default: "API Owner (name)"
+api_owner_team:
+  type: str
+  default: "@example-org/exd-api-owners"
+data_steward:
+  type: str
+  default: "Data Steward (name)"
+data_steward_team:
+  type: str
+  default: "@example-org/exd-data-stewards"
+records_owner:
+  type: str
+  default: "Records Owner (name)"
+records_owner_team:
+  type: str
+  default: "@example-org/exd-records"
+ai_risk_owner:
+  type: str
+  default: "AI Risk Office (placeholder)"
+ai_risk_owner_team:
+  type: str
+  default: "@example-org/ai-risk-office"
+
+# ---- Enterprise wiring -------------------------------------------------------------------
+base_iri:
+  type: str
+  default: https://ontology.example.com/
+governance_path:
+  type: str
+  default: ../enterprise-semantic-governance
+fibo_extensions_path:
+  type: str
+  default: ../fibo-extensions
+created:
+  type: str
+  default: "2026-09-28"

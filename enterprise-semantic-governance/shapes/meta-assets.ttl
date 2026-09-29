@@ -1,0 +1,187 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix ent-ms:   <https://ontology.example.com/governance/shapes/> .
+@prefix ent-av:   <https://ontology.example.com/governance/annotations/> .
+@prefix ent-gov:  <https://ontology.example.com/governance/model/> .
+@prefix ent-proc: <https://ontology.example.com/governance/process/> .
+@prefix ent-ctl:  <https://ontology.example.com/governance/controls/> .
+@prefix ent-fab:  <https://ontology.example.com/fabric/model/> .
+@prefix ent-tax:  <https://ontology.example.com/taxonomy/> .
+@prefix ent-cap:  <https://ontology.example.com/capability/> .
+
+# -----------------------------------------------------------------------------
+# META-SHAPES (governed assets) - the publication contract for domain-owned
+# assets and fabric artefacts. A domain release is blocked unless its manifest,
+# rules, APIs, stewardship, records, collections and execution models conform.
+# -----------------------------------------------------------------------------
+
+# ---- Reusable node constraints ------------------------------------------------
+
+ent-ms:TaxonomyNode a sh:NodeShape ;
+    sh:property [ sh:path skos:inScheme ; sh:hasValue ent-tax:EnterpriseTaxonomy ;
+                  sh:message "Must reference a node of the enterprise taxonomy." ] .
+
+ent-ms:CapabilityNode a sh:NodeShape ;
+    sh:property [ sh:path skos:inScheme ; sh:hasValue ent-cap:CapabilityMap ;
+                  sh:message "Must reference a capability of the enterprise capability map." ] .
+
+ent-ms:RoleAssignment a sh:NodeShape ;
+    sh:property [ sh:path ent-gov:heldBy ; sh:minCount 1 ;
+                  sh:message "An accountable role must name who holds it." ] ;
+    sh:property [ sh:path ent-gov:reviewTeam ; sh:minCount 1 ; sh:maxCount 1 ; sh:pattern "^@[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" ;
+                  sh:message "An accountable role needs one review team handle (@org/team) for CODEOWNERS." ] .
+
+# ---- Domain manifest ---------------------------------------------------------------
+
+ent-ms:DomainManifestShape a sh:NodeShape ;
+    rdfs:label "Domain manifest completeness (domain accountability)" ;
+    sh:targetClass ent-gov:DomainManifest ;
+    sh:property [ sh:path ent-gov:describesDomain ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ent-gov:BusinessDomain ;
+                  sh:message "The manifest must describe exactly one business domain registered in the capability map." ] ;
+    sh:property [ sh:path ent-gov:hasDomainOwner ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ;
+                  sh:message "MEANING: a domain owner is required." ] ;
+    sh:property [ sh:path ent-gov:hasRuleOwner ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ;
+                  sh:message "RULES: a (default) rule owner is required." ] ;
+    sh:property [ sh:path ent-gov:hasApiOwner ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ;
+                  sh:message "APIs: an API owner is required." ] ;
+    sh:property [ sh:path ent-gov:hasDataSteward ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ;
+                  sh:message "DATA: at least one data steward is required." ] ;
+    sh:property [ sh:path ent-gov:hasRecordsOwner ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ;
+                  sh:message "RECORDS: a records owner is required." ] ;
+    sh:property [ sh:path ent-gov:anchoredTo ; sh:minCount 1 ; sh:node ent-ms:TaxonomyNode ;
+                  sh:message "The domain must anchor to at least one enterprise taxonomy node." ] ;
+    sh:property [ sh:path ent-gov:realizesCapability ; sh:minCount 1 ; sh:node ent-ms:CapabilityNode ;
+                  sh:message "The domain must realize at least one capability-map capability." ] ;
+    sh:property [ sh:path ent-gov:namespace ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ent-gov:codeRepository ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ent-gov:hasOntologyModule ; sh:minCount 1 ] .
+
+# ---- Business rules ------------------------------------------------------------------
+
+ent-ms:BusinessRuleShape a sh:NodeShape ;
+    rdfs:label "Business rule metadata (domain-owned rules)" ;
+    sh:targetClass ent-gov:BusinessRule ;
+    sh:property [ sh:path ent-av:ruleIdentifier ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A business rule needs one stable ruleIdentifier." ] ;
+    sh:property [ sh:path ent-av:ruleStatement ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A business rule needs its authoritative plain-language ruleStatement." ] ;
+    sh:property [ sh:path ent-av:policySource ; sh:minCount 1 ;
+                  sh:message "A business rule must cite its policySource." ] ;
+    sh:property [ sh:path ent-gov:hasRuleOwner ; sh:minCount 1 ; sh:maxCount 1 ; sh:node ent-ms:RoleAssignment ;
+                  sh:message "A business rule needs exactly one rule owner." ] ;
+    sh:property [ sh:path ent-av:governedBy ; sh:minCount 1 ; sh:node ent-ms:TaxonomyNode ;
+                  sh:message "A business rule must be anchored to the taxonomy." ] ;
+    sh:property [ sh:path sh:message ; sh:minCount 1 ; sh:severity sh:Warning ;
+                  sh:message "Provide sh:message so violations are explainable to users and agents." ] .
+
+# ---- Processes ---------------------------------------------------------------------------
+
+ent-ms:BusinessProcessShape a sh:NodeShape ;
+    sh:targetClass ent-proc:BusinessProcess ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ] ;
+    sh:property [ sh:path skos:definition ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-proc:hasStep ; sh:minCount 1 ; sh:class ent-proc:ProcessStep ] ;
+    sh:property [ sh:path ent-av:realizesCapability ; sh:minCount 1 ; sh:node ent-ms:CapabilityNode ;
+                  sh:message "A process must realize a capability-map capability." ] .
+
+ent-ms:ProcessStepShape a sh:NodeShape ;
+    sh:targetClass ent-proc:ProcessStep ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-proc:stepOrder ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ] ;
+    sh:property [ sh:path ent-proc:performedBy ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-proc:automationLevel ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ent-proc:appliesRule ; sh:class ent-gov:BusinessRule ] .
+
+# ---- APIs, stewardship, records -------------------------------------------------------------
+
+ent-ms:DomainApiShape a sh:NodeShape ;
+    rdfs:label "Domain API registration" ;
+    sh:targetClass ent-gov:DomainApi ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-gov:apiSpecification ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ent-gov:servesConcept ; sh:minCount 1 ; sh:message "An API must declare the ontology concepts it serves." ] ;
+    sh:property [ sh:path ent-gov:hasApiOwner ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ] ;
+    sh:property [ sh:path ent-av:governedBy ; sh:minCount 1 ; sh:node ent-ms:TaxonomyNode ] .
+
+ent-ms:CriticalDataElementShape a sh:NodeShape ;
+    sh:targetClass ent-gov:CriticalDataElement ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-gov:elementOf ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-gov:hasDataSteward ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ] ;
+    sh:property [ sh:path ent-gov:hasQualityRule ; sh:minCount 1 ; sh:severity sh:Warning ;
+                  sh:message "Critical data elements should have at least one quality rule." ] .
+
+ent-ms:DataProductShape a sh:NodeShape ;
+    rdfs:label "Data product stewardship" ;
+    sh:targetClass dcat:Dataset ;
+    sh:property [ sh:path ent-gov:hasDataSteward ; sh:minCount 1 ;
+                  sh:message "Every dataset / data product published by a domain needs a data steward." ] .
+
+ent-ms:RecordClassShape a sh:NodeShape ;
+    rdfs:label "Record class (record keeping)" ;
+    sh:targetClass ent-gov:RecordClass ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-gov:recordOf ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-gov:retentionPeriod ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:duration ] ;
+    sh:property [ sh:path ent-gov:retentionTrigger ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-gov:legalHoldApplicable ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:boolean ] ;
+    sh:property [ sh:path ent-gov:hasRecordsOwner ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ] ;
+    sh:property [ sh:path ent-av:regulatoryCitation ; sh:minCount 1 ;
+                  sh:message "Cite the regulation or policy that sets the retention requirement." ] .
+
+# ---- Semantic fabric ------------------------------------------------------------------------
+
+ent-ms:KnowledgeCollectionShape a sh:NodeShape ;
+    rdfs:label "Governed knowledge collection" ;
+    sh:targetClass ent-fab:KnowledgeCollection ;
+    sh:property [ sh:path ent-fab:publishedBy ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ent-gov:BusinessDomain ] ;
+    sh:property [ sh:path owl:versionInfo ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ent-fab:sensitivity ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ent-ctl:SensitivityClass ] ;
+    sh:property [ sh:path ent-fab:usagePolicy ; sh:minCount 1 ; sh:class odrl:Policy ;
+                  sh:message "A collection needs an ODRL usage policy before AI may consume it." ] ;
+    sh:property [ sh:path ent-fab:hasPartition ; sh:minCount 1 ; sh:class ent-fab:GraphPartition ] ;
+    sh:property [ sh:path ent-fab:subjectToControl ; sh:hasValue ent-ctl:CTL-001 ;
+                  sh:message "Collections are always subject to CTL-001 (answer only from governed collections)." ] ;
+    sh:property [ sh:path ent-fab:hasRiskAssessment ; sh:minCount 1 ; sh:class ent-ctl:RiskAssessment ] ;
+    sh:property [ sh:path ent-gov:hasDataSteward ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ] .
+
+ent-ms:GraphPartitionShape a sh:NodeShape ;
+    sh:targetClass ent-fab:GraphPartition ;
+    sh:property [ sh:path ent-fab:graphName ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:pattern "^https?://[^/]+/graph/[^/]+/[^/]+/v[0-9]+\\.[0-9]+\\.[0-9]+/[a-z-]+$" ;
+                  sh:message "Graph names follow {base}graph/{publisher}/{collection}/v{semver}/{partition}." ] ;
+    sh:property [ sh:path ent-fab:partitionKind ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ent-fab:sourcePath ; sh:minCount 1 ; sh:message "A partition lists one or more repository-relative source globs." ] .
+
+ent-ms:UsagePolicyShape a sh:NodeShape ;
+    sh:targetClass odrl:Policy ;
+    sh:property [ sh:path odrl:permission ; sh:minCount 1 ] ;
+    sh:property [ sh:path odrl:prohibition ; sh:minCount 1 ; sh:severity sh:Warning ;
+                  sh:message "State prohibited uses explicitly (e.g. external model providers, model training)." ] .
+
+ent-ms:ExecutionModelShape a sh:NodeShape ;
+    rdfs:label "Published execution model" ;
+    sh:targetClass ent-fab:ExecutionModel ;
+    sh:property [ sh:path ent-fab:toolName ; sh:minCount 1 ; sh:maxCount 1 ; sh:pattern "^[a-z][a-z0-9_]*$" ] ;
+    sh:property [ sh:path ent-fab:artifactPath ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-fab:groundedIn ; sh:minCount 1 ; sh:class ent-fab:KnowledgeCollection ] ;
+    sh:property [ sh:path ent-fab:subjectToControl ; sh:hasValue ent-ctl:CTL-006 ;
+                  sh:message "Execution models are always subject to CTL-006 (risk assessment and traceability)." ] ;
+    sh:property [ sh:path ent-fab:hasRiskAssessment ; sh:minCount 1 ; sh:class ent-ctl:RiskAssessment ] ;
+    sh:or ( [ sh:path ent-fab:derivedFromRule ; sh:minCount 1 ]
+            [ sh:path ent-fab:implementsProcess ; sh:minCount 1 ] ) ;
+    sh:message "An execution model must trace to a domain rule or process." .
+
+ent-ms:RiskAssessmentShape a sh:NodeShape ;
+    sh:targetClass ent-ctl:RiskAssessment ;
+    sh:property [ sh:path ent-ctl:assesses ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-ctl:identifiedRisk ; sh:minCount 1 ; sh:class ent-ctl:AIRisk ] ;
+    sh:property [ sh:path ent-ctl:residualRiskRating ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ent-ctl:approvedBy ; sh:minCount 1 ; sh:node ent-ms:RoleAssignment ] ;
+    sh:property [ sh:path ent-ctl:assessmentDate ; sh:minCount 1 ; sh:datatype xsd:date ] .

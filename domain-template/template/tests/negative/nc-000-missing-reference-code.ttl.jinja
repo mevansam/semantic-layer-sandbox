@@ -1,0 +1,5 @@
+@prefix {{ prefix }}:    <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/> .
+@prefix {{ prefix }}-ex: <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/examples/> .
+
+# NEGATIVE: a {{ seed_class_label }} without a reference code - must violate {{ rule_prefix }}-R-000.
+{{ prefix }}-ex:item-bad-0001 a {{ prefix }}:{{ seed_class }} .

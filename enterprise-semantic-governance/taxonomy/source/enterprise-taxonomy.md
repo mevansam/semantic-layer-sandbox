@@ -1,0 +1,493 @@
+# Enterprise Taxonomy
+
+- **Customers**
+  - Customer Identity & Access
+    - Customer Personal Information
+    - Customer Contact Information
+    - Customer Identifiers
+    - Customer Credentials
+    - Customer Entitlements
+    - Customer IP Addresses & Geo Locations
+    - Customer Devices
+  - Customer Profile
+    - Customer Employment Information
+    - Customer Life Events
+    - Customer Financial Profile
+    - Customer Risk Profile
+    - Customer Health Profile
+    - Customer Social Media Profile
+  - Customer Clerical Transactions
+  - Customer Preferences & Consent
+    - Customer User Experience Preferences
+    - Customer Privacy Preferences
+    - Customer Fidelity Agreements & Contracts
+    - Customer Products & Services Interests
+    - Customer Subscriptions
+  - Customer to Fidelity Relationships
+  - Customer to Customer Relationships
+    - Customer Household Relationships
+  - Customer Intelligence & Analytics
+    - Customer Segmentation
+    - Customer Profitability / Lifetime Value to Fidelity
+    - Customer Financial Goals & Plans
+    - Customer Model Scores
+    - Customer Portfolio Analytics
+    - Customer Financial Health Scores
+
+- **Clients**
+  - Client Profile
+    - Client Name(s), Identifiers & Addresses
+    - Client Corporate Actions
+    - Client Classifications
+    - Client Financial Profile
+    - Client Social Media Profile & External Data
+    - Client Risk Profile
+  - Client Structure, Divisions & Branches
+  - Client to Fidelity Relationships
+  - Client to Client Relationships
+  - Client Clerical Transactions
+  - Client Preferences & Consent
+    - Client Fidelity Contracts & Agreements
+  - Client Intelligence & Analytics
+    - Client Segmentation
+    - Client Profitability / Lifetime Value to Fidelity
+    - Client Financial Goals & Plans
+    - Client Model Scores
+    - Client Portfolio Analytics
+    - Client Financial Health Scores
+  - Client Representative Profile
+    - Client Rep Employment Details
+    - Client Rep Personal Details
+    - Client Rep Contact Details
+    - Client Rep Life Events
+    - Client Rep Financial Profile
+    - Client Rep Risk Profile
+    - Client Rep Registration Types
+    - Client Rep Certifications
+    - Client Rep State Licenses
+    - Client Rep Social Media Profile
+  - Client Representative Preferences & Consent
+    - Client Rep Fidelity Contracts & Agreements
+  - Client Representative Identity & Access
+    - Client Rep Identifiers
+    - Client Rep Credentials
+    - Client Rep Entitlements
+    - Client Rep IP Addresses & Geo Locations
+    - Client Rep Devices
+    - Client Rep Applications
+    - Client Rep Authorizations
+  - Client Representative to Fidelity Relationships
+  - Client Representative to Representative Relationships
+  - Client Representative Regulatory Infractions
+    - Client Rep Infraction History
+    - Client Rep Year-wise Financial Impacts
+    - Client Rep Suspension History
+  - Client Representative Intelligence & Analytics
+    - Client Rep Segmentation
+    - Client Rep Profitability / Lifetime Value to Fidelity
+    - Client Rep Financial Goals & Plans
+    - Client Rep Model Scores
+    - Client Rep Portfolio Analytics
+    - Client Rep Financial Health Scores
+  - Client Products and Services
+    - Client Defined Contributions Plans
+    - Client Defined Benefits Plans
+    - Client Stock Purchase Plans
+    - Client Health & Wellness Plans
+    - Client Health Savings Accounts
+    - Client Workplace Giving Accounts
+    - Client Student Loan Accounts
+    - Client Fiduciary Solutions (Flex)
+    - Client Personalized Planning & Advice
+    - Client Financial Wellness
+
+- **Accounts**
+  - Brokerage Accounts
+    - Account Features, Services & Attributes
+    - Account Balances & Positions
+    - Account Transactions
+    - Account Suitability & Investment Objectives
+    - Account Margin, Credit, Risk & Compliance
+    - Customer to Account Relationships & Householding
+    - Client & Client Representative Relationships
+    - Account to Other Interested Party Relationships
+    - Fidelity to Account Relationships
+    - Account Performance Reporting
+  - Intermediary Accounts
+    - Account Features, Services & Attributes
+    - Account Balances & Positions
+    - Account Transactions
+    - Client & Client Representative Relationships
+    - Account to Other Interested Party Relationships
+  - Defined Contributions Accounts
+    - Account Features, Services & Attributes
+    - Account Balances & Positions
+    - Account Transactions
+    - Account Eligibility & Enrollment
+    - Plan Relationships & Roles
+    - Account Contributions & Deferrals
+    - Account Withdrawals
+    - Account to Client Relationship
+  - Defined Benefits Accounts
+    - Account Features, Services & Attributes
+    - Account Transactions (cash balance)
+    - Account Eligibility & Enrollment
+    - Plan Participation, Service & Vesting
+    - Plan Relationships & Roles
+    - Account Contributions
+    - Plan Benefit Calculations
+    - Account Payments & Checks
+    - Retirement Initiation
+    - Account to Client Relationship
+  - Stock Plan Services Accounts
+    - Account Features, Services & Attributes
+    - Account Transactions
+    - Stock Plan Eligibility
+    - Stock Plan Grants
+    - Stock Plan Vesting
+    - Account to Client Relationship
+  - Health & Welfare Accounts
+    - Account Features, Services & Attributes
+    - Plan Electability
+    - Plan Eligibility & Enrollment
+    - Plan Participation
+    - Plan Relationships & Roles
+    - Account to Client Relationship
+  - HSA Accounts
+    - Account Features, Services & Attributes
+    - Account Balances & Positions
+    - Account Transactions
+    - Plan Eligibility & Enrollment
+    - Plan Participation
+    - Plan Relationships & Roles
+    - Plan Contributions
+    - Account Withdrawals
+    - Account to Client Relationship
+  - Insurance & Annuity Accounts
+    - Account Features, Services & Attributes
+    - Account Balances & Positions
+    - Account Transactions
+    - Account Suitability & Investment Objectives
+    - Account Margin, Credit, Risk & Compliance
+    - Customer to Account Relationships & Householding
+    - Fidelity to Account Relationships
+    - Account Performance Reporting
+  - Retail Charitable Giving Accounts
+    - Account Features, Services & Attributes
+    - Account Balances & Positions
+    - Account Transactions
+    - Account Suitability & Investment Objectives
+    - Account Margin, Credit, Risk & Compliance
+    - Customer to Account Relationships & Householding
+    - Fidelity to Account Relationships
+    - Account Performance Reporting
+  - Non Brokerage Accounts
+    - Account Features & Services
+    - Account Type & Attributes
+    - Account Balances & Positions
+    - Account Transactions
+    - Account Suitability & Investment Objectives
+    - Account Margin, Credit, Risk & Compliance
+    - Customer to Account Relationships & Householding
+    - Fidelity to Account Relationships
+    - Account Performance Reporting
+  - Student Loan Accounts
+    - Account to Client Relationships
+    - Eligibility & Enrollment
+    - Account & Loans Relationships
+    - Employer Contributions
+    - Loan Transactions
+  - Workplace Giving Accounts
+    - Account to Client Relationships
+    - Account Features, Services & Attributes
+    - Eligibility
+    - Account Relationships & Roles
+    - Donations
+    - Volunteering Activities
+    - Company Match
+  - Fiduciary Solutions (Flex) Accounts
+
+- **Portfolios**
+  - Portfolio Reference
+    - Portfolio Basic Reference
+    - Portfolio Alternate Identifiers
+    - Portfolio Classification
+    - Portfolio Features
+    - Portfolio FX Configuration
+    - Portfolio Regulation Rules
+  - Portfolio Relationships
+    - Portfolio to Associate Relationships
+    - Portfolio to Portfolio Relationships
+    - Portfolio to Other Parties Relationships
+  - Share Class
+    - Share Class Basic Reference
+    - Share Class Features
+    - Share Class Events
+  - Index Reference
+    - Index Basic Reference
+    - Index Alternate Identifiers
+    - Index Families
+    - Index Variants
+    - Index Classifications
+  - Portfolio Benchmarks
+  - Portfolio & Index Measures
+    - Portfolio & Index Yields
+    - Portfolio & Index Expenses
+  - Share Class Measures
+    - Share Class Yields
+    - Share Class Expenses
+  - Holdings & Assets
+    - Assets
+    - Portfolio Holdings
+    - Portfolio Holdings Collateral
+    - Portfolio Lot Holdings
+    - Relative Weights
+    - Index Prices
+    - Index Holdings
+    - Index Constituent Data
+  - Portfolio Performance, Characteristics & Attributions
+    - Portfolio Performance
+    - Portfolio Investment Characteristics
+    - Portfolio Attributions
+  - Portfolio Trades
+    - Portfolio Manager Instructions
+    - Portfolio Trade Tickets
+    - Portfolio Trade Orders
+    - Portfolio Trade Allocations
+    - Interfund Allocations
+    - Portfolio Trade Executions
+    - Portfolio Post Trades
+    - FX Orders
+    - FX Executions
+    - FX Trades
+  - Portfolio Cash
+    - Available Cash
+    - Shareholder Flows
+    - Accounting General Ledger
+    - Cash Allocation
+    - Loan
+    - Security Lending
+
+- **Interactions**
+  - Phone Call Interactions
+    - Employee Assisted Call Interactions
+    - VRU Interactions
+  - Mobile/Web Interactions & Click History
+  - Text Message Interactions
+  - Chat Interactions
+    - Employee Assisted Chats
+    - Chatbot Chats
+  - Email Interactions
+  - Postal Mail Interactions
+  - Branch In Person Interactions
+  - Video Interactions
+  - Workshops/Seminars
+  - Interactions Feedback
+    - Satisfaction Survey
+    - Net Promoter Score
+
+- **Products & Services**
+  - Investment Product
+  - Retail Brokerage Services
+  - Retail Insurance & Annuity Account Services
+  - Planning & Guidance Services
+  - Defined Contributions Administrative Services
+  - Defined Benefits Administrative Services
+  - Stock Plan Administrative Services
+  - Health & Welfare Administrative Services
+  - Health Savings Accounts Administrative Services
+  - Student Loans Services
+  - Workplace Giving Services
+  - Fiduciary Solutions (FLEX)
+  - Personalized Planning & Guidance Services
+  - Financial Wellness Services
+  - Clearing & Custody Platform & Services
+  - Trading, Financial & Prime Brokerage Services
+  - Adviser Consulting Services
+  - Commingled Pool Investment Products
+  - Packaged Products & Services
+  - Corporate Actions Solutions
+
+- **Other Interested Parties**
+  - External Organizations
+    - Clearing Firms
+    - Law Firms
+    - Regulatory Agencies
+    - Non-financial Organizations
+  - External People
+    - Litigants
+    - Outside Counsels
+    - Covered Persons
+
+- **Workforce**
+  - Associates
+    - Associate Identifiers
+    - Associate Contact Information
+    - Associate Demographics
+  - Employment
+    - Jobs
+    - Associate Positions
+    - Managers & Manager Hierarchy
+    - Employment Events
+  - Skills
+    - Competencies
+    - Training
+    - Licenses & Certifications
+  - Performance
+    - Performance Ratings
+    - Performance Rating Dates
+  - Compensation & Benefits
+    - Base Pay
+    - Variable Pay
+    - Profit Sharing
+    - Time Off & Leave
+    - Benefit Programs
+    - Benefit Eligibility
+    - Associate Schedule & Hours Worked
+  - Talent Management
+    - Resumes
+    - Recruiting
+    - Associate Surveys
+    - Workforce Third Party Data
+
+- **Financials & Accounting**
+  - Management Financial Result
+  - Legal Financial Results
+  - Organizational Structure
+  - Purchasing
+  - Taxes
+  - Treasury
+  - Shareholders
+  - Calculated Measures
+
+- **Content, Commentary & Research**
+  - News & Announcements
+  - Educational Materials
+  - Product & Service Announcements
+  - Commentary, Planning & Guidance
+  - Financial Measures and Statistics
+  - External Research
+  - Internal Asset Management Research
+    - Asset Management Research Teams
+    - Asset Management Research Assignments
+    - Asset Management Research Publications
+    - Asset Management Research Ratings
+    - Asset Management Research Meetings
+    - Asset Management Research Analytics
+
+- **Legal, Risk, Compliance & Surveillance**
+  - Employee Compliance
+    - Registration & Licensing
+    - Disclosures & Certifications
+    - Trade Monitoring
+    - Compliance Designation Lists
+  - Enterprise Risk
+    - Regulations & Policies
+    - Enterprise Risk Assessment
+    - Enterprise Risk Management
+    - Business Process Attestations & Certifications
+    - Business Continuity Planning
+    - Enterprise Risk Audits
+    - Content Retention & Management
+  - Surveillance & Fraud Detection
+    - Surveillance Models
+    - Activity Screening
+    - Security Event Alerts
+    - Surveillance Case Management
+    - Employee Supervision
+    - Marketing Communications Review
+  - Legal
+    - Registration & Licensing
+    - Disclosures & Certifications
+  - Electronic Communications
+
+- **Securities**
+  - Securities Reference
+    - Securities Basic Reference
+    - Securities Alternate Identifiers
+    - Securities Alternate Names
+    - Securities Classifications
+    - Income Stream
+    - Redemption
+    - Securities Trading Restrictions
+    - Securities Trading Regulations
+    - Securities Financials
+    - Securities Settlements
+    - Securities Delivery
+    - Investment Approval
+    - Swap Characteristics
+    - Muni Derivatives
+    - Securities Relationships
+    - Securities External Ratings
+  - Securities Prices
+    - Internal Prices
+    - External Prices
+  - Corporate Actions
+    - Mergers
+    - Acquisitions
+    - Dividends
+    - Stock Splits
+    - Reverse Splits
+    - Rights Issues
+    - Spin Offs
+
+- **Business Operations and Support**
+  - Sales & Distribution Operations & Support
+    - Sales Strategy, Planning & Forecasting
+    - Sales Leads & Opportunity Management
+    - Sales Territory Management & Coverage Model
+    - Sales Channels
+    - Sales Pipeline Management
+    - Sales Event Management
+    - Sales Analytics
+  - Marketing Operations & Support
+    - Marketing Strategy, Planning & Forecasting
+    - Marketing Channels
+    - Marketing Event Management
+    - Marketing Campaign Management
+    - Marketing Analytics
+  - Servicing Operations & Support
+    - Servicing Strategy, Planning & Forecasting
+    - Servicing Work Item Operations
+    - Servicing Analytics
+
+- **Technology Management & Operations**
+  - IT Strategy & Planning
+  - IT Portfolio Management
+  - IT Lifecycle Management
+    - IT Program Management
+    - IT Product Management
+    - Team Execution
+    - IT Development Operations
+  - IT Asset Management
+  - IT Service Management
+  - IT Infrastructure/Cloud Management
+  - IT Governance
+  - IT Architecture Management
+  - IT Risk Management
+  - IT Resource Planning
+    - IT Workforce Planning
+    - IT Financial Planning
+    - IT Vendor Planning
+  - IT Innovation
+
+- **Real Estate**
+  - Internal Locations
+  - Corporate Services
+
+- **Common Reference**
+  - Locations
+    - Countries
+    - States, Provinces & Regions
+    - Location Demographic & Economic Data
+    - Standardized Postal Address
+    - IP to Location Mapping
+  - Calendar
+    - Common Calendar Dates
+    - Location Calendar Dates
+    - Time Zones
+  - Currency
+  - Market Exchanges
+    - Financial Exchange Codes
+    - Market Calendars
+  - Mortality Tables

@@ -1,0 +1,5 @@
+id: CQ-002
+question: Who is accountable for this domain's meaning, rules, APIs, data and records?
+query: cq-002-accountability.rq
+expect:
+  min_rows: 5

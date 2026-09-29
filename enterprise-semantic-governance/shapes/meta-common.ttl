@@ -1,0 +1,61 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix ent-ms: <https://ontology.example.com/governance/shapes/> .
+
+# -----------------------------------------------------------------------------
+# META-SHAPES (common) - apply to every repository, including this one.
+# Standard: docs/standards/01-ontology-standards.md
+# -----------------------------------------------------------------------------
+
+ent-ms:OntologyHeaderShape a sh:NodeShape ;
+    rdfs:label "Ontology header standard" ;
+    sh:targetClass owl:Ontology ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ; sh:message "Every ontology needs an rdfs:label." ] ;
+    sh:property [ sh:path dct:abstract ; sh:minCount 1 ; sh:message "Every ontology needs a dct:abstract describing its scope." ] ;
+    sh:property [ sh:path owl:versionIRI ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ;
+                  sh:message "Every ontology needs exactly one owl:versionIRI." ] ;
+    sh:property [ sh:path owl:versionInfo ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:pattern "^[0-9]+\\.[0-9]+\\.[0-9]+(-[A-Za-z0-9.]+)?$" ;
+                  sh:message "owl:versionInfo must be a semantic version (MAJOR.MINOR.PATCH)." ] ;
+    sh:property [ sh:path fibo-fnd-utl-av:hasMaturityLevel ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:in ( fibo-fnd-utl-av:Release fibo-fnd-utl-av:Provisional fibo-fnd-utl-av:Informative ) ;
+                  sh:message "Maturity must be FIBO Release, Provisional or Informative." ] .
+
+ent-ms:TermDocumentationShape a sh:NodeShape ;
+    rdfs:label "Term documentation standard" ;
+    sh:targetClass owl:Class , owl:ObjectProperty , owl:DatatypeProperty , owl:AnnotationProperty ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ; sh:datatype rdf:langString ;
+                  sh:message "Every term needs a language-tagged rdfs:label." ] ;
+    sh:property [ sh:path skos:definition ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "Every term needs exactly one skos:definition (ISO 704 style: genus + differentia)." ] ;
+    sh:property [ sh:path rdfs:label ; sh:pattern "^([a-z0-9]|[A-Z]{2,})" ; sh:severity sh:Warning ;
+                  sh:message "FIBO convention: labels are lower case unless a proper noun or acronym." ] .
+
+ent-ms:TermNamingShape a sh:NodeShape ;
+    rdfs:label "Term naming standard" ;
+    sh:targetClass owl:Class ;
+    sh:sparql [
+        sh:message "Class local names must be UpperCamelCase." ;
+        sh:select """
+            SELECT $this WHERE {
+              BIND(REPLACE(STR($this), "^.*[/#]", "") AS ?local)
+              FILTER(!REGEX(?local, "^[A-Z][A-Za-z0-9]*$"))
+            }""" ] .
+
+ent-ms:PropertyNamingShape a sh:NodeShape ;
+    rdfs:label "Property naming standard" ;
+    sh:targetClass owl:ObjectProperty , owl:DatatypeProperty ;
+    sh:sparql [
+        sh:message "Property local names must be lowerCamelCase." ;
+        sh:select """
+            SELECT $this WHERE {
+              BIND(REPLACE(STR($this), "^.*[/#]", "") AS ?local)
+              FILTER(!REGEX(?local, "^[a-z][A-Za-z0-9]*$"))
+            }""" ] .
+

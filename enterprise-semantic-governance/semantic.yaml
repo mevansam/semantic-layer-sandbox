@@ -1,0 +1,38 @@
+# Enterprise semantic configuration - the single source of enterprise settings.
+# Every other repository points at this repo (see its own semantic.yaml).
+repo_kind: governance
+
+# Neutral placeholder namespace. To adopt a real namespace run:
+#   python tools/semtool.py rebase --to https://ontology.<your-domain>/  --all
+base_iri: https://ontology.example.com/
+
+enterprise:
+  name: Example Enterprise
+  # Source-control teams used to generate CODEOWNERS in every repo.
+  teams:
+    ontology_standards: "@example-org/ontology-standards"
+    semantic_review: "@example-org/semantic-review-board"
+    ai_risk: "@example-org/ai-risk-office"
+    fabric: "@example-org/semantic-fabric-platform"
+
+fibo:
+  repository: https://github.com/edmcouncil/fibo
+  release_tag: master_2026Q2
+
+# Files owned by this repository, by asset kind.
+paths:
+  ontology:
+    - ontology/*.ttl
+    - fabric/fabric.ttl
+  reference:
+    - taxonomy/enterprise-taxonomy.ttl
+    - capabilities/capability-map.ttl
+  shapes:
+    - shapes/*.ttl
+  assets:
+    - fabric/reusable-assets/*.ttl
+  alignment:
+    - alignment/*.ttl
+
+# Knowledge-graph named graph convention (see docs/standards/08-semantic-fabric.md)
+graph_name_template: "{base}graph/{publisher}/{collection}/{version}/{partition}"

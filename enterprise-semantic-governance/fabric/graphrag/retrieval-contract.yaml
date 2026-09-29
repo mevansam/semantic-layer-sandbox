@@ -1,0 +1,77 @@
+# GraphRAG retrieval contract
+#
+# Owned by: Semantic Fabric (enterprise). Consumed by: the GraphRAG indexer and
+# every agent runtime. It defines WHAT is retrievable from the knowledge graph,
+# as which unit, and what every retrieved unit must carry so answers can be
+# grounded, cited and policy-checked (controls CTL-001, CTL-002, CTL-003).
+#
+# `semtool cards` implements this contract and writes build/graphrag/{cards,edges}.jsonl.
+
+version: 0.1.0
+
+# 1. Retrieval unit = "concept card": one per governed node of these types.
+card_types:
+  - owl:Class
+  - owl:ObjectProperty
+  - owl:DatatypeProperty
+  - "{base}governance/model/BusinessRule"
+  - "{base}governance/process/BusinessProcess"
+  - "{base}governance/process/ProcessStep"
+  - "{base}governance/model/DomainApi"
+  - "{base}governance/model/CriticalDataElement"
+  - "{base}governance/model/RecordClass"
+  - dcat:Dataset
+  - "{base}fabric/model/QueryTool"
+  - "{base}fabric/model/RulePack"
+
+# 2. Card fields. `text` is what gets embedded; the rest is metadata for
+#    filtering, graph expansion and citation.
+card_fields:
+  id: IRI of the node (stable key; cite it)
+  type: node types
+  label: rdfs:label / skos:prefLabel
+  definition: skos:definition, or ent-av:ruleStatement for business rules
+  agent_guidance: ent-av:agentGuidance
+  rule_id: ent-av:ruleIdentifier (rules only)
+  taxonomy_anchors: labels of ent-av:governedBy taxonomy nodes
+  broader: direct rdfs:subClassOf parents incl. FIBO (id + label)
+  governing_rules: business rules whose sh:targetClass is this class or any superclass (id, rule_id, statement)
+  served_by_apis: domain APIs that ent-gov:servesConcept this class
+  data_products: data products (dcat:Dataset) that serve this class, with their data steward
+  citation:
+    graph: named graph the node was published in
+    collection: knowledge collection IRI
+    collection_version: owl:versionInfo of the collection
+    sensitivity: sensitivity class of the collection (drives CTL-004 filtering)
+  text: rendered card text (label, definition, taxonomy, parents, rules, guidance)
+
+# 3. Graph expansion: after vector retrieval of top-k cards, expand 1-2 hops
+#    along these predicates only (keeps context on-topic and explainable).
+edge_predicates:
+  - http://www.w3.org/2000/01/rdf-schema#subClassOf
+  - http://www.w3.org/2000/01/rdf-schema#domain
+  - http://www.w3.org/2000/01/rdf-schema#range
+  - governance/annotations/governedBy
+  - governance/annotations/realizesCapability
+  - governance/model/servesConcept
+  - governance/model/recordOf
+  - governance/model/elementOf
+  - governance/model/hasQualityRule
+  - governance/process/hasStep
+  - governance/process/appliesRule
+  - governance/process/usesConcept
+  - governance/process/producesConcept
+  - governance/process/invokesApi
+  - governance/process/createsRecord
+  - fabric/model/derivedFromRule
+  - fabric/model/implementsProcess
+  - fabric/model/groundedIn
+  - http://www.w3.org/ns/shacl#targetClass
+
+# 4. Runtime obligations for any agent using retrieved cards.
+runtime_obligations:
+  - Filter candidate cards by collection usage policy for the calling agent class and purpose BEFORE ranking (CTL-001, CTL-004).
+  - Serve only the current released collection version (CTL-003).
+  - Every answer lists the card ids, rule ids and collection@version it relied on (CTL-002).
+  - Terms from different publishers are combined only via ent-gov:AlignmentDecision or shared enterprise-core parents (CTL-007).
+  - Business rules are explained with their ruleStatement; enforcement uses the published rule pack, never free-text reasoning (CTL-005).

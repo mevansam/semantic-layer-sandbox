@@ -1,0 +1,78 @@
+openapi: 3.1.0
+info:
+  title: Planning Insights API
+  version: 0.1.0
+  description: |
+    Financial health score and self-directed insights. Every insight returned has passed
+    the advice-boundary rule pack (SDP-R-001) and carries model provenance (SDP-R-005).
+paths:
+  /customers/{customerId}/financial-health-score:
+    get:
+      operationId: getFinancialHealthScore
+      parameters:
+        - { name: customerId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Latest score
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FinancialHealthScore" }
+  /customers/{customerId}/insights:
+    get:
+      operationId: listInsights
+      parameters:
+        - { name: customerId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Current self-directed insights
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/SelfDirectedInsight" } }
+components:
+  schemas:
+    ModelProvenance:
+      type: object
+      required: [model, modelVersion, generatedAt]
+      properties:
+        model:
+          type: string
+          x-ontology-property: https://ontology.example.com/fabric/assets/generatedByModel
+        modelVersion:
+          type: string
+          x-ontology-property: https://ontology.example.com/fabric/assets/modelVersion
+        generatedAt:
+          type: string
+          format: date-time
+          x-ontology-property: https://ontology.example.com/fabric/assets/generatedAt
+    FinancialHealthScore:
+      type: object
+      x-ontology-class: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/FinancialHealthScore
+      required: [score, provenance]
+      properties:
+        score:
+          type: number
+          minimum: 0
+          maximum: 100
+          x-ontology-property: https://ontology.example.com/fabric/assets/scoreValue
+        provenance: { $ref: "#/components/schemas/ModelProvenance" }
+    SelfDirectedInsight:
+      type: object
+      x-ontology-class: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/SelfDirectedInsight
+      required: [text, category, provenance]
+      properties:
+        text:
+          type: string
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/insightText
+        category:
+          type: string
+          enum: [savings-rate, retirement-readiness, diversification-education, emergency-fund]
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/hasInsightCategory
+        suggestedAction:
+          type: string
+          enum: [increase-contributions, review-allocation, learn-more]
+          description: buy-security / sell-security are never returned (SDP-R-001)
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/suggestsAction
+        relatedGoalReference:
+          type: string
+          x-ontology-property: https://ontology.example.com/domain/rwpa/self-directed-planning/planning/relatesToGoal
+        provenance: { $ref: "#/components/schemas/ModelProvenance" }

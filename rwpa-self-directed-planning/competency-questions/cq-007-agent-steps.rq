@@ -1,0 +1,11 @@
+PREFIX ent-proc: <https://ontology.example.com/governance/process/>
+PREFIX ent-fab: <https://ontology.example.com/fabric/model/>
+PREFIX ent-av:  <https://ontology.example.com/governance/annotations/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?step ?agentClass ?ruleId ?rulePack WHERE {
+  ?s a ent-proc:ProcessStep ; ent-proc:automationLevel ent-proc:AgentAssisted ;
+     rdfs:label ?step ; ent-proc:performedBy/rdfs:label ?agentClass ; ent-proc:appliesRule ?rule .
+  ?rule ent-av:ruleIdentifier ?ruleId .
+  OPTIONAL { ?pack a ent-fab:RulePack ; ent-fab:derivedFromRule ?rule ; ent-fab:toolName ?rulePack . }
+}
+ORDER BY ?ruleId

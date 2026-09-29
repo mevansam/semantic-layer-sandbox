@@ -1,0 +1,159 @@
+@prefix ent-ctl: <https://ontology.example.com/governance/controls/> .
+@prefix ent-gov: <https://ontology.example.com/governance/model/> .
+@prefix ent-av:  <https://ontology.example.com/governance/annotations/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# AI Risks & Controls Catalog (enterprise-owned)
+#
+# Risks that arise when AI agents consume enterprise knowledge, the controls
+# that mitigate them, and the sensitivity classification that governs
+# exposure. Framework mappings (NIST AI RMF, ISO/IEC 42001) are PLACEHOLDERS
+# to be replaced by the enterprise's own control framework references.
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/governance/controls/>
+    a owl:Ontology ;
+    rdfs:label "AI Risks and Controls Catalog"@en ;
+    dct:abstract "AI risk and control model plus the enterprise catalog of controls applied to knowledge collections and execution models."@en ;
+    owl:imports <https://ontology.example.com/governance/model/> ;
+    owl:versionIRI <https://ontology.example.com/governance/controls/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# ---- Model ------------------------------------------------------------------
+
+ent-ctl:AIRisk a owl:Class ; rdfs:label "AI risk"@en ;
+    skos:definition "A potential harm arising from an AI agent's use of enterprise knowledge or execution of enterprise logic."@en .
+ent-ctl:AIControl a owl:Class ; rdfs:label "AI control"@en ;
+    skos:definition "A preventive or detective measure that reduces an AI risk, with a stated enforcement point."@en .
+ent-ctl:RiskAssessment a owl:Class ; rdfs:subClassOf prov:Entity ; rdfs:label "AI risk assessment"@en ;
+    skos:definition "A documented assessment of the AI risks of publishing a knowledge collection or execution model, approved by the AI risk owner."@en .
+ent-ctl:SensitivityClass a owl:Class ; rdfs:label "sensitivity class"@en ;
+    skos:definition "Information sensitivity classification governing where knowledge may be exposed."@en .
+
+ent-ctl:mitigatesRisk a owl:ObjectProperty ; rdfs:label "mitigates risk"@en ;
+    rdfs:domain ent-ctl:AIControl ; rdfs:range ent-ctl:AIRisk ;
+    skos:definition "Risk reduced by a control."@en .
+ent-ctl:controlType a owl:ObjectProperty ; rdfs:label "control type"@en ;
+    rdfs:domain ent-ctl:AIControl ; rdfs:range skos:Concept ;
+    skos:definition "Preventive or detective."@en .
+ent-ctl:enforcementPoint a owl:DatatypeProperty ; rdfs:label "enforcement point"@en ;
+    rdfs:domain ent-ctl:AIControl ;
+    skos:definition "Where the control is enforced: CI check, publication gate, retrieval runtime, agent runtime, or human review."@en .
+ent-ctl:mapsToFramework a owl:ObjectProperty ; rdfs:label "maps to framework"@en ;
+    rdfs:range skos:Concept ;
+    skos:definition "Reference-framework function or clause the control or risk maps to."@en .
+ent-ctl:assesses a owl:ObjectProperty ; rdfs:label "assesses"@en ;
+    rdfs:domain ent-ctl:RiskAssessment ;
+    skos:definition "The collection or execution model that was assessed."@en .
+ent-ctl:identifiedRisk a owl:ObjectProperty ; rdfs:label "identified risk"@en ;
+    rdfs:domain ent-ctl:RiskAssessment ; rdfs:range ent-ctl:AIRisk ;
+    skos:definition "A risk identified by an assessment."@en .
+ent-ctl:residualRiskRating a owl:ObjectProperty ; rdfs:label "residual risk rating"@en ;
+    rdfs:domain ent-ctl:RiskAssessment ; rdfs:range skos:Concept ;
+    skos:definition "Residual risk rating after controls."@en .
+ent-ctl:approvedBy a owl:ObjectProperty ; rdfs:label "approved by"@en ;
+    rdfs:domain ent-ctl:RiskAssessment ; rdfs:range ent-gov:AIRiskOwner ;
+    skos:definition "AI risk owner who approved the assessment."@en .
+ent-ctl:assessmentDate a owl:DatatypeProperty ; rdfs:label "assessment date"@en ; rdfs:range xsd:date ;
+    skos:definition "Date the assessment was approved."@en .
+
+# ---- Schemes -----------------------------------------------------------------
+
+ent-ctl:ControlTypes a skos:ConceptScheme ; skos:prefLabel "Control types"@en .
+ent-ctl:Preventive a skos:Concept ; skos:inScheme ent-ctl:ControlTypes ; skos:prefLabel "Preventive"@en .
+ent-ctl:Detective a skos:Concept ; skos:inScheme ent-ctl:ControlTypes ; skos:prefLabel "Detective"@en .
+
+ent-ctl:RiskRatings a skos:ConceptScheme ; skos:prefLabel "Risk ratings"@en .
+ent-ctl:Low a skos:Concept ; skos:inScheme ent-ctl:RiskRatings ; skos:prefLabel "Low"@en .
+ent-ctl:Medium a skos:Concept ; skos:inScheme ent-ctl:RiskRatings ; skos:prefLabel "Medium"@en .
+ent-ctl:High a skos:Concept ; skos:inScheme ent-ctl:RiskRatings ; skos:prefLabel "High"@en .
+
+# PLACEHOLDER framework references - replace with the enterprise control framework.
+ent-ctl:NistAiRmf a skos:ConceptScheme ; skos:prefLabel "NIST AI RMF 1.0 functions (placeholder mapping)"@en .
+ent-ctl:NIST-GOVERN a skos:Concept ; skos:inScheme ent-ctl:NistAiRmf ; skos:prefLabel "GOVERN"@en .
+ent-ctl:NIST-MAP a skos:Concept ; skos:inScheme ent-ctl:NistAiRmf ; skos:prefLabel "MAP"@en .
+ent-ctl:NIST-MEASURE a skos:Concept ; skos:inScheme ent-ctl:NistAiRmf ; skos:prefLabel "MEASURE"@en .
+ent-ctl:NIST-MANAGE a skos:Concept ; skos:inScheme ent-ctl:NistAiRmf ; skos:prefLabel "MANAGE"@en .
+
+# ---- Sensitivity classes -------------------------------------------------------
+
+ent-ctl:Public a ent-ctl:SensitivityClass ; rdfs:label "Public"@en ;
+    skos:definition "May be disclosed externally without restriction."@en .
+ent-ctl:Internal a ent-ctl:SensitivityClass ; rdfs:label "Internal"@en ;
+    skos:definition "For use by employees and approved internal agents; no customer or personal data."@en .
+ent-ctl:Confidential a ent-ctl:SensitivityClass ; rdfs:label "Confidential"@en ;
+    skos:definition "Business-confidential knowledge; approved internal agents only, no external model providers without approval."@en .
+ent-ctl:RestrictedPersonal a ent-ctl:SensitivityClass ; rdfs:label "Restricted - personal data"@en ;
+    skos:definition "Contains customer or personal data; exposed only to agents acting for the data subject or authorised staff, never to external model training."@en .
+
+# ---- Risk catalog ---------------------------------------------------------------
+
+ent-ctl:RSK-001 a ent-ctl:AIRisk ; rdfs:label "Ungrounded or fabricated answer"@en ;
+    skos:definition "An agent states business facts, rules or figures that are not supported by governed knowledge."@en ;
+    ent-ctl:mapsToFramework ent-ctl:NIST-MEASURE .
+ent-ctl:RSK-002 a ent-ctl:AIRisk ; rdfs:label "Stale or superseded knowledge"@en ;
+    skos:definition "An agent relies on a retired or superseded version of a rule, definition or data specification."@en ;
+    ent-ctl:mapsToFramework ent-ctl:NIST-MANAGE .
+ent-ctl:RSK-003 a ent-ctl:AIRisk ; rdfs:label "Sensitive data exposure"@en ;
+    skos:definition "Personal or confidential knowledge is exposed to an agent, user or model provider not entitled to it."@en ;
+    ent-ctl:mapsToFramework ent-ctl:NIST-GOVERN .
+ent-ctl:RSK-004 a ent-ctl:AIRisk ; rdfs:label "Regulated-activity boundary breach"@en ;
+    skos:definition "An agent performs or appears to perform a regulated activity (e.g. personalized investment advice) outside the channel, licence or supervision it requires."@en ;
+    ent-ctl:mapsToFramework ent-ctl:NIST-MAP .
+ent-ctl:RSK-005 a ent-ctl:AIRisk ; rdfs:label "Untraceable decision"@en ;
+    skos:definition "An agent-assisted outcome cannot be traced to the rules, data and model versions that produced it, preventing supervision and record keeping."@en ;
+    ent-ctl:mapsToFramework ent-ctl:NIST-GOVERN .
+ent-ctl:RSK-006 a ent-ctl:AIRisk ; rdfs:label "Cross-domain misinterpretation"@en ;
+    skos:definition "An agent conflates terms from different domains that look alike but are not aligned."@en ;
+    ent-ctl:mapsToFramework ent-ctl:NIST-MAP .
+
+# ---- Control catalog -------------------------------------------------------------
+
+ent-ctl:CTL-001 a ent-ctl:AIControl ; rdfs:label "Answer only from governed collections"@en ;
+    skos:definition "Agents may ground answers only in released knowledge collections they are entitled to under the collection's usage policy."@en ;
+    ent-ctl:mitigatesRisk ent-ctl:RSK-001 , ent-ctl:RSK-003 ;
+    ent-ctl:controlType ent-ctl:Preventive ;
+    ent-ctl:enforcementPoint "retrieval runtime (collection entitlement filter)" .
+ent-ctl:CTL-002 a ent-ctl:AIControl ; rdfs:label "Cite knowledge provenance"@en ;
+    skos:definition "Every agent answer that relies on governed knowledge cites the collection, version and term or rule identifiers used."@en ;
+    ent-ctl:mitigatesRisk ent-ctl:RSK-001 , ent-ctl:RSK-005 ;
+    ent-ctl:controlType ent-ctl:Detective ;
+    ent-ctl:enforcementPoint "agent runtime (response contract) and sampling review" .
+ent-ctl:CTL-003 a ent-ctl:AIControl ; rdfs:label "Version-pinned retrieval"@en ;
+    skos:definition "Retrieval serves only the current released version of a collection; retired versions are removed from the serving graph."@en ;
+    ent-ctl:mitigatesRisk ent-ctl:RSK-002 ;
+    ent-ctl:controlType ent-ctl:Preventive ;
+    ent-ctl:enforcementPoint "knowledge graph publication pipeline" .
+ent-ctl:CTL-004 a ent-ctl:AIControl ; rdfs:label "Sensitivity-based exposure"@en ;
+    skos:definition "Collections classified Confidential or Restricted are not sent to external model providers or used for model training without an approved exception."@en ;
+    ent-ctl:mitigatesRisk ent-ctl:RSK-003 ;
+    ent-ctl:controlType ent-ctl:Preventive ;
+    ent-ctl:enforcementPoint "CI publication gate and retrieval runtime" .
+ent-ctl:CTL-005 a ent-ctl:AIControl ; rdfs:label "Regulated-boundary rule pack"@en ;
+    skos:definition "Agent outputs in a regulated context are checked by the domain's boundary rule pack before delivery; violations are blocked and routed to human review."@en ;
+    ent-ctl:mitigatesRisk ent-ctl:RSK-004 ;
+    ent-ctl:controlType ent-ctl:Preventive ;
+    ent-ctl:enforcementPoint "agent runtime (pre-delivery rule pack)" .
+ent-ctl:CTL-006 a ent-ctl:AIControl ; rdfs:label "Execution model risk assessment"@en ;
+    skos:definition "No execution model is published without an approved AI risk assessment and traceability to its source rules and owners."@en ;
+    ent-ctl:mitigatesRisk ent-ctl:RSK-004 , ent-ctl:RSK-005 ;
+    ent-ctl:controlType ent-ctl:Preventive ;
+    ent-ctl:enforcementPoint "CI publication gate" .
+ent-ctl:CTL-007 a ent-ctl:AIControl ; rdfs:label "Aligned terms only across domains"@en ;
+    skos:definition "Agents combine terms from different domains only through recorded alignment decisions; unaligned look-alike terms are treated as distinct."@en ;
+    ent-ctl:mitigatesRisk ent-ctl:RSK-006 ;
+    ent-ctl:controlType ent-ctl:Preventive ;
+    ent-ctl:enforcementPoint "retrieval runtime (alignment-aware traversal)" .
+ent-ctl:CTL-008 a ent-ctl:AIControl ; rdfs:label "Decision record retention"@en ;
+    skos:definition "Agent-assisted outcomes delivered to customers are retained as records with the rule, data and model versions used."@en ;
+    ent-ctl:mitigatesRisk ent-ctl:RSK-005 ;
+    ent-ctl:controlType ent-ctl:Detective ;
+    ent-ctl:enforcementPoint "agent runtime and domain record keeping" .

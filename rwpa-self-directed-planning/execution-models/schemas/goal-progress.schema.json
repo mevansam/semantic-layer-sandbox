@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "sdp_goal_progress",
+  "description": "Progress of one of the authenticated customer's financial goals: target, latest projection, probability of success, scenario assumptions (with mortality-table provenance) and governing rule ids.",
+  "type": "object",
+  "required": ["goalReference"],
+  "properties": {
+    "goalReference": {
+      "type": "string",
+      "pattern": "^G-[0-9]{4,}$",
+      "description": "Goal reference as returned by listGoals (Self-Directed Planning API)."
+    }
+  },
+  "additionalProperties": false
+}

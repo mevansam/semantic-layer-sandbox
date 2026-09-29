@@ -1,0 +1,288 @@
+@prefix ent-gov: <https://ontology.example.com/governance/model/> .
+@prefix ent-av:  <https://ontology.example.com/governance/annotations/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# -----------------------------------------------------------------------------
+# Enterprise Governance & Accountability Model
+#
+# Encodes the operating model: business domains are accountable for MEANING,
+# RULES, DATA, RECORDS and APIs; the enterprise governs how that knowledge is
+# REPRESENTED, SHARED and CONSUMED by AI. Every domain repository publishes a
+# DomainManifest using this vocabulary; CI rejects incomplete manifests and
+# generates CODEOWNERS from them.
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/governance/model/>
+    a owl:Ontology ;
+    rdfs:label "Enterprise Governance and Accountability Model"@en ;
+    dct:abstract "Domains, sub-domains, manifests, accountable roles, business rules, domain APIs, critical data elements, record classes, semantic reviews and cross-domain alignment decisions."@en ;
+    owl:imports <https://ontology.example.com/governance/annotations/> ;
+    owl:versionIRI <https://ontology.example.com/governance/model/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# =============================================================================
+# Accountability areas (who is accountable for what)
+# =============================================================================
+
+ent-gov:AccountabilityAreas a skos:ConceptScheme ;
+    skos:prefLabel "Accountability areas"@en ;
+    skos:definition "The split of accountability between business domains and the enterprise."@en .
+
+ent-gov:DomainAccountability a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ;
+    skos:prefLabel "Domain ownership"@en ;
+    skos:definition "Areas for which a business domain is accountable."@en .
+ent-gov:EnterpriseAccountability a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ;
+    skos:prefLabel "Enterprise governance"@en ;
+    skos:definition "Areas for which the enterprise is accountable."@en .
+ent-gov:FabricAccountability a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ;
+    skos:prefLabel "Semantic fabric"@en ;
+    skos:definition "Areas for which the enterprise semantic fabric (platform) is accountable."@en .
+
+ent-gov:Meaning a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:DomainAccountability ;
+    skos:prefLabel "Meaning (business ontologies)"@en ; skos:definition "What business terms mean and how they relate."@en .
+ent-gov:Rules a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:DomainAccountability ;
+    skos:prefLabel "Business rules"@en ; skos:definition "Constraints, derivations and policies that govern business behaviour and data."@en .
+ent-gov:Apis a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:DomainAccountability ;
+    skos:prefLabel "Domain APIs"@en ; skos:definition "Interfaces through which domain data and services are accessed."@en .
+ent-gov:Data a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:DomainAccountability ;
+    skos:prefLabel "Data stewardship"@en ; skos:definition "Quality, lineage and fitness of domain data products and critical data elements."@en .
+ent-gov:Records a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:DomainAccountability ;
+    skos:prefLabel "Record keeping"@en ; skos:definition "Retention, disposition and legal hold of records the domain creates."@en .
+
+ent-gov:OntologyStandards a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:EnterpriseAccountability ;
+    skos:prefLabel "Ontology standards"@en ; skos:definition "How knowledge is represented: meta-model, naming, annotation, modularity, FIBO usage."@en .
+ent-gov:SemanticReview a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:EnterpriseAccountability ;
+    skos:prefLabel "Semantic review"@en ; skos:definition "Review that domain changes conform to standards and do not break alignment."@en .
+ent-gov:AIRiskAndControls a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:EnterpriseAccountability ;
+    skos:prefLabel "AI risks and controls"@en ; skos:definition "Risks of AI consumption of knowledge and the controls that mitigate them."@en .
+ent-gov:CrossDomainAlignment a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:EnterpriseAccountability ;
+    skos:prefLabel "Cross-domain alignment"@en ; skos:definition "Resolution of overlapping or conflicting meaning between domains."@en .
+
+ent-gov:GovernedKnowledgeCollections a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:FabricAccountability ;
+    skos:prefLabel "Governed knowledge collections"@en ; skos:definition "Released, policy-bound bundles of domain knowledge available to AI."@en .
+ent-gov:KnowledgeGraphManagement a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:FabricAccountability ;
+    skos:prefLabel "Knowledge graph management"@en ; skos:definition "Assembly, versioning, provenance and serving of the enterprise knowledge graph."@en .
+ent-gov:ReusableSemanticAssets a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:FabricAccountability ;
+    skos:prefLabel "Reusable semantic assets"@en ; skos:definition "Shared shapes, patterns, vocabularies and query templates."@en .
+ent-gov:PublishedExecutionModels a skos:Concept ; skos:inScheme ent-gov:AccountabilityAreas ; skos:broader ent-gov:FabricAccountability ;
+    skos:prefLabel "Published execution models"@en ; skos:definition "Rule packs, process models and query tools that agents execute."@en .
+
+# =============================================================================
+# Domains and manifests
+# =============================================================================
+
+ent-gov:BusinessDomain a owl:Class ;
+    rdfs:label "business domain"@en ;
+    skos:definition "An area of the business that is accountable for the meaning, rules, data, records and APIs of a coherent set of capabilities."@en ;
+    ent-av:agentGuidance "When asked who owns a concept or rule, resolve the concept's owning domain and read its DomainManifest."@en .
+
+ent-gov:SubDomain a owl:Class ;
+    rdfs:subClassOf ent-gov:BusinessDomain ;
+    rdfs:label "sub-domain"@en ;
+    skos:definition "A business domain that is part of a larger business domain and publishes its own ontology modules under the parent's governance."@en .
+
+ent-gov:isSubDomainOf a owl:ObjectProperty ;
+    rdfs:label "is sub-domain of"@en ;
+    rdfs:domain ent-gov:SubDomain ; rdfs:range ent-gov:BusinessDomain ;
+    skos:definition "Relates a sub-domain to its parent business domain."@en .
+
+ent-gov:DomainManifest a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "domain manifest"@en ;
+    skos:definition "Machine-readable declaration, held in the domain's own repository, of the domain's accountable roles, taxonomy anchors, capabilities and published assets."@en .
+
+ent-gov:describesDomain a owl:ObjectProperty ; rdfs:label "describes domain"@en ;
+    rdfs:domain ent-gov:DomainManifest ; rdfs:range ent-gov:BusinessDomain ;
+    skos:definition "The domain a manifest declares."@en .
+
+ent-gov:anchoredTo a owl:ObjectProperty ; rdfs:label "anchored to"@en ;
+    rdfs:range skos:Concept ;
+    skos:definition "Taxonomy node(s) whose meaning the domain is accountable for elaborating."@en .
+
+ent-gov:realizesCapability a owl:ObjectProperty ; rdfs:label "realizes capability"@en ;
+    rdfs:range skos:Concept ;
+    skos:definition "Capability-map capability supported by a domain or asset."@en .
+
+ent-gov:hasDataOntology a owl:DatatypeProperty ; rdfs:label "has data ontology"@en ;
+    skos:definition "Name of the data ontology assigned to the domain in the capability map."@en .
+
+ent-gov:hasOntologyModule a owl:ObjectProperty ; rdfs:label "has ontology module"@en ;
+    rdfs:range owl:Ontology ;
+    skos:definition "An ontology module published by the domain."@en .
+
+ent-gov:codeRepository a owl:DatatypeProperty ; rdfs:label "code repository"@en ;
+    rdfs:range xsd:anyURI ;
+    skos:definition "Source repository holding the domain's semantic assets."@en .
+
+ent-gov:namespace a owl:DatatypeProperty ; rdfs:label "namespace"@en ;
+    rdfs:range xsd:anyURI ;
+    skos:definition "The IRI namespace reserved for the domain in the domain registry."@en .
+
+# =============================================================================
+# Accountable roles
+# =============================================================================
+
+ent-gov:AccountableRole a owl:Class ;
+    rdfs:subClassOf prov:Role ;
+    rdfs:label "accountable role"@en ;
+    skos:definition "A role that carries accountability for one or more accountability areas of a domain or of the enterprise."@en .
+
+ent-gov:accountableFor a owl:ObjectProperty ; rdfs:label "accountable for"@en ;
+    rdfs:domain ent-gov:AccountableRole ; rdfs:range skos:Concept ;
+    skos:definition "Accountability area(s) the role answers for."@en .
+
+ent-gov:heldBy a owl:DatatypeProperty ; rdfs:label "held by"@en ;
+    skos:definition "Name or mailbox of the person or team currently holding the role."@en .
+
+ent-gov:reviewTeam a owl:DatatypeProperty ; rdfs:label "review team"@en ;
+    skos:definition "Source-control team handle (e.g. @example-org/rwpa-owners) used to generate CODEOWNERS."@en .
+
+ent-gov:DomainOwner a owl:Class ; rdfs:subClassOf ent-gov:AccountableRole ; rdfs:label "domain owner"@en ;
+    skos:definition "Business executive accountable for the meaning of the domain's concepts and for approving its semantic changes."@en .
+ent-gov:RuleOwner a owl:Class ; rdfs:subClassOf ent-gov:AccountableRole ; rdfs:label "rule owner"@en ;
+    skos:definition "Person accountable for the correctness of a business rule and its policy source."@en .
+ent-gov:ApiOwner a owl:Class ; rdfs:subClassOf ent-gov:AccountableRole ; rdfs:label "API owner"@en ;
+    skos:definition "Person accountable for a domain API contract and its semantic annotation."@en .
+ent-gov:DataSteward a owl:Class ; rdfs:subClassOf ent-gov:AccountableRole ; rdfs:label "data steward"@en ;
+    skos:definition "Person accountable for the quality, lineage and fitness for use of domain data products and critical data elements."@en .
+ent-gov:RecordsOwner a owl:Class ; rdfs:subClassOf ent-gov:AccountableRole ; rdfs:label "records owner"@en ;
+    skos:definition "Person accountable for retention, disposition and legal hold of the records the domain creates."@en .
+ent-gov:SemanticReviewer a owl:Class ; rdfs:subClassOf ent-gov:AccountableRole ; rdfs:label "semantic reviewer"@en ;
+    skos:definition "Enterprise role that approves how domain knowledge is represented (standards conformance and alignment), never what it means."@en .
+ent-gov:AIRiskOwner a owl:Class ; rdfs:subClassOf ent-gov:AccountableRole ; rdfs:label "AI risk owner"@en ;
+    skos:definition "Enterprise role accountable for AI risk assessment and controls on knowledge consumed by AI."@en .
+ent-gov:FabricOwner a owl:Class ; rdfs:subClassOf ent-gov:AccountableRole ; rdfs:label "semantic fabric owner"@en ;
+    skos:definition "Enterprise role accountable for the knowledge graph, knowledge collections and published execution models."@en .
+
+ent-gov:hasRole a owl:ObjectProperty ; rdfs:label "has role"@en ;
+    rdfs:range ent-gov:AccountableRole ;
+    skos:definition "Relates a manifest (or enterprise) to an accountable role assignment."@en .
+ent-gov:hasDomainOwner a owl:ObjectProperty ; rdfs:subPropertyOf ent-gov:hasRole ; rdfs:range ent-gov:DomainOwner ; rdfs:label "has domain owner"@en ;
+    skos:definition "The domain owner declared in a manifest."@en .
+ent-gov:hasDataSteward a owl:ObjectProperty ; rdfs:subPropertyOf ent-gov:hasRole ; rdfs:range ent-gov:DataSteward ; rdfs:label "has data steward"@en ;
+    skos:definition "A data steward declared in a manifest or assigned to a data asset."@en .
+ent-gov:hasRecordsOwner a owl:ObjectProperty ; rdfs:subPropertyOf ent-gov:hasRole ; rdfs:range ent-gov:RecordsOwner ; rdfs:label "has records owner"@en ;
+    skos:definition "The records owner declared in a manifest or for a record class."@en .
+ent-gov:hasRuleOwner a owl:ObjectProperty ; rdfs:subPropertyOf ent-gov:hasRole ; rdfs:range ent-gov:RuleOwner ; rdfs:label "has rule owner"@en ;
+    skos:definition "The owner of a business rule (or the default rule owner of a manifest)."@en .
+ent-gov:hasApiOwner a owl:ObjectProperty ; rdfs:subPropertyOf ent-gov:hasRole ; rdfs:range ent-gov:ApiOwner ; rdfs:label "has API owner"@en ;
+    skos:definition "The owner of a domain API (or the default API owner of a manifest)."@en .
+
+# =============================================================================
+# Domain-owned asset types
+# =============================================================================
+
+ent-gov:BusinessRule a owl:Class ;
+    rdfs:subClassOf sh:NodeShape ;
+    rdfs:label "business rule"@en ;
+    skos:definition "A domain-owned constraint or derivation, expressed executably as a SHACL shape and authoritatively as a plain-language rule statement."@en ;
+    ent-av:agentGuidance "Quote the ruleStatement, not the SHACL, when explaining a rule. Cite the ruleIdentifier and policySource."@en .
+
+ent-gov:ownsRule a owl:ObjectProperty ; rdfs:label "owns rule"@en ;
+    rdfs:range ent-gov:BusinessRule ;
+    skos:definition "Relates a manifest to the business rules the domain owns."@en .
+
+ent-gov:DomainApi a owl:Class ;
+    rdfs:subClassOf dcat:DataService ;
+    rdfs:label "domain API"@en ;
+    skos:definition "A domain-owned interface whose request and response structures are annotated with ontology terms."@en .
+
+ent-gov:providesApi a owl:ObjectProperty ; rdfs:label "provides API"@en ; rdfs:range ent-gov:DomainApi ;
+    skos:definition "Relates a manifest to the APIs the domain provides."@en .
+ent-gov:servesConcept a owl:ObjectProperty ; rdfs:label "serves concept"@en ;
+    skos:definition "An ontology class whose instances an API or data product exposes."@en .
+ent-gov:apiSpecification a owl:DatatypeProperty ; rdfs:label "API specification"@en ; rdfs:range xsd:anyURI ;
+    skos:definition "Location of the machine-readable API contract (e.g. OpenAPI document)."@en .
+ent-gov:operationId a owl:DatatypeProperty ; rdfs:label "operation id"@en ;
+    skos:definition "OpenAPI operationId of an API operation that serves a concept."@en .
+
+ent-gov:CriticalDataElement a owl:Class ;
+    rdfs:label "critical data element"@en ;
+    skos:definition "A data element whose quality is material to a business outcome, regulatory obligation or AI answer, and which therefore has a named steward and quality rules."@en .
+ent-gov:elementOf a owl:ObjectProperty ; rdfs:label "element of"@en ;
+    skos:definition "The ontology property (or class) a critical data element corresponds to."@en .
+ent-gov:hasQualityRule a owl:ObjectProperty ; rdfs:label "has quality rule"@en ; rdfs:range ent-gov:BusinessRule ;
+    skos:definition "A data quality rule applying to a critical data element."@en .
+
+ent-gov:RecordClass a owl:Class ;
+    rdfs:label "record class"@en ;
+    skos:definition "A category of business record with a common retention requirement, disposition method and legal-hold treatment."@en .
+ent-gov:keepsRecordClass a owl:ObjectProperty ; rdfs:label "keeps record class"@en ; rdfs:range ent-gov:RecordClass ;
+    skos:definition "Relates a manifest to the record classes the domain creates and keeps."@en .
+ent-gov:recordOf a owl:ObjectProperty ; rdfs:label "record of"@en ;
+    skos:definition "The ontology class whose instances constitute records of this class."@en .
+ent-gov:retentionPeriod a owl:DatatypeProperty ; rdfs:label "retention period"@en ; rdfs:range xsd:duration ;
+    skos:definition "Minimum period for which records must be retained after the retention trigger."@en .
+ent-gov:retentionTrigger a owl:DatatypeProperty ; rdfs:label "retention trigger"@en ;
+    skos:definition "Event from which the retention period is counted (e.g. creation, account closure)."@en .
+ent-gov:legalHoldApplicable a owl:DatatypeProperty ; rdfs:label "legal hold applicable"@en ; rdfs:range xsd:boolean ;
+    skos:definition "Whether records of this class can be placed under legal hold, suspending disposition."@en .
+ent-gov:dispositionMethod a owl:DatatypeProperty ; rdfs:label "disposition method"@en ;
+    skos:definition "How records are disposed of at the end of retention (e.g. secure deletion)."@en .
+ent-gov:storageRequirement a owl:DatatypeProperty ; rdfs:label "storage requirement"@en ;
+    skos:definition "Storage constraint imposed on the record class (e.g. non-rewriteable, non-erasable)."@en .
+
+# =============================================================================
+# Semantic review and cross-domain alignment (enterprise-owned)
+# =============================================================================
+
+ent-gov:SemanticReviewActivity a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "semantic review activity"@en ;
+    skos:definition "A review of a proposed change to governed knowledge. Domain approval covers meaning; enterprise approval covers representation. Both are required to release."@en .
+ent-gov:reviewOutcome a owl:ObjectProperty ; rdfs:label "review outcome"@en ; rdfs:range skos:Concept ;
+    skos:definition "Outcome of a semantic review."@en .
+ent-gov:reviewOf a owl:DatatypeProperty ; rdfs:label "review of"@en ;
+    skos:definition "Reference to the change reviewed (pull request, ADR)."@en .
+
+ent-gov:ReviewOutcomes a skos:ConceptScheme ; skos:prefLabel "Review outcomes"@en .
+ent-gov:Approved a skos:Concept ; skos:inScheme ent-gov:ReviewOutcomes ; skos:prefLabel "Approved"@en .
+ent-gov:ChangesRequested a skos:Concept ; skos:inScheme ent-gov:ReviewOutcomes ; skos:prefLabel "Changes requested"@en .
+ent-gov:Rejected a skos:Concept ; skos:inScheme ent-gov:ReviewOutcomes ; skos:prefLabel "Rejected"@en .
+
+ent-gov:AlignmentDecision a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "alignment decision"@en ;
+    skos:definition "An enterprise decision on how terms owned by different domains relate (equivalent, broader, narrower, related or conflicting), recorded with rationale and the domains consulted."@en .
+ent-gov:alignsTerm a owl:ObjectProperty ; rdfs:label "aligns term"@en ;
+    skos:definition "A term participating in an alignment decision."@en .
+ent-gov:alignmentType a owl:ObjectProperty ; rdfs:label "alignment type"@en ; rdfs:range skos:Concept ;
+    skos:definition "Kind of alignment decided."@en .
+ent-gov:consultedDomain a owl:ObjectProperty ; rdfs:label "consulted domain"@en ; rdfs:range ent-gov:BusinessDomain ;
+    skos:definition "A domain whose owner was consulted and agreed the alignment."@en .
+
+ent-gov:AlignmentTypes a skos:ConceptScheme ; skos:prefLabel "Alignment types"@en .
+ent-gov:Equivalent a skos:Concept ; skos:inScheme ent-gov:AlignmentTypes ; skos:prefLabel "Equivalent"@en .
+ent-gov:Specialization a skos:Concept ; skos:inScheme ent-gov:AlignmentTypes ; skos:prefLabel "Specialization"@en .
+ent-gov:RelatedNotEquivalent a skos:Concept ; skos:inScheme ent-gov:AlignmentTypes ; skos:prefLabel "Related, not equivalent"@en .
+ent-gov:Conflict a skos:Concept ; skos:inScheme ent-gov:AlignmentTypes ; skos:prefLabel "Unresolved conflict"@en .
+
+# =============================================================================
+# Domain registry (held in fibo-extensions/registry, vocabulary defined here)
+# =============================================================================
+
+ent-gov:DomainRegistration a owl:Class ;
+    rdfs:label "domain registration"@en ;
+    skos:definition "Entry in the enterprise domain registry that reserves a namespace for a business (sub-)domain and lists the ontology modules it publishes for reuse by other domains."@en .
+
+ent-gov:registersDomain a owl:ObjectProperty ; rdfs:label "registers domain"@en ;
+    rdfs:domain ent-gov:DomainRegistration ; rdfs:range ent-gov:BusinessDomain ;
+    skos:definition "The capability-map domain being registered."@en .
+ent-gov:domainCode a owl:DatatypeProperty ; rdfs:label "domain code"@en ;
+    rdfs:domain ent-gov:DomainRegistration ;
+    skos:definition "Short stable code used in graph names and rule identifiers (e.g. rwpa-sdp)."@en .
+ent-gov:publishedModule a owl:ObjectProperty ; rdfs:label "published module"@en ;
+    rdfs:domain ent-gov:DomainRegistration ; rdfs:range owl:Ontology ;
+    skos:definition "An ontology module the domain publishes for import by other domains. Unpublished modules are private to the domain."@en .
+ent-gov:registrationStatus a owl:DatatypeProperty ; rdfs:label "registration status"@en ;
+    rdfs:domain ent-gov:DomainRegistration ;
+    skos:definition "Active, Provisional or Retired."@en .

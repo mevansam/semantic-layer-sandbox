@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "{{ registry_code | replace('-', '_') }}_{{ module_name }}_lookup",
+  "description": "Look up a {{ seed_class_label }} and the business rules that govern it.",
+  "type": "object",
+  "required": ["referenceCode"],
+  "properties": {
+    "referenceCode": { "type": "string", "description": "Business reference code of the {{ seed_class_label }}." }
+  },
+  "additionalProperties": false
+}

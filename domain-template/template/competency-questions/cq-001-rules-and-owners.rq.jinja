@@ -1,0 +1,12 @@
+PREFIX {{ prefix }}: <{{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/>
+PREFIX ent-av:  <{{ base_iri }}governance/annotations/>
+PREFIX ent-gov: <{{ base_iri }}governance/model/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+SELECT ?ruleId ?statement ?owner ?policy WHERE {
+  ?rule sh:targetClass {{ prefix }}:{{ seed_class }} ;
+        ent-av:ruleIdentifier ?ruleId ;
+        ent-av:ruleStatement ?statement ;
+        ent-av:policySource ?policy ;
+        ent-gov:hasRuleOwner/ent-gov:heldBy ?owner .
+}
+ORDER BY ?ruleId

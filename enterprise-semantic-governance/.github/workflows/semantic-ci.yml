@@ -1,0 +1,81 @@
+# Reusable CI for every semantic repository.
+# Callers:  jobs: semantic: uses: example-org/enterprise-semantic-governance/.github/workflows/semantic-ci.yml@v0
+# Layout:   repositories are checked out side by side, matching the relative paths in semantic.yaml.
+name: semantic-ci
+
+on:
+  workflow_call:
+    inputs:
+      governance-ref:
+        type: string
+        default: main
+      fibo-extensions-ref:
+        type: string
+        default: main
+      robot-version:
+        type: string
+        default: v1.9.10
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository under test
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.event.repository.name }}
+
+      - name: Checkout enterprise-semantic-governance
+        if: github.event.repository.name != 'enterprise-semantic-governance'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/enterprise-semantic-governance
+          ref: ${{ inputs.governance-ref }}
+          path: enterprise-semantic-governance
+
+      - name: Checkout fibo-extensions (with pinned FIBO submodule)
+        if: github.event.repository.name != 'fibo-extensions' && github.event.repository.name != 'enterprise-semantic-governance'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/fibo-extensions
+          ref: ${{ inputs.fibo-extensions-ref }}
+          path: fibo-extensions
+          submodules: true
+
+      - name: Init FIBO submodule (when testing fibo-extensions itself)
+        if: github.event.repository.name == 'fibo-extensions'
+        run: git -C fibo-extensions submodule update --init --depth 1
+
+      - name: Fetch OMG Commons / LCC dependencies of FIBO
+        if: github.event.repository.name != 'enterprise-semantic-governance'
+        run: bash fibo-extensions/scripts/fetch-omg-dependencies.sh
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install tooling
+        run: |
+          pip install -r enterprise-semantic-governance/requirements.txt
+          curl -sSL -o robot.jar https://github.com/ontodev/robot/releases/download/${{ inputs.robot-version }}/robot.jar
+          echo "ROBOT_JAR=$PWD/robot.jar" >> "$GITHUB_ENV"
+
+      - name: Verify (gates G1-G7 as applicable)
+        run: python enterprise-semantic-governance/tools/semtool.py verify --repo ${{ github.event.repository.name }}
+
+      - name: Full OWL DL coherence (HermiT)
+        if: github.event.repository.name != 'enterprise-semantic-governance'
+        run: python enterprise-semantic-governance/tools/semtool.py reason --reasoner HermiT --repo ${{ github.event.repository.name }}
+
+      - name: Upload knowledge graph + GraphRAG cards
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semantic-build
+          path: ${{ github.event.repository.name }}/build/
+          if-no-files-found: ignore

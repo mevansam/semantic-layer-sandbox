@@ -1,0 +1,9 @@
+# Enterprise semantic governance: standards, review, AI controls and alignment, plus the semantic fabric
+*                       @example-org/ontology-standards @example-org/semantic-review-board
+/ontology/controls.ttl  @example-org/ai-risk-office @example-org/semantic-review-board
+/docs/standards/06-*    @example-org/ai-risk-office
+/alignment/             @example-org/semantic-review-board
+/taxonomy/              @example-org/ontology-standards
+/capabilities/          @example-org/ontology-standards @example-org/semantic-review-board
+/fabric/                @example-org/semantic-fabric-platform @example-org/semantic-review-board
+/tools/                 @example-org/semantic-fabric-platform

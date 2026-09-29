@@ -1,0 +1,33 @@
+openapi: 3.1.0
+info:
+  title: {{ subdomain_name }} - {{ module_name }} API
+  version: 0.1.0
+  description: |
+    Placeholder contract. Every schema carries x-ontology-class and every
+    property x-ontology-property (full IRIs) so the knowledge graph knows which
+    concepts this API serves (docs/standards/04).
+paths:
+  /{{ module_name }}/{id}:
+    get:
+      operationId: get{{ seed_class }}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: The {{ seed_class_label }}
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/{{ seed_class }}" }
+components:
+  schemas:
+    {{ seed_class }}:
+      type: object
+      x-ontology-class: {{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/{{ seed_class }}
+      required: [referenceCode]
+      properties:
+        referenceCode:
+          type: string
+          x-ontology-property: {{ base_iri }}domain/{{ domain_code }}/{{ subdomain_slug }}/{{ module_name }}/hasReferenceCode
