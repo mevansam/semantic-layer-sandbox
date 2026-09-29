@@ -14,5 +14,5 @@ paths:
 
 # Sub-domain folders (kept last; new_domain.py appends to it)
 sub_domains:
-  - planning-and-guidance
+  - financial-planning
   - insights-and-analytics

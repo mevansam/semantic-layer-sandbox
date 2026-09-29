@@ -1,0 +1,75 @@
+@prefix ent-core:          <https://ontology.example.com/fibo-ext/core/> .
+@prefix fibo-fbc-pas-caa:  <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/ClientsAndAccounts/> .
+@prefix fibo-fnd-acc-4217: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/ISO4217-CurrencyCodes/> .
+@prefix fibo-fnd-acc-cur:  <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> .
+@prefix fp:                <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> .
+@prefix fp-ex:             <https://ontology.example.com/domain/retail-wealth-management/financial-planning/examples/> .
+@prefix rdfs:              <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:               <http://www.w3.org/2001/XMLSchema#> .
+
+# POSITIVE EXAMPLES - Financial Planning (synthetic). Must pass every FP rule;
+# used by competency questions and the goal-progress tool.
+
+# -----------------------------------------------------------------------------
+# POSITIVE EXAMPLES - a fictitious customer's self-directed planning journey.
+# Must conform to every rule (gate G5); used by competency questions and tools.
+# Entirely synthetic data.
+# -----------------------------------------------------------------------------
+# ---- Customer and account -------------------------------------------------------
+fp-ex:customer-001 a ent-core:RetailCustomer ;
+    rdfs:label "Customer 001 (synthetic)" .
+
+fp-ex:account-001 a fibo-fbc-pas-caa:InvestmentAccount ;
+    rdfs:label "Retirement brokerage account (synthetic)" .
+
+# ---- Reference data (normally from Common Reference Data) --------------------------
+fp-ex:mortality-table-2024 a ent-core:MortalityTable ;
+    rdfs:label "Example Mortality Table 2024 (synthetic)" ;
+    ent-core:tableVersion "2024.1" .
+
+# ---- Goal and plan -------------------------------------------------------------------
+fp-ex:goal-retirement a fp:RetirementGoal ;
+    rdfs:label "Retire at 67" ;
+    fp:hasGoalReference "G-0001" ;
+    fp:hasGoalOwner fp-ex:customer-001 ;
+    fp:hasTargetAmount fp-ex:goal-retirement-target ;
+    fp:hasTargetDate "2055-06-30"^^xsd:date ;
+    fp:isFundedBy fp-ex:account-001 .
+
+fp-ex:goal-retirement-target a fibo-fnd-acc-cur:MonetaryAmount ;
+    fibo-fnd-acc-cur:hasAmount 1200000.00 ;
+    fibo-fnd-acc-cur:hasCurrency fibo-fnd-acc-4217:USD .
+
+fp-ex:plan-001 a fp:SelfDirectedPlan ;
+    rdfs:label "Customer 001 retirement plan" ;
+    ent-core:hasDeliveryModel ent-core:SelfDirected ;
+    fp:hasPlanGoal fp-ex:goal-retirement ;
+    fp:hasScenario fp-ex:scenario-base .
+
+# ---- Scenario, assumptions and projection ---------------------------------------------
+fp-ex:scenario-base a fp:PlanningScenario ;
+    rdfs:label "Base case" ;
+    fp:usesAssumption fp-ex:assumption-return , fp-ex:assumption-inflation , fp-ex:assumption-life .
+
+fp-ex:assumption-return a fp:PlanningAssumption ;
+    rdfs:label "expected annual portfolio return" ;
+    fp:assumedValue 0.050 .
+
+fp-ex:assumption-inflation a fp:PlanningAssumption ;
+    rdfs:label "expected annual inflation" ;
+    fp:assumedValue 0.025 .
+
+fp-ex:assumption-life a fp:LifeExpectancyAssumption ;
+    rdfs:label "life expectancy" ;
+    fp:assumedValue 92 ;
+    fp:sourcedFromTable fp-ex:mortality-table-2024 .
+
+fp-ex:projection-001 a fp:GoalProjection ;
+    fp:projectsGoal fp-ex:goal-retirement ;
+    fp:producedByScenario fp-ex:scenario-base ;
+    fp:hasProjectedAmount fp-ex:projection-001-amount ;
+    fp:probabilityOfSuccess 0.78 .
+
+fp-ex:projection-001-amount a fibo-fnd-acc-cur:MonetaryAmount ;
+    fibo-fnd-acc-cur:hasAmount 1050000.00 ;
+    fibo-fnd-acc-cur:hasCurrency fibo-fnd-acc-4217:USD .

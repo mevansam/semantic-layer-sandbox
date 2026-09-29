@@ -6,7 +6,7 @@ The baseline that sets **how** enterprise knowledge is represented, shared and c
 enterprise-semantic-governance/     ← you are here: standards + fabric
 fibo-extensions/                    ← pinned FIBO, enterprise FIBO profile, core extensions, domain registry
 domains/domain-template/            ← template every sub-domain is generated from
-domains/retail-wealth-management/   ← first business domain: planning-and-guidance, insights-and-analytics
+domains/retail-wealth-management/   ← first business domain: financial-planning, insights-and-analytics
 ```
 
 ## What's in this repo
@@ -37,7 +37,7 @@ domains/retail-wealth-management/   ← first business domain: planning-and-guid
 pip install -r requirements.txt                       # rdflib, pyshacl, pyyaml, openpyxl
 export ROBOT_JAR=/path/to/robot.jar                   # https://github.com/ontodev/robot/releases
 python tools/semtool.py verify                        # this repo
-python tools/semtool.py verify --repo ../domains/retail-wealth-management/planning-and-guidance   # a sub-domain, all gates
+python tools/semtool.py verify --repo ../domains/retail-wealth-management/financial-planning   # a sub-domain, all gates
 ```
 
 ## Common tasks

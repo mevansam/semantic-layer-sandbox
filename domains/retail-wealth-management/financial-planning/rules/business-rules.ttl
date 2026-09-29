@@ -1,0 +1,105 @@
+@prefix dct:             <http://purl.org/dc/terms/> .
+@prefix ent-av:          <https://ontology.example.com/governance/annotations/> .
+@prefix ent-core:        <https://ontology.example.com/fibo-ext/core/> .
+@prefix ent-gov:         <https://ontology.example.com/governance/model/> .
+@prefix ent-ra:          <https://ontology.example.com/fabric/assets/> .
+@prefix ent-tax:         <https://ontology.example.com/taxonomy/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:             <http://www.w3.org/2002/07/owl#> .
+@prefix fp:              <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> .
+@prefix fp-m:            <https://ontology.example.com/domain/retail-wealth-management/financial-planning/governance/> .
+@prefix fp-rule:         <https://ontology.example.com/domain/retail-wealth-management/financial-planning/rules/> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:              <http://www.w3.org/ns/shacl#> .
+@prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
+
+# Financial Planning - BUSINESS RULES (owned by the rule owner). FP-R-NNN.
+
+<https://ontology.example.com/domain/retail-wealth-management/financial-planning/rules/>
+    a owl:Ontology ;
+    rdfs:label "Financial Planning - business rules"@en ;
+    dct:abstract "Executable business rules for financial goals, planning assumptions and goal projections."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/financial-planning/rules/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional ;
+    sh:declare [ sh:prefix "fp" ; sh:namespace "https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/"^^xsd:anyURI ] .
+
+# ---- FP-R-001  Goal completeness ------------------------------------------------
+fp-rule:GoalCompletenessRule
+    a sh:NodeShape , ent-gov:BusinessRule ;
+    rdfs:label "goal completeness rule"@en ;
+    ent-av:ruleIdentifier "FP-R-001" ;
+    ent-av:ruleStatement "Every financial goal has exactly one goal reference, one owning customer, one target amount in a single currency and one target date."@en ;
+    ent-av:policySource "Digital planning data standard (placeholder ref DPS-GOAL-01)" ;
+    ent-gov:hasRuleOwner fp-m:RuleOwnerRole ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans ;
+    sh:targetClass fp:FinancialGoal ;
+    sh:message "FP-R-001: a financial goal must be complete (reference, owner, target amount, target date)." ;
+    sh:property [ sh:path fp:hasGoalReference ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+                  sh:message "FP-R-001: a goal needs exactly one goal reference." ] ;
+    sh:property [ sh:path fp:hasGoalOwner ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ent-core:RetailCustomer ;
+                  sh:message "FP-R-001: a goal needs exactly one owning retail customer." ] ;
+    sh:property [ sh:path fp:hasTargetAmount ; sh:minCount 1 ; sh:maxCount 1 ; sh:node ent-ra:MonetaryAmountShape ;
+                  sh:message "FP-R-001: a goal needs exactly one target amount with amount and currency." ] ;
+    sh:property [ sh:path fp:hasTargetDate ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+                  sh:message "FP-R-001: a goal needs exactly one target date." ] .
+
+# ---- FP-R-002  Life expectancy provenance ------------------------------------------
+fp-rule:LifeExpectancyProvenanceRule
+    a sh:NodeShape , ent-gov:BusinessRule ;
+    rdfs:label "life expectancy provenance rule"@en ;
+    ent-av:ruleIdentifier "FP-R-002" ;
+    ent-av:ruleStatement "A life expectancy assumption must come from exactly one governed mortality table with a stated version."@en ;
+    ent-av:policySource "Planning assumptions policy (placeholder ref PAP-03)" ;
+    ent-gov:hasRuleOwner fp-m:RuleOwnerRole ;
+    ent-av:governedBy ent-tax:common-reference.mortality-tables ;
+    sh:targetClass fp:LifeExpectancyAssumption ;
+    sh:message "FP-R-002: life expectancy assumptions must cite one versioned mortality table." ;
+    sh:property [ sh:path fp:sourcedFromTable ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ent-core:MortalityTable ;
+                  sh:message "FP-R-002: cite exactly one mortality table." ] ;
+    sh:property [ sh:path ( fp:sourcedFromTable ent-core:tableVersion ) ; sh:minCount 1 ;
+                  sh:message "FP-R-002: the mortality table must state its version." ] ;
+    sh:property [ sh:path fp:assumedValue ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:minInclusive 50 ; sh:maxInclusive 120 ;
+                  sh:message "FP-R-002: life expectancy must be a single age between 50 and 120." ] .
+
+# ---- FP-R-004  Retirement scenario completeness ------------------------------------
+fp-rule:RetirementScenarioRule
+    a sh:NodeShape , ent-gov:BusinessRule ;
+    rdfs:label "retirement scenario rule"@en ;
+    ent-av:ruleIdentifier "FP-R-004" ;
+    ent-av:ruleStatement "Every projection of a retirement goal must come from a scenario that uses a life expectancy assumption."@en ;
+    ent-av:policySource "Planning assumptions policy (placeholder ref PAP-03)" ;
+    ent-gov:hasRuleOwner fp-m:RuleOwnerRole ;
+    ent-av:governedBy ent-tax:common-reference.mortality-tables ;
+    skos:editorialNote "SHACL-SPARQL used because the constraint spans projection -> goal type -> scenario -> assumption type."@en ;
+    sh:targetClass fp:GoalProjection ;
+    sh:message "FP-R-004: retirement projections need a scenario with a life expectancy assumption." ;
+    sh:sparql [
+        sh:message "FP-R-004: this retirement projection's scenario has no life expectancy assumption." ;
+        sh:prefixes <https://ontology.example.com/domain/retail-wealth-management/financial-planning/rules/> ;
+        sh:select """
+            SELECT $this WHERE {
+              $this fp:projectsGoal ?goal ; fp:producedByScenario ?scenario .
+              ?goal a fp:RetirementGoal .
+              FILTER NOT EXISTS { ?scenario fp:usesAssumption ?a . ?a a fp:LifeExpectancyAssumption . }
+            }""" ] .
+
+# ---- FP-R-003  Projection validity ------------------------------------------------------
+fp-rule:ProjectionValidityRule
+    a sh:NodeShape , ent-gov:BusinessRule ;
+    rdfs:label "projection validity rule"@en ;
+    ent-av:ruleIdentifier "FP-R-003" ;
+    ent-av:ruleStatement "A goal projection projects one goal, comes from one scenario, has one projected amount and a probability of success between 0 and 1."@en ;
+    ent-av:policySource "Digital planning data standard (placeholder ref DPS-PROJ-02)" ;
+    ent-gov:hasRuleOwner fp-m:RuleOwnerRole ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans ;
+    sh:targetClass fp:GoalProjection ;
+    sh:message "FP-R-003: projections must be well-formed." ;
+    sh:property [ sh:path fp:projectsGoal ; sh:minCount 1 ; sh:maxCount 1 ; sh:class fp:FinancialGoal ] ;
+    sh:property [ sh:path fp:producedByScenario ; sh:minCount 1 ; sh:maxCount 1 ; sh:class fp:PlanningScenario ] ;
+    sh:property [ sh:path fp:hasProjectedAmount ; sh:minCount 1 ; sh:maxCount 1 ; sh:node ent-ra:MonetaryAmountShape ] ;
+    sh:property [ sh:path fp:probabilityOfSuccess ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:decimal ;
+                  sh:minInclusive 0 ; sh:maxInclusive 1 ;
+                  sh:message "FP-R-003: probability of success must be a decimal between 0 and 1." ] .

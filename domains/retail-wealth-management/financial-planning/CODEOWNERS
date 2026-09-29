@@ -1,0 +1,13 @@
+# GENERATED from domain-manifest.ttl by semtool codeowners - do not edit by hand.
+# Two-key review: the domain approves MEANING; the enterprise approves REPRESENTATION.
+*                      @example-org/rwm-fp-domain-owners @example-org/semantic-review-board
+/ontology/             @example-org/rwm-fp-domain-owners @example-org/semantic-review-board
+/rules/                @example-org/rwm-fp-rule-owners @example-org/semantic-review-board
+/processes/            @example-org/rwm-fp-domain-owners @example-org/semantic-review-board
+/apis/                 @example-org/rwm-fp-api-owners @example-org/semantic-review-board
+/stewardship/          @example-org/rwm-fp-data-stewards @example-org/semantic-review-board
+/records/              @example-org/rwm-records @example-org/semantic-review-board
+/collections/          @example-org/rwm-fp-domain-owners @example-org/semantic-fabric-platform @example-org/ai-risk-office
+/execution-models/     @example-org/rwm-fp-domain-owners @example-org/semantic-fabric-platform @example-org/ai-risk-office
+/domain-manifest.ttl   @example-org/rwm-fp-domain-owners @example-org/semantic-review-board
+/semantic.yaml         @example-org/rwm-fp-domain-owners @example-org/semantic-review-board

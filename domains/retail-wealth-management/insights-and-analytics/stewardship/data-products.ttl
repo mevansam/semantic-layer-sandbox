@@ -13,7 +13,7 @@
 @prefix ia-m:            <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/governance/> .
 @prefix ia-rule:         <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/rules/> .
 @prefix owl:             <http://www.w3.org/2002/07/owl#> .
-@prefix pg:              <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> .
+@prefix fp:              <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> .
 @prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
 
 <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/stewardship/>
@@ -27,7 +27,7 @@
 ia-data:PlanningInsights a dcat:Dataset , dprod:DataProduct ;
     rdfs:label "planning insights and scores"@en ;
     dct:description "Goal projections, financial health scores and self-directed insights produced for retail customers."@en ;
-    ent-gov:servesConcept pg:GoalProjection , fa:FinancialHealthScore , ia:SelfDirectedInsight ;
+    ent-gov:servesConcept fp:GoalProjection , fa:FinancialHealthScore , ia:SelfDirectedInsight ;
     ent-gov:hasDataSteward ia-m:DataStewardRole ;
     ent-av:sensitivity ent-ctl:RestrictedPersonal ;
     ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics .

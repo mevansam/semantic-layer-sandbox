@@ -1,0 +1,41 @@
+# Answers for domains/retail-wealth-management/financial-planning
+ontology_domain_name: Investment Servicing
+parent_domain_name: Retail Wealth Management
+parent_domain_slug: retail-wealth-management
+domain_name: Financial Planning
+domain_slug: financial-planning
+registry_code: rwm-fp
+rule_prefix: FP
+prefix: fp
+module_name: planning
+capability_domain_iri: https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/financial-planning
+capabilities:
+  - financial-planning.goal-based-planning
+  - financial-planning.retirement-income-projection
+taxonomy_anchors:
+  - customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans
+  - products-and-services.planning-and-guidance-services
+seed_class: FinancialGoal
+seed_class_label: financial goal
+seed_class_definition: financial objective set by a customer, with a target amount to be reached by a target date
+seed_class_parent: fibo-fnd-gao-obj:FinancialObjective
+seed_class_anchor: customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans
+github_org: example-org
+repo_name: semantic-layer-sandbox
+domain_owner: Head of Digital Financial Planning (placeholder)
+domain_owner_team: "@example-org/rwm-fp-domain-owners"
+rule_owner: Financial Planning Rules Lead (placeholder)
+rule_owner_team: "@example-org/rwm-fp-rule-owners"
+api_owner: Planning Platform Product Owner (placeholder)
+api_owner_team: "@example-org/rwm-fp-api-owners"
+data_steward: Planning Data Steward (placeholder)
+data_steward_team: "@example-org/rwm-fp-data-stewards"
+records_owner: Wealth Records Manager (placeholder)
+records_owner_team: "@example-org/rwm-records"
+ai_risk_owner: AI Risk Office (placeholder)
+ai_risk_owner_team: "@example-org/ai-risk-office"
+parent_registry_code: rwm
+parent_domain_owner: Head of Retail Wealth Management (placeholder)
+parent_domain_owner_team: "@example-org/rwm-domain-owners"
+dependencies: []
+created: "2026-09-29"

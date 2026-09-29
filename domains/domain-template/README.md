@@ -10,7 +10,7 @@ A [Copier](https://copier.readthedocs.io) template for a **sub-domain** reposito
    copier copy domains/domain-template domains/<business-domain>/<sub-domain>                            # Copier >= 9
    python domains/domain-template/scripts/new_domain.py --answers my.yaml --out domains/<business-domain>/<sub-domain>
    ```
-   The script also scaffolds the business domain's parent layer (`domain.ttl`, `semantic.yaml`, `README.md` from `parent-template/`) if it doesn't exist yet. `answers/rwm-pg.yaml` and `answers/rwm-ia.yaml` are worked examples (Retail Wealth Management › Planning and Guidance / Insights and Analytics).
+   The script also scaffolds the business domain's parent layer (`domain.ttl`, `semantic.yaml`, `README.md` from `parent-template/`) if it doesn't exist yet. `answers/rwm-fp.yaml` and `answers/rwm-ia.yaml` are worked examples (Retail Wealth Management › Financial Planning / Insights and Analytics).
 3. `python enterprise-semantic-governance/tools/semtool.py verify --repo domains/<business-domain>/<sub-domain>` (also generates CODEOWNERS).
    Check alignment any time with `python domains/domain-template/scripts/compare_domain.py domains/<business-domain>/<sub-domain>`.
 4. Replace the seed concept, rule, tool and tests with real modelling, **keeping the file names** (see below).

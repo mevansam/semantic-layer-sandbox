@@ -1,0 +1,12 @@
+# Negative test cases: each file MUST trigger the listed business rules (gate G5).
+# nc-NNN tests rule FP-R-NNN (it may trip others too). Validated together with the positive examples.
+cases:
+  - name: incomplete goal (no target date, amount without currency)
+    file: nc-001-incomplete-goal.ttl
+    expect_violations: [FP-R-001]
+  - name: unsourced life expectancy, and a retirement scenario without one
+    file: nc-002-unsourced-life-expectancy.ttl
+    expect_violations: [FP-R-002, FP-R-004]
+  - name: probability of success above 1
+    file: nc-003-probability-out-of-range.ttl
+    expect_violations: [FP-R-003]

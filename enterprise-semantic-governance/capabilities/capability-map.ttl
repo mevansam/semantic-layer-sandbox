@@ -1026,7 +1026,7 @@ ent-cap:financial-planning.goal-based-planning a skos:Concept ;
     skos:inScheme ent-cap:CapabilityMap ;
     skos:notation "Financial Planning > Goal-Based Planning" ;
     skos:prefLabel "Goal-Based Planning"@en ;
-    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance> ;
+    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/financial-planning> ;
     ent-gov:capabilityStatus "Proposed" .
 
 ent-cap:financial-planning.planning-insights-and-analytics a skos:Concept ;
@@ -1046,7 +1046,7 @@ ent-cap:financial-planning.retirement-income-projection a skos:Concept ;
     skos:inScheme ent-cap:CapabilityMap ;
     skos:notation "Financial Planning > Retirement Income Projection" ;
     skos:prefLabel "Retirement Income Projection"@en ;
-    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance> ;
+    ent-gov:accountableDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/financial-planning> ;
     ent-gov:capabilityStatus "Proposed" .
 
 ent-cap:investment-management.digital-asset-management a skos:Concept ;
@@ -1153,9 +1153,8 @@ ent-cap:benefits-management.benefits-record-keeping a skos:Concept ;
     ent-gov:accountableDomain <https://ontology.example.com/capability/domain/planning-and-guidance/benefits-management> ;
     ent-gov:capabilityStatus "Authoritative" .
 
-<https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance> a ent-gov:SubDomain ;
-    rdfs:label "Planning and Guidance"@en ;
-    skos:editorialNote "Name coincides with the capability map's ontology domain 'Planning and Guidance'; they are different things (this is a sub-domain of Retail Wealth Management)."@en ;
+<https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/financial-planning> a ent-gov:SubDomain ;
+    rdfs:label "Financial Planning"@en ;
     ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans,
         ent-tax:products-and-services.planning-and-guidance-services ;
     ent-gov:inOntologyDomain ent-od:investment-servicing ;

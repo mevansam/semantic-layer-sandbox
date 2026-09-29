@@ -1,0 +1,15 @@
+@prefix fibo-fnd-acc-4217: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/ISO4217-CurrencyCodes/> .
+@prefix fibo-fnd-acc-cur:  <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> .
+@prefix fp:                <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> .
+@prefix fp-ex:             <https://ontology.example.com/domain/retail-wealth-management/financial-planning/examples/> .
+
+# NEGATIVE (FP-R-003): probability of success above 1.
+fp-ex:bad-probability a fp:GoalProjection ;
+    fp:projectsGoal fp-ex:goal-retirement ;
+    fp:producedByScenario fp-ex:scenario-base ;
+    fp:hasProjectedAmount fp-ex:bad-probability-amount ;
+    fp:probabilityOfSuccess 1.4 .
+
+fp-ex:bad-probability-amount a fibo-fnd-acc-cur:MonetaryAmount ;
+    fibo-fnd-acc-cur:hasAmount 1000000.00 ;
+    fibo-fnd-acc-cur:hasCurrency fibo-fnd-acc-4217:USD .

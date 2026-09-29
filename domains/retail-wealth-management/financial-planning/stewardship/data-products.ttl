@@ -1,0 +1,56 @@
+@prefix dcat:            <http://www.w3.org/ns/dcat#> .
+@prefix dct:             <http://purl.org/dc/terms/> .
+@prefix dprod:           <https://ekgf.github.io/dprod/> .
+@prefix ent-av:          <https://ontology.example.com/governance/annotations/> .
+@prefix ent-ctl:         <https://ontology.example.com/governance/controls/> .
+@prefix ent-gov:         <https://ontology.example.com/governance/model/> .
+@prefix ent-tax:         <https://ontology.example.com/taxonomy/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:             <http://www.w3.org/2002/07/owl#> .
+@prefix fp:              <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> .
+@prefix fp-data:         <https://ontology.example.com/domain/retail-wealth-management/financial-planning/stewardship/> .
+@prefix fp-m:            <https://ontology.example.com/domain/retail-wealth-management/financial-planning/governance/> .
+@prefix fp-rule:         <https://ontology.example.com/domain/retail-wealth-management/financial-planning/rules/> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://ontology.example.com/domain/retail-wealth-management/financial-planning/stewardship/>
+    a owl:Ontology ;
+    rdfs:label "Financial Planning - data stewardship"@en ;
+    dct:abstract "Data products and critical data elements for goals, plans, planning assumptions and projections."@en ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/financial-planning/stewardship/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# ---- Data products ------------------------------------------------------------------
+fp-data:GoalsAndPlans a dcat:Dataset , dprod:DataProduct ;
+    rdfs:label "customer goals and plans"@en ;
+    dct:description "Authoritative data product of retail customers' financial goals and self-directed plans."@en ;
+    ent-gov:servesConcept fp:FinancialGoal , fp:SelfDirectedPlan ;
+    ent-gov:hasDataSteward fp-m:DataStewardRole ;
+    ent-av:sensitivity ent-ctl:RestrictedPersonal ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+# ---- Critical data elements --------------------------------------------------------
+fp-data:GoalTargetAmount a ent-gov:CriticalDataElement ;
+    rdfs:label "goal target amount"@en ;
+    ent-gov:elementOf fp:hasTargetAmount ;
+    ent-gov:hasDataSteward fp-m:DataStewardRole ;
+    ent-gov:hasQualityRule fp-rule:GoalCompletenessRule .
+
+fp-data:GoalTargetDate a ent-gov:CriticalDataElement ;
+    rdfs:label "goal target date"@en ;
+    ent-gov:elementOf fp:hasTargetDate ;
+    ent-gov:hasDataSteward fp-m:DataStewardRole ;
+    ent-gov:hasQualityRule fp-rule:GoalCompletenessRule .
+
+fp-data:ProbabilityOfSuccess a ent-gov:CriticalDataElement ;
+    rdfs:label "probability of success"@en ;
+    ent-gov:elementOf fp:probabilityOfSuccess ;
+    ent-gov:hasDataSteward fp-m:DataStewardRole ;
+    ent-gov:hasQualityRule fp-rule:ProjectionValidityRule .
+
+fp-data:LifeExpectancy a ent-gov:CriticalDataElement ;
+    rdfs:label "life expectancy assumption"@en ;
+    ent-gov:elementOf fp:LifeExpectancyAssumption ;
+    ent-gov:hasDataSteward fp-m:DataStewardRole ;
+    ent-gov:hasQualityRule fp-rule:LifeExpectancyProvenanceRule , fp-rule:RetirementScenarioRule .

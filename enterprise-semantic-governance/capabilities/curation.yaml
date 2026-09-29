@@ -34,9 +34,8 @@ suspicious_placements:
 # parent's ontology domain. Refer to a sub-domain elsewhere as "Parent > Sub-domain".
 sub_domains:
   Retail Wealth Management:
-    - name: Planning and Guidance
-      slug: planning-and-guidance
-      note: "Name coincides with the capability map's ontology domain 'Planning and Guidance'; they are different things (this is a sub-domain of Retail Wealth Management)."
+    - name: Financial Planning
+      slug: financial-planning
     - name: Insights and Analytics
       slug: insights-and-analytics
 
@@ -48,10 +47,10 @@ proposed_capabilities:
     domain: Retail Wealth Management
     description: Helping retail customers set, plan for and track financial goals, and understand how they are doing.
   - path: Financial Planning > Goal-Based Planning
-    domain: Retail Wealth Management > Planning and Guidance
+    domain: Retail Wealth Management > Financial Planning
     description: Customers define financial goals and build self-directed plans to reach them.
   - path: Financial Planning > Retirement Income Projection
-    domain: Retail Wealth Management > Planning and Guidance
+    domain: Retail Wealth Management > Financial Planning
     description: Projecting goal and retirement outcomes from balances, contributions and planning assumptions.
   - path: Financial Planning > Planning Insights & Analytics
     domain: Retail Wealth Management > Insights and Analytics

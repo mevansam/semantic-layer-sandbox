@@ -9,19 +9,19 @@ Owned by the domain owner. This is the semantic review record for the sub-domain
 | Business domain › sub-domain | **Retail Wealth Management › Insights and Analytics** (`rwm-ia`) |
 | Ontology domain (capability map) | Investment Servicing (metadata only) |
 | Capabilities realized | Financial Planning › Planning Insights & Analytics (**proposed**) |
-| Builds on | **Planning and Guidance**: imports its published `planning` module (`semantic.yaml` `dependencies`, `ent-gov:dependsOnSubDomain`) |
+| Builds on | **Financial Planning**: imports its published `planning` module (`semantic.yaml` `dependencies`, `ent-gov:dependsOnSubDomain`) |
 | Related domains | Financial Assessments (accountable for the health score; `assessments.ttl` incubated here) · Customer Management (owns `RetailCustomer`) · a future advice sub-domain of Retail Wealth Management (advised side of the advice boundary, ALN-002) |
 
-## How it builds on Planning and Guidance (extension point)
+## How it builds on Financial Planning (extension point)
 
-| Here | Uses from Planning and Guidance | How |
+| Here | Uses from Financial Planning | How |
 |---|---|---|
-| `ia:relatesToGoal` | `pg:FinancialGoal` | property range |
-| process step *score financial health* | `pg:GoalProjection`, after `pg-proc:RunProjection` | `ent-proc:usesConcept`, `ent-proc:precededBy` (hand-off) |
-| process step *generate insights* | `pg:GoalProjection` | `ent-proc:usesConcept` |
-| `rwm_ia_customer_insights` | `pg:hasGoalReference` | query |
+| `ia:relatesToGoal` | `fp:FinancialGoal` | property range |
+| process step *score financial health* | `fp:GoalProjection`, after `fp-proc:RunProjection` | `ent-proc:usesConcept`, `ent-proc:precededBy` (hand-off) |
+| process step *generate insights* | `fp:GoalProjection` | `ent-proc:usesConcept` |
+| `rwm_ia_customer_insights` | `fp:hasGoalReference` | query |
 
-This sub-domain never mints terms in Planning and Guidance's namespace (rule E2); it imports only the published module (rule E3). CQ-104 lists every such dependency from the knowledge graph.
+This sub-domain never mints terms in Financial Planning's namespace (rule E2); it imports only the published module (rule E3). CQ-104 lists every such dependency from the knowledge graph.
 
 ## FIBO parent choices
 
@@ -39,7 +39,7 @@ This sub-domain never mints terms in Planning and Guidance's namespace (rule E2)
 | IA-R-002 health score validity | `nc-002-invalid-health-score.ttl` | health-score step (Financial Assessments) |
 | IA-R-003 insight traceability | `nc-003-insight-without-provenance.ttl` | `rwm_ia_advice_boundary_rulepack` |
 
-Competency questions: CQ-001…CQ-005 come from the template (CQ-005 exercises `rwm_ia_customer_insights`). CQ-101 covers serving and stewardship, CQ-102 execution-model controls, CQ-103 agent-assisted steps, CQ-104 dependencies on Planning and Guidance.
+Competency questions: CQ-001…CQ-005 come from the template (CQ-005 exercises `rwm_ia_customer_insights`). CQ-101 covers serving and stewardship, CQ-102 execution-model controls, CQ-103 agent-assisted steps, CQ-104 dependencies on Financial Planning.
 
 ## The advice boundary, end to end
 

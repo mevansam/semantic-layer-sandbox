@@ -15,8 +15,8 @@ fibo-extensions/                     FIBO (pinned submodule), enterprise FIBO pr
 domains/
 ├── domain-template/                 Template every sub-domain is generated from (+ parent-template for business domains)
 └── retail-wealth-management/        Business domain (parent layer: domain.ttl umbrella + parent manifest)
-    ├── planning-and-guidance/       Sub-domain: goals, plans, scenarios, projections  (publishes `planning`)
-    └── insights-and-analytics/      Sub-domain: insights, health score, advice boundary (builds on planning-and-guidance)
+    ├── financial-planning/          Sub-domain: goals, plans, scenarios, projections  (publishes `planning`)
+    └── insights-and-analytics/      Sub-domain: insights, health score, advice boundary (builds on financial-planning)
 ```
 
 | Layer | Owns | Extension point |

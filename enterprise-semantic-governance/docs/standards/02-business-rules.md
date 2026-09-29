@@ -28,7 +28,7 @@ ia-rule:AdviceBoundaryRule
 
 ## Conventions
 
-- **One rule, one shape, one identifier** (`{PREFIX}-R-{nnn}`, numbered per sub-domain, e.g. `PG-R-001`, `IA-R-001`). Don't bundle unrelated constraints into one shape.
+- **One rule, one shape, one identifier** (`{PREFIX}-R-{nnn}`, numbered per sub-domain, e.g. `FP-R-001`, `IA-R-001`). Don't bundle unrelated constraints into one shape.
 - Use core SHACL first. Use SHACL-SPARQL (`sh:sparql`) only when core SHACL cannot express the rule, and explain why in `skos:editorialNote`.
 - Reuse fabric shapes (`fabric/reusable-assets/`) with `sh:node` instead of rewriting them.
 - Every rule has at least one **negative test case**: an example that must violate it, listed in `tests/negative/expectations.yaml`.

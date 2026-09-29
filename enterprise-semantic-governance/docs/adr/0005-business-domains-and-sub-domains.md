@@ -27,9 +27,9 @@ Both belong to the **Retail Wealth Management** business domain. The capability 
 
    Dependencies run one way (`ent-ms:SubDomainDependencyShape` rejects cycles). A sub-domain never mints terms in another's namespace (E2). Its knowledge graph includes the dependency's published ontology, and in tests its example data.
 5. **IRIs follow folders:** `{base}domain/{business-domain}/{sub-domain}/{module}/`. The ontology domain is metadata (`ent-gov:inOntologyDomain`), so re-grouping the map never changes IRIs. Ontology-domain umbrellas move to `{base}ontology-domain/{od}/`.
-6. **Identifiers are per sub-domain:** rule IDs `PG-R-nnn` / `IA-R-nnn`, tool names `rwm_pg_*` / `rwm_ia_*`, graph names `graph/rwm-pg/…`.
+6. **Identifiers are per sub-domain:** rule IDs `FP-R-nnn` / `IA-R-nnn`, tool names `rwm_fp_*` / `rwm_ia_*`, graph names `graph/rwm-fp/…`.
 
 ## Consequences
-- Retail Wealth Management is split into Planning and Guidance (`rwm-pg`, publishes `planning`) and Insights and Analytics (`rwm-ia`, builds on `rwm-pg`). Financial Plan Management no longer has a repository; it is again a capability gap in the map.
+- Retail Wealth Management is split into Financial Planning (`rwm-fp`, publishes `planning`) and Insights and Analytics (`rwm-ia`, builds on `rwm-fp`). Financial Plan Management no longer has a repository; it is again a capability gap in the map.
 - The advice boundary (ALN-002) now runs inside Retail Wealth Management: the self-directed side is Insights and Analytics, and the advised side is a future advice sub-domain.
-- The sub-domain name "Planning and Guidance" coincides with a capability-map ontology domain. They are different things; the data-quality report notes it.
+- The planning sub-domain is named **Financial Planning**, not "Planning and Guidance", so it cannot be confused with the capability map's ontology domain of that name. It is the sub-domain accountable for the proposed capabilities under "Financial Planning" (Goal-Based Planning, Retirement Income Projection).

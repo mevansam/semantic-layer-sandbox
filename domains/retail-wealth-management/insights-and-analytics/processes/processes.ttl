@@ -11,8 +11,8 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix dct:  <http://purl.org/dc/terms/> .
-@prefix pg:      <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> .
-@prefix pg-proc: <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/processes/> .
+@prefix fp:      <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> .
+@prefix fp-proc: <https://ontology.example.com/domain/retail-wealth-management/financial-planning/processes/> .
 @prefix fa:      <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/assessments/> .
 @prefix ia:      <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> .
 @prefix ia-proc: <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/processes/> .
@@ -22,8 +22,8 @@
 
 # -----------------------------------------------------------------------------
 # Insights and Analytics - PROCESSES (owned by the domain owner)
-# Starts where Planning and Guidance's goal planning cycle ends (hand-off:
-# pg:GoalProjection). Step 2 is the only agent-assisted step in Retail Wealth
+# Starts where Financial Planning's goal planning cycle ends (hand-off:
+# fp:GoalProjection). Step 2 is the only agent-assisted step in Retail Wealth
 # Management; its output must pass the advice-boundary rule pack before step 3.
 # -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@ ia-proc:InsightCycle a ent-proc:BusinessProcess ;
 ia-proc:ScoreFinancialHealth a ent-proc:ProcessStep ;
     rdfs:label "score financial health"@en ;
     ent-proc:stepOrder 1 ;
-    ent-proc:precededBy <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/processes/RunProjection> ;
-    skos:editorialNote "Cross-sub-domain hand-off: starts after Planning and Guidance has projected the customer's goals."@en ;
+    ent-proc:precededBy <https://ontology.example.com/domain/retail-wealth-management/financial-planning/processes/RunProjection> ;
+    skos:editorialNote "Cross-sub-domain hand-off: starts after Financial Planning has projected the customer's goals."@en ;
     ent-proc:performedBy "financial health model (Financial Assessments)" ;
     ent-proc:automationLevel ent-proc:SystemAutomated ;
-    ent-proc:usesConcept pg:GoalProjection ;
+    ent-proc:usesConcept fp:GoalProjection ;
     ent-proc:producesConcept fa:FinancialHealthScore ;
     ent-proc:appliesRule ia-rule:HealthScoreRule .
 
@@ -60,7 +60,7 @@ ia-proc:GenerateInsights a ent-proc:ProcessStep ;
     ent-proc:precededBy ia-proc:ScoreFinancialHealth ;
     ent-proc:performedBy ent-fab:CustomerFacingAgent ;
     ent-proc:automationLevel ent-proc:AgentAssisted ;
-    ent-proc:usesConcept pg:GoalProjection , fa:FinancialHealthScore ;
+    ent-proc:usesConcept fp:GoalProjection , fa:FinancialHealthScore ;
     ent-proc:producesConcept ia:SelfDirectedInsight ;
     ent-proc:appliesRule ia-rule:AdviceBoundaryRule , ia-rule:InsightTraceabilityRule .
 

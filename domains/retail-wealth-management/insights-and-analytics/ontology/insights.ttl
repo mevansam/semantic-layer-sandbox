@@ -8,21 +8,21 @@
 @prefix fibo-fnd-utl-av:   <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
 @prefix ia:                <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> .
 @prefix owl:               <http://www.w3.org/2002/07/owl#> .
-@prefix pg:                <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> .
+@prefix fp:                <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> .
 @prefix rdfs:              <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos:              <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd:               <http://www.w3.org/2001/XMLSchema#> .
 
 # Retail Wealth Management - Insights and Analytics: INSIGHTS module (published)
 # MEANING owned by the Insights and Analytics domain owner. Builds on the published
-# planning module of Planning and Guidance (extension point: dependencies).
+# planning module of Financial Planning (extension point: dependencies).
 
 <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/>
     a owl:Ontology ;
     rdfs:label "Insights and Analytics - insights"@en ;
-    dct:abstract "Self-directed planning insights, their categories and suggested actions, specializing FIBO. Builds on the planning module of Retail Wealth Management - Planning and Guidance."@en ;
+    dct:abstract "Self-directed planning insights, their categories and suggested actions, specializing FIBO. Builds on the planning module of Retail Wealth Management - Financial Planning."@en ;
     owl:imports <https://ontology.example.com/fibo-ext/core/> ,
-        <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> ;
+        <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> ;
     owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/0.1.0/> ;
     owl:versionInfo "0.1.0" ;
     fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
@@ -59,7 +59,7 @@ ia:insightText a owl:DatatypeProperty ;
 ia:relatesToGoal a owl:ObjectProperty ;
     rdfs:label "relates to goal"@en ;
     skos:definition "relates a planning insight to a goal it concerns"@en ;
-    rdfs:domain ia:PlanningInsight ; rdfs:range pg:FinancialGoal ;
+    rdfs:domain ia:PlanningInsight ; rdfs:range fp:FinancialGoal ;
     ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
 
 ia:refersToSecurity a owl:ObjectProperty ;

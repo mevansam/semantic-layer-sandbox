@@ -17,9 +17,9 @@ Owner: Semantic review board. Enforced by: `shapes/meta-common.ttl`, `shapes/met
 | Semantic fabric | `{base}fabric/{module}/` | `…/fabric/model/` |
 | Taxonomy | `{base}taxonomy/{path}` | `…/taxonomy/customers.customer-profile` |
 | Capability map | `{base}capability/{path}` | `…/capability/investment-management.portfolio-management` |
-| Ontology / business domains / sub-domains (capability map) | `{base}capability/ontology-domain/{od}`, `{base}capability/domain/{od}/{domain}[/{sub-domain}]` | `…/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance` |
+| Ontology / business domains / sub-domains (capability map) | `{base}capability/ontology-domain/{od}`, `{base}capability/domain/{od}/{domain}[/{sub-domain}]` | `…/capability/domain/investment-servicing/retail-wealth-management/financial-planning` |
 | Enterprise FIBO extensions | `{base}fibo-ext/{module}/` | `…/fibo-ext/core/` |
-| Sub-domain modules | `{base}domain/{business-domain}/{sub-domain}/{module}/` (= folder `domains/{business-domain}/{sub-domain}`) | `…/domain/retail-wealth-management/planning-and-guidance/planning/` |
+| Sub-domain modules | `{base}domain/{business-domain}/{sub-domain}/{module}/` (= folder `domains/{business-domain}/{sub-domain}`) | `…/domain/retail-wealth-management/financial-planning/planning/` |
 | Business-domain umbrella | `{base}domain/{business-domain}/` (= `domains/{business-domain}/domain.ttl`) | `…/domain/retail-wealth-management/` |
 | Ontology-domain umbrella | `{base}ontology-domain/{ontology-domain}/` | `…/ontology-domain/investment-servicing/` |
 | Knowledge-graph named graphs | `{base}graph/{publisher}/{collection}/v{semver}/{partition}` | see standard 08 |

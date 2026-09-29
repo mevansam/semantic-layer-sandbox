@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Show how a domain repository lines up with domain-template.
 
-    python domains/domain-template/scripts/compare_domain.py domains/retail-wealth-management/planning-and-guidance
+    python domains/domain-template/scripts/compare_domain.py domains/retail-wealth-management/financial-planning
 
 Re-generates the template with the domain's own .copier-answers.yml into a temp
 folder and classifies every file:

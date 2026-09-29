@@ -276,7 +276,7 @@ ent-gov:registersDomain a owl:ObjectProperty ; rdfs:label "registers domain"@en 
     skos:definition "The capability-map domain being registered."@en .
 ent-gov:domainCode a owl:DatatypeProperty ; rdfs:label "domain code"@en ;
     rdfs:domain ent-gov:DomainRegistration ;
-    skos:definition "Short stable code used in graph names and rule identifiers (e.g. rwm-pg)."@en .
+    skos:definition "Short stable code used in graph names and rule identifiers (e.g. rwm-fp)."@en .
 ent-gov:publishedModule a owl:ObjectProperty ; rdfs:label "published module"@en ;
     rdfs:domain ent-gov:DomainRegistration ; rdfs:range owl:Ontology ;
     skos:definition "An ontology module the domain publishes for import by other domains. Unpublished modules are private to the domain."@en .

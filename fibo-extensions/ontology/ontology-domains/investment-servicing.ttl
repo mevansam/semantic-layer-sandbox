@@ -12,7 +12,7 @@
 <https://ontology.example.com/ontology-domain/investment-servicing/>
     a owl:Ontology ;
     rdfs:label "Investment Servicing ontology domain"@en ;
-    dct:abstract "Umbrella for the Investment Servicing ontology domain. Retail Wealth Management (planning and guidance, insights and analytics) is the first business domain with published modules."@en ;
+    dct:abstract "Umbrella for the Investment Servicing ontology domain. Retail Wealth Management (financial planning, insights and analytics) is the first business domain with published modules."@en ;
     dct:subject <https://ontology.example.com/capability/ontology-domain/investment-servicing> ;
     owl:imports <https://ontology.example.com/domain/retail-wealth-management/> ;
     owl:versionIRI <https://ontology.example.com/ontology-domain/investment-servicing/0.1.0/> ;

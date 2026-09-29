@@ -51,7 +51,7 @@ Source: `capabilities/source/capability-map.csv` (308 rows). Rules: `capabilitie
 
 | Business domain | Sub-domain | Note |
 |---|---|---|
-| Retail Wealth Management | Planning and Guidance | Name coincides with the capability map's ontology domain 'Planning and Guidance'; they are different things (this is a sub-domain of Retail Wealth Management). |
+| Retail Wealth Management | Financial Planning |  |
 | Retail Wealth Management | Insights and Analytics |  |
 
 ## Proposed capabilities (to add to the authoritative map)
@@ -59,8 +59,8 @@ Source: `capabilities/source/capability-map.csv` (308 rows). Rules: `capabilitie
 | Domain | Capability |
 |---|---|
 | Retail Wealth Management | Financial Planning |
-| Retail Wealth Management > Planning and Guidance | Financial Planning > Goal-Based Planning |
-| Retail Wealth Management > Planning and Guidance | Financial Planning > Retirement Income Projection |
+| Retail Wealth Management > Financial Planning | Financial Planning > Goal-Based Planning |
+| Retail Wealth Management > Financial Planning | Financial Planning > Retirement Income Projection |
 | Retail Wealth Management > Insights and Analytics | Financial Planning > Planning Insights & Analytics |
 | Financial Assessments | Financial Assessment |
 | Financial Assessments | Financial Assessment > Financial Wellness Assessment |

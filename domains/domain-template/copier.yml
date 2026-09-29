@@ -42,7 +42,7 @@ parent_domain_slug:
   default: "example-business-domain"
 domain_name:
   type: str
-  help: Sub-domain name as declared in capabilities/curation.yaml, e.g. Planning and Guidance
+  help: Sub-domain name as declared in capabilities/curation.yaml, e.g. Financial Planning
   default: "Example Sub-Domain"
 domain_slug:
   type: str

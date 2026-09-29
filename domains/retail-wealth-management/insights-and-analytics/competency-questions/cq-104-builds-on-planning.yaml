@@ -1,5 +1,5 @@
 id: CQ-104
-question: Which Planning and Guidance concepts does Insights and Analytics build on, and through which properties and process steps?
+question: Which Financial Planning concepts does Insights and Analytics build on, and through which properties and process steps?
 query: cq-104-builds-on-planning.rq
 expect:
   min_rows: 2

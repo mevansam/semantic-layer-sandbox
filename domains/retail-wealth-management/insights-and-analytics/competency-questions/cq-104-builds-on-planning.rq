@@ -1,4 +1,4 @@
-# Extension point check: every place this sub-domain refers to Planning and Guidance's published module.
+# Extension point check: every place this sub-domain refers to Financial Planning's published module.
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ent-proc: <https://ontology.example.com/governance/process/>
 SELECT DISTINCT ?planningConcept ?via ?from WHERE {
@@ -11,7 +11,7 @@ SELECT DISTINCT ?planningConcept ?via ?from WHERE {
     FILTER(STRSTARTS(STR(?s), "https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/"))
     BIND("process step" AS ?from)
   }
-  FILTER(STRSTARTS(STR(?c), "https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/"))
+  FILTER(STRSTARTS(STR(?c), "https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/"))
   BIND(REPLACE(STR(?c), "^.*/", "") AS ?planningConcept)
 }
 ORDER BY ?planningConcept ?via

@@ -17,7 +17,7 @@ It is partitioned into **named graphs**, one per asset kind: ontology, rules, pr
 
 ```
 {base}graph/{publisher}/{collection}/v{MAJOR.MINOR.PATCH}/{partition}
-e.g. https://ontology.example.com/graph/rwm-pg/planning-and-guidance/v0.1.0/rules
+e.g. https://ontology.example.com/graph/rwm-fp/financial-planning/v0.1.0/rules
 ```
 
 Enterprise graphs use publisher `enterprise`: governance ontology, taxonomy and capability map, reusable assets, enterprise FIBO extensions, registry. FIBO itself is loaded as `{base}graph/fibo/{release_tag}/…`.

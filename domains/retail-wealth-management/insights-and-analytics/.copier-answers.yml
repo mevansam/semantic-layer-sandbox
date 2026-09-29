@@ -11,9 +11,9 @@ created: '2026-09-29'
 data_steward: Insights Data Steward (placeholder)
 data_steward_team: '@example-org/rwm-ia-data-stewards'
 dependencies:
-- domain_iri: https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance
-  module: https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/
-  path: ../planning-and-guidance
+- domain_iri: https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/financial-planning
+  module: https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/
+  path: ../financial-planning
 domain_name: Insights and Analytics
 domain_owner: Head of Planning Insights & Analytics (placeholder)
 domain_owner_team: '@example-org/rwm-ia-domain-owners'

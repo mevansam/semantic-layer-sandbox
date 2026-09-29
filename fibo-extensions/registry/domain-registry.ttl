@@ -38,14 +38,14 @@ ent-reg:rwm a ent-gov:DomainRegistration ;
     dct:description "Parent namespace: business-domain umbrella ontology and parent manifest. Sub-domains are registered below."@en ;
     dct:created "2026-09-29"^^xsd:date .
 
-ent-reg:rwm-pg a ent-gov:DomainRegistration ;
-    rdfs:label "Retail Wealth Management - Planning and Guidance"@en ;
-    ent-gov:registersDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance> ;
-    ent-gov:domainCode "rwm-pg" ;
-    ent-gov:namespace "https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/"^^xsd:anyURI ;
-    ent-gov:codeRepository "https://github.com/example-org/semantic-layer-sandbox/tree/main/domains/retail-wealth-management/planning-and-guidance"^^xsd:anyURI ;
+ent-reg:rwm-fp a ent-gov:DomainRegistration ;
+    rdfs:label "Retail Wealth Management - Financial Planning"@en ;
+    ent-gov:registersDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/financial-planning> ;
+    ent-gov:domainCode "rwm-fp" ;
+    ent-gov:namespace "https://ontology.example.com/domain/retail-wealth-management/financial-planning/"^^xsd:anyURI ;
+    ent-gov:codeRepository "https://github.com/example-org/semantic-layer-sandbox/tree/main/domains/retail-wealth-management/financial-planning"^^xsd:anyURI ;
     # Published: other sub-domains (insights-and-analytics) and the business-domain umbrella build on it.
-    ent-gov:publishedModule <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> ;
+    ent-gov:publishedModule <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> ;
     ent-gov:registrationStatus "Provisional" ;
     dct:created "2026-09-29"^^xsd:date .
 
@@ -76,7 +76,7 @@ ent-reg:is-calc a ent-gov:DomainRegistration ;
     ent-gov:domainCode "calc" ;
     ent-gov:namespace "https://ontology.example.com/domain/calculator-management/"^^xsd:anyURI ;
     ent-gov:registrationStatus "Reserved" ;
-    dct:description "Provides the projection calculations used by Retail Wealth Management - Planning and Guidance."@en ;
+    dct:description "Provides the projection calculations used by Retail Wealth Management - Financial Planning."@en ;
     dct:created "2026-09-28"^^xsd:date .
 
 ent-reg:cm-cust a ent-gov:DomainRegistration ;

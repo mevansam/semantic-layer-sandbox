@@ -1,0 +1,5 @@
+id: CQ-004
+question: Which FIBO concept does each Financial Planning class specialize (directly or via enterprise core)?
+query: cq-004-fibo-grounding.rq
+expect:
+  min_rows: 1

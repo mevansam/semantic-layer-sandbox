@@ -24,7 +24,7 @@ Structure: this repository follows the enterprise domain repository standard (`s
 
 ## Extension points
 
-- **Builds on:** `../planning-and-guidance` (imports its published module `https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/`). Dependencies run one way; this sub-domain never mints terms in another's namespace.
+- **Builds on:** `../financial-planning` (imports its published module `https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/`). Dependencies run one way; this sub-domain never mints terms in another's namespace.
 - **Published for others:** the modules listed for `rwm-ia` in `fibo-extensions/registry/domain-registry.ttl`. Anything published is a contract; breaking changes need a MAJOR version.
 - **Parent:** `../domain.ttl` imports this sub-domain's published module into the Retail Wealth Management umbrella.
 
@@ -54,9 +54,9 @@ python enterprise-semantic-governance/tools/semtool.py cq --repo domains/retail-
 
 Self-directed insights (categories, suggested actions) and the financial health score (`ontology/assessments.ttl`, earmarked for Financial Assessments). Also:
 - 3 rules, including the **advice boundary IA-R-001**
-- the insight cycle (3 steps; step 2 is agent-assisted), which starts from Planning and Guidance's goal projections
+- the insight cycle (3 steps; step 2 is agent-assisted), which starts from Financial Planning's goal projections
 - the Insights API, the insights-and-scores data product and insight records
 - a knowledge collection
 - the `rwm_ia_advice_boundary_rulepack`, `rwm_ia_customer_insights` and `rwm_ia_insight_cycle` execution models
 
-It **builds on Planning and Guidance** (see Extension points). See `docs/modeling-notes.md`.
+It **builds on Financial Planning** (see Extension points). See `docs/modeling-notes.md`.

@@ -5,7 +5,7 @@ fibo_extensions: ../../../fibo-extensions
 # Extension point: sibling sub-domains whose PUBLISHED modules this one imports
 # (one direction only, no cycles; see domain-manifest.ttl ent-gov:dependsOnSubDomain).
 dependencies:
-  - ../planning-and-guidance
+  - ../financial-planning
 
 domain:
   name: "Insights and Analytics"

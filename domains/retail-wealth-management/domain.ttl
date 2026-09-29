@@ -24,7 +24,7 @@
     a owl:Ontology ;
     rdfs:label "Retail Wealth Management"@en ;
     dct:abstract "Umbrella ontology of the Retail Wealth Management business domain (Investment Servicing ontology domain): imports the published modules of its sub-domains."@en ;
-    owl:imports <https://ontology.example.com/domain/retail-wealth-management/planning-and-guidance/planning/> ,
+    owl:imports <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> ,
         <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> ;
     owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/0.1.0/> ;
     owl:versionInfo "0.1.0" ;
@@ -35,7 +35,7 @@ rwm-p:ParentManifest a ent-gov:ParentDomainManifest ;
     ent-gov:describesDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management> ;
     ent-gov:namespace "https://ontology.example.com/domain/retail-wealth-management/"^^xsd:anyURI ;
     ent-gov:hasDomainOwner rwm-p:DomainOwnerRole ;
-    ent-gov:includesSubDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/planning-and-guidance> ,
+    ent-gov:includesSubDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/financial-planning> ,
         <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/insights-and-analytics> .
 
 rwm-p:DomainOwnerRole a ent-gov:DomainOwner ;

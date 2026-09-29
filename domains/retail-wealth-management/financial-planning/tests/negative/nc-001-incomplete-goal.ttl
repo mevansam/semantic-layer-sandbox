@@ -1,0 +1,12 @@
+@prefix fibo-fnd-acc-cur: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> .
+@prefix fp:               <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> .
+@prefix fp-ex:            <https://ontology.example.com/domain/retail-wealth-management/financial-planning/examples/> .
+
+# NEGATIVE (FP-R-001): goal without a target date, and a target amount without currency.
+fp-ex:bad-goal a fp:FinancialGoal ;
+    fp:hasGoalReference "G-9001" ;
+    fp:hasGoalOwner fp-ex:customer-001 ;
+    fp:hasTargetAmount fp-ex:bad-goal-amount .
+
+fp-ex:bad-goal-amount a fibo-fnd-acc-cur:MonetaryAmount ;
+    fibo-fnd-acc-cur:hasAmount 50000.00 .

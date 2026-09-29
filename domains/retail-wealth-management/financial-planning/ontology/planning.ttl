@@ -1,0 +1,176 @@
+@prefix dct:               <http://purl.org/dc/terms/> .
+@prefix ent-av:            <https://ontology.example.com/governance/annotations/> .
+@prefix ent-core:          <https://ontology.example.com/fibo-ext/core/> .
+@prefix ent-tax:           <https://ontology.example.com/taxonomy/> .
+@prefix fibo-fbc-pas-caa:  <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/ClientsAndAccounts/> .
+@prefix fibo-fnd-acc-cur:  <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> .
+@prefix fibo-fnd-arr-asmt: <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Assessments/> .
+@prefix fibo-fnd-gao-obj:  <https://spec.edmcouncil.org/fibo/ontology/FND/GoalsAndObjectives/Objectives/> .
+@prefix fibo-fnd-utl-av:   <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:               <http://www.w3.org/2002/07/owl#> .
+@prefix fp:                <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> .
+@prefix rdfs:              <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:              <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:               <http://www.w3.org/2001/XMLSchema#> .
+
+# Retail Wealth Management - Financial Planning: PLANNING module (published)
+# MEANING owned by the Financial Planning domain owner. Published: Insights and
+# Analytics and the Retail Wealth Management umbrella build on this module.
+
+<https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/>
+    a owl:Ontology ;
+    rdfs:label "Financial Planning - planning"@en ;
+    dct:abstract "Financial goals, self-directed plans, planning scenarios and assumptions and goal projections for retail customers, specializing FIBO. Published module of Retail Wealth Management - Financial Planning."@en ;
+    owl:imports <https://ontology.example.com/fibo-ext/core/> ;
+    owl:versionIRI <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# =============================================================================
+# Goals and plans
+# =============================================================================
+fp:FinancialGoal a owl:Class ;
+    rdfs:subClassOf fibo-fnd-gao-obj:FinancialObjective ;
+    rdfs:label "financial goal"@en ;
+    skos:definition "financial objective that a retail customer sets for themselves, expressed as a target amount of money to be available by a target date"@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans ;
+    ent-av:businessExample "Have $1.2M saved for retirement by June 2055."@en ;
+    ent-av:agentGuidance "A goal belongs to the customer who set it. Report progress using the latest goal projection; never state that a goal will be achieved - projections are estimates."@en .
+
+fp:RetirementGoal a owl:Class ;
+    rdfs:subClassOf fp:FinancialGoal ;
+    rdfs:label "retirement goal"@en ;
+    skos:definition "financial goal whose purpose is to fund the customer's living expenses after they stop working"@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans ;
+    ent-av:agentGuidance "Retirement projections depend on a life-expectancy assumption from a governed mortality table (rule FP-R-002); mention the assumption when explaining results."@en .
+
+fp:FinancialPlan a owl:Class ;
+    rdfs:subClassOf fibo-fnd-gao-obj:Strategy ;
+    rdfs:label "financial plan"@en ;
+    skos:definition "strategy that sets out how a customer intends to reach one or more financial goals, including the scenarios under which progress is projected"@en ;
+    skos:editorialNote "FIBO-GAP: FIBO has no 'plan' concept distinct from strategy; Strategy is the closest parent."@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans ;
+    ent-av:agentGuidance "Distinguish self-directed plans (customer-built with tools) from advised plans (built with an associate). This domain holds only self-directed plans."@en .
+
+fp:SelfDirectedPlan a owl:Class ;
+    rdfs:subClassOf fp:FinancialPlan ;
+    rdfs:label "self-directed plan"@en ;
+    skos:definition "financial plan that the customer builds and maintains themselves using digital planning tools, without a personalized recommendation from an associate"@en ;
+    ent-av:governedBy ent-tax:products-and-services.planning-and-guidance-services ;
+    ent-av:agentGuidance "Everything produced for a self-directed plan is educational and generic, never a personalized recommendation (see IA-R-001)."@en .
+
+fp:hasPlanGoal a owl:ObjectProperty ;
+    rdfs:subPropertyOf fibo-fnd-gao-obj:hasObjective ;
+    rdfs:label "has plan goal"@en ;
+    skos:definition "relates a financial plan to a goal it is intended to achieve"@en ;
+    rdfs:domain fp:FinancialPlan ; rdfs:range fp:FinancialGoal ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:hasGoalOwner a owl:ObjectProperty ;
+    rdfs:label "has goal owner"@en ;
+    skos:definition "relates a financial goal to the retail customer who set it"@en ;
+    rdfs:domain fp:FinancialGoal ; rdfs:range ent-core:RetailCustomer ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:hasGoalReference a owl:DatatypeProperty ;
+    rdfs:label "has goal reference"@en ;
+    skos:definition "business identifier of a financial goal, unique within the planning platform"@en ;
+    rdfs:domain fp:FinancialGoal ; rdfs:range xsd:string ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:hasTargetAmount a owl:ObjectProperty ;
+    rdfs:label "has target amount"@en ;
+    skos:definition "the amount of money the goal aims to have available at the target date"@en ;
+    rdfs:domain fp:FinancialGoal ; rdfs:range fibo-fnd-acc-cur:MonetaryAmount ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:hasTargetDate a owl:DatatypeProperty ;
+    rdfs:label "has target date"@en ;
+    skos:definition "the date by which the target amount of a goal should be available"@en ;
+    rdfs:domain fp:FinancialGoal ; rdfs:range xsd:date ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:isFundedBy a owl:ObjectProperty ;
+    rdfs:label "is funded by"@en ;
+    skos:definition "relates a financial goal to an account whose assets the customer has earmarked towards it"@en ;
+    rdfs:domain fp:FinancialGoal ; rdfs:range fibo-fbc-pas-caa:Account ;
+    ent-av:governedBy ent-tax:accounts.brokerage-accounts.account-balances-and-positions .
+
+# =============================================================================
+# Scenarios, assumptions and projections
+# =============================================================================
+fp:PlanningScenario a owl:Class ;
+    rdfs:subClassOf fibo-fnd-arr-asmt:AssessmentActivity ;
+    rdfs:label "planning scenario"@en ;
+    skos:definition "assessment activity that projects the outcome of a financial plan under a stated set of planning assumptions"@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans ;
+    ent-av:agentGuidance "Always state the key assumptions of a scenario when quoting its projections."@en .
+
+fp:PlanningAssumption a owl:Class ;
+    rdfs:subClassOf fibo-fnd-arr-asmt:ExpectedValue ;
+    rdfs:label "planning assumption"@en ;
+    skos:definition "expected value, such as a rate of return, inflation rate or life expectancy, that a planning scenario takes as given"@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans ;
+    ent-av:agentGuidance "Assumptions are inputs, not forecasts made by the firm; describe them as assumptions."@en .
+
+fp:LifeExpectancyAssumption a owl:Class ;
+    rdfs:subClassOf fp:PlanningAssumption ;
+    rdfs:label "life expectancy assumption"@en ;
+    skos:definition "planning assumption of the age to which the customer is expected to live, derived from a governed mortality table"@en ;
+    ent-av:governedBy ent-tax:common-reference.mortality-tables ;
+    ent-av:agentGuidance "Cite the mortality table and version; never infer life expectancy from health or other personal data."@en .
+
+fp:hasScenario a owl:ObjectProperty ;
+    rdfs:label "has scenario"@en ;
+    skos:definition "relates a financial plan to a planning scenario run for it"@en ;
+    rdfs:domain fp:FinancialPlan ; rdfs:range fp:PlanningScenario ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:usesAssumption a owl:ObjectProperty ;
+    rdfs:label "uses assumption"@en ;
+    skos:definition "relates a planning scenario to an assumption it takes as given"@en ;
+    rdfs:domain fp:PlanningScenario ; rdfs:range fp:PlanningAssumption ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:assumedValue a owl:DatatypeProperty ;
+    rdfs:label "assumed value"@en ;
+    skos:definition "numeric value of a planning assumption (rates as decimals, e.g. 0.05 for 5%; ages in years)"@en ;
+    rdfs:domain fp:PlanningAssumption ; rdfs:range xsd:decimal ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:sourcedFromTable a owl:ObjectProperty ;
+    rdfs:label "sourced from table"@en ;
+    skos:definition "relates a life expectancy assumption to the mortality table it is derived from"@en ;
+    rdfs:domain fp:LifeExpectancyAssumption ; rdfs:range ent-core:MortalityTable ;
+    ent-av:governedBy ent-tax:common-reference.mortality-tables .
+
+fp:GoalProjection a owl:Class ;
+    rdfs:subClassOf fibo-fnd-arr-asmt:ExpectedValue ;
+    rdfs:label "goal projection"@en ;
+    skos:definition "expected value of the amount available for a financial goal at its target date, produced by a planning scenario, together with the estimated probability of reaching the target"@en ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans ;
+    ent-av:agentGuidance "Quote the probability of success as an estimate under the scenario's assumptions, never as a guarantee."@en .
+
+fp:projectsGoal a owl:ObjectProperty ;
+    rdfs:label "projects goal"@en ;
+    skos:definition "relates a goal projection to the goal it projects"@en ;
+    rdfs:domain fp:GoalProjection ; rdfs:range fp:FinancialGoal ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:producedByScenario a owl:ObjectProperty ;
+    rdfs:label "produced by scenario"@en ;
+    skos:definition "relates a goal projection to the planning scenario that produced it"@en ;
+    rdfs:domain fp:GoalProjection ; rdfs:range fp:PlanningScenario ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:hasProjectedAmount a owl:ObjectProperty ;
+    rdfs:label "has projected amount"@en ;
+    skos:definition "the amount projected to be available for the goal at its target date"@en ;
+    rdfs:domain fp:GoalProjection ; rdfs:range fibo-fnd-acc-cur:MonetaryAmount ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
+
+fp:probabilityOfSuccess a owl:DatatypeProperty ;
+    rdfs:label "probability of success"@en ;
+    skos:definition "estimated probability, between 0 and 1, that the target amount is reached by the target date under the scenario"@en ;
+    rdfs:domain fp:GoalProjection ; rdfs:range xsd:decimal ;
+    ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .

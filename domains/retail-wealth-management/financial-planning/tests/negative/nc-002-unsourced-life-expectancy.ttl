@@ -1,0 +1,22 @@
+@prefix fibo-fnd-acc-4217: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/ISO4217-CurrencyCodes/> .
+@prefix fibo-fnd-acc-cur:  <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> .
+@prefix fp:                <https://ontology.example.com/domain/retail-wealth-management/financial-planning/planning/> .
+@prefix fp-ex:             <https://ontology.example.com/domain/retail-wealth-management/financial-planning/examples/> .
+
+# NEGATIVE (FP-R-002, FP-R-004): a life expectancy assumption with no mortality table,
+# and a retirement projection whose scenario has no life expectancy assumption at all.
+fp-ex:bad-life-assumption a fp:LifeExpectancyAssumption ;
+    fp:assumedValue 95 .
+
+fp-ex:scenario-no-life a fp:PlanningScenario ;
+    fp:usesAssumption fp-ex:assumption-return .
+
+fp-ex:bad-projection a fp:GoalProjection ;
+    fp:projectsGoal fp-ex:goal-retirement ;
+    fp:producedByScenario fp-ex:scenario-no-life ;
+    fp:hasProjectedAmount fp-ex:bad-projection-amount ;
+    fp:probabilityOfSuccess 0.81 .
+
+fp-ex:bad-projection-amount a fibo-fnd-acc-cur:MonetaryAmount ;
+    fibo-fnd-acc-cur:hasAmount 1100000.00 ;
+    fibo-fnd-acc-cur:hasCurrency fibo-fnd-acc-4217:USD .

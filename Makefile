@@ -26,9 +26,9 @@ verify-domains:
 # Generate throw-away sub-domains from the template (both worked examples) and run every gate on them.
 verify-template:
 	rm -rf _template-check
-	python3 $(TEMPLATE)/scripts/new_domain.py --answers $(TEMPLATE)/answers/rwm-pg.yaml --out _template-check/rwm/planning-and-guidance --no-git
+	python3 $(TEMPLATE)/scripts/new_domain.py --answers $(TEMPLATE)/answers/rwm-fp.yaml --out _template-check/rwm/financial-planning --no-git
 	python3 $(TEMPLATE)/scripts/new_domain.py --answers $(TEMPLATE)/answers/rwm-ia.yaml --out _template-check/rwm/insights-and-analytics --no-git
-	$(SEMTOOL) verify --repo _template-check/rwm/planning-and-guidance
+	$(SEMTOOL) verify --repo _template-check/rwm/financial-planning
 	$(SEMTOOL) verify --repo _template-check/rwm/insights-and-analytics
 	rm -rf _template-check
 

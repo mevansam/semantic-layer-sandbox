@@ -1,0 +1,10 @@
+id: CQ-005
+question: "Query tool rwm_fp_goal_progress: how is goal G-0001 tracking, under which assumptions?"
+query: ../execution-models/queries/rwm_fp_goal_progress.rq
+bindings:
+  goalReference: '"G-0001"'
+expect:
+  min_rows: 3
+  contains:
+    mortalityTable: Example Mortality Table 2024
+    governingRules: FP-R-001
