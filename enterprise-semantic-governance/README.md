@@ -28,30 +28,13 @@ domains/retail-wealth-management/   ← first business domain: financial-plannin
 | `fabric/graphrag/retrieval-contract.yaml` | Semantic fabric | What GraphRAG retrieves, as which unit, with which citations and runtime obligations |
 | `docs/standards/01…08` | all | Standards documents |
 | `docs/adr/` | all | Architecture decision records |
-| `tools/semtool.py` | all | The one CLI used by every repo, locally and in CI (see `tools/README.md` and `docs/framework/08-validation-tooling.md` at the root) |
+| `tools/semtool.py` | all | The one CLI used by every repo, locally and in CI |
 | `tools/tests/selftest.py` | all | Self-test: every check must catch a seeded defect (`make selftest`) |
 | `.github/workflows/semantic-ci.yml` | all | Reusable CI workflow (gates G1–G8) |
 
-## Quick start
+## Running and validating
 
-```bash
-pip install -r requirements.txt                       # rdflib, pyshacl, pyyaml, openpyxl
-export ROBOT_JAR=/path/to/robot.jar                   # https://github.com/ontodev/robot/releases
-python tools/semtool.py verify                        # this repo
-python tools/semtool.py verify --repo ../domains/retail-wealth-management/financial-planning   # a sub-domain, all gates
-```
-
-## Common tasks
-
-| Task | Command |
-|---|---|
-| Regenerate taxonomy after editing `taxonomy/source/enterprise-taxonomy.md` | `python tools/semtool.py taxonomy` |
-| Re-import the capability map | replace `capabilities/source/capability-map.csv`, review `capabilities/curation.yaml`, run `python tools/semtool.py capabilities` |
-| Adopt the real enterprise namespace | `python tools/semtool.py rebase --to https://ontology.<company>.com/ --all` |
-| Add a control | edit `ontology/controls.ttl`, update `docs/standards/06`, raise an ADR |
-| Check that repeated facts and generated files agree (gate G8) | `python tools/semtool.py drift --repo <folder>` or `make drift` at the root |
-| Check version bumps against the change class before a PR | `make changes BASE=origin/main` at the root |
-| Understand the framework end to end | `docs/framework/` at the repository root |
+Setup, validation and testing commands for every part of the framework are in the [root README](../README.md#run-validate-and-test). The full tooling reference is [`docs/framework/08-validation-tooling.md`](../docs/framework/08-validation-tooling.md); how to make each kind of change is in [doc 7](../docs/framework/07-change-management.md).
 
 ## Configuration
 

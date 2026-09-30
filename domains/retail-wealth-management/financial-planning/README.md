@@ -32,23 +32,16 @@ Structure: this repository follows the enterprise domain repository standard (`s
 
 `https://ontology.example.com/domain/retail-wealth-management/financial-planning/` (registered as `rwm-fp` in `fibo-extensions/registry`).
 
-## Working locally
+## Validating
 
-```bash
-# from the repository root
-export ROBOT_JAR=/path/to/robot.jar
-python enterprise-semantic-governance/tools/semtool.py verify --repo domains/retail-wealth-management/financial-planning
-python enterprise-semantic-governance/tools/semtool.py cq --repo domains/retail-wealth-management/financial-planning --show 5
-```
-
-`verify` runs gates G1–G8 and writes `build/kg.trig` (knowledge graph) and `build/graphrag/cards.jsonl` (GraphRAG concept cards). Every command, its output and how to fix a failure: `docs/framework/08-validation-tooling.md` at the repository root. Before a pull request, also run `make changes BASE=origin/main` from the root.
+CI runs gates G1–G8 on this sub-domain; they also produce its knowledge graph and GraphRAG concept cards. To run them yourself, see [Validate a sub-domain](../../../README.md#validate-a-sub-domain) in the root README.
 
 ## Changing things
 
 - **New concept:** add it to `ontology/` with a FIBO parent, a taxonomy anchor, a definition and agent guidance.
 - **New rule:** add a shape to `rules/` with id, statement, policy source and owner. Add a negative test to `tests/negative/`.
 - **Anything exposed to agents:** it must be in the collection's partitions. New execution models need a risk assessment approved by the AI risk office.
-- **Role holder changes:** update `domain-manifest.ttl`, then run `semtool codeowners`.
+- **Role holder changes:** update `domain-manifest.ttl`, then regenerate `CODEOWNERS` (see [Regenerate generated files](../../../README.md#regenerate-generated-files) in the root README).
 
 ## Current content (v0.1.0)
 

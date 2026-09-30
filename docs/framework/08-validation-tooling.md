@@ -56,7 +56,7 @@ Run from the repository root. Each target exits non-zero on failure, so they can
 | `make verify` | `semtool verify` for governance, FIBO extensions, every sub-domain, every business domain, then `verify-template` | G1–G8 | ~60 s |
 | `make verify-governance` · `verify-fibo` · `verify-domains` · `verify-template` | the parts of `make verify` | | |
 | `make drift` | `semtool drift` for every repository | G8 | ~3 s |
-| `make changes BASE=<ref>` | `semtool changes --base <ref>` for every repository (default `BASE=origin/main`) | PR check | ~1 s |
+| `make changes BASE=<ref> [STRICT=1]` | `semtool changes --base <ref>` for every repository (default `BASE=origin/main`; `STRICT=1` adds `--strict`) | PR check | ~1 s |
 | `make hermit` | full OWL DL reasoning (HermiT) over each business domain with all its sub-domains and FIBO | G4 (complete) | ~25 s |
 | `make align` | `compare_domain.py` for every sub-domain; fails if a template-owned file drifted or a template file is missing | template conformance | ~5 s |
 | `make selftest` | seeds 30 defects one at a time and expects each to be caught, plus one correct change that must pass | the checks themselves | ~30 s |

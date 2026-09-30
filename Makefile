@@ -11,7 +11,7 @@ help:
 	@echo "Validation (see docs/framework/08-validation-tooling.md)"
 	@echo "  make verify            all gates G1-G8 for every repository, sub-domain, business domain + template check"
 	@echo "  make drift             gate G8 only (repeated facts agree, generated files current) - fast"
-	@echo "  make changes BASE=ref  version bumps match change classes against a git ref (default origin/main)"
+	@echo "  make changes BASE=ref  version bumps match change classes against a git ref (default origin/main; STRICT=1 also fails on Provisional)"
 	@echo "  make hermit            full OWL DL reasoning (HermiT) per business domain"
 	@echo "  make align             sub-domains still match domain-template (fails on drifted template-owned files)"
 	@echo "  make selftest          prove every check still catches what it should (after changing the tooling)"
@@ -58,7 +58,7 @@ drift:
 # bumps the collection version; changes to machine-checked standards carry an ADR.  make changes BASE=origin/main
 BASE ?= origin/main
 changes:
-	@set -e; for d in enterprise-semantic-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) changes --base $(BASE) --repo $$d; done
+	@set -e; for d in enterprise-semantic-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) changes --base $(BASE) --repo $$d $(if $(STRICT),--strict,); done
 
 # Self-test of the tooling: each check must catch a seeded defect (enterprise-semantic-governance/tools/tests).
 selftest:

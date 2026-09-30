@@ -12,12 +12,7 @@
        ent-gov:registrationStatus "Provisional" .
    ```
    The semantic review board approves it.
-3. **Scaffold the repository** from `domain-template`:
-   ```bash
-   python domains/domain-template/scripts/new_domain.py --answers my.yaml --out domains/<business-domain>/<sub-domain>
-   # or, with Copier installed:  copier copy domains/domain-template domains/<business-domain>/<sub-domain>
-   # (the business domain's parent layer is scaffolded on first use)
-   ```
-4. **Fill in the domain manifest** (accountable roles and review teams) and run `semtool codeowners`.
+3. **Scaffold the repository** from `domains/domain-template` (commands: [Create a sub-domain](../../README.md#create-a-sub-domain) in the root README). The business domain's parent layer is scaffolded on first use.
+4. **Fill in the domain manifest** (accountable roles and review teams) and regenerate `CODEOWNERS`.
 5. **Model a first slice**, get CI green (gates G1–G8), then request semantic review.
 6. **Publish modules for reuse** by adding `ent-gov:publishedModule` to your registration, once another domain needs them. Also add it to the business domain's umbrella (`domains/<business-domain>/domain.ttl`).

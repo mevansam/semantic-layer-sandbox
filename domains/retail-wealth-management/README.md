@@ -12,9 +12,9 @@ Business domain **Retail Wealth Management** (Investment Servicing ontology doma
 
 | Extension point | Where | Rule |
 |---|---|---|
-| Add a sub-domain | `python domains/domain-template/scripts/new_domain.py --answers … --out domains/retail-wealth-management/<sub-domain>` | Declare it in `capabilities/curation.yaml` (sub_domains) and register its namespace first |
+| Add a sub-domain | generate it from `domains/domain-template` (see [Create a sub-domain](../../README.md#create-a-sub-domain) in the root README) | Declare it in `capabilities/curation.yaml` (sub_domains) and register its namespace first |
 | Build on another sub-domain | all three in the dependent sub-domain: `semantic.yaml` `dependencies`, manifest `ent-gov:dependsOnSubDomain`, and `owl:imports` of the other's **published** module | One direction only; no cycles (`ent-ms:SubDomainDependencyShape`); only published modules (rule E3); the three must agree (D4) |
 | Publish a module | `fibo-extensions/registry` `ent-gov:publishedModule`, plus `owl:imports` here | Published modules are a contract: breaking changes need a MAJOR version |
 | Share a term between sub-domains | the owning sub-domain publishes it; the other imports it | Never copy a term. If both need to own it, raise it with the business-domain owner |
 
-`python enterprise-semantic-governance/tools/semtool.py verify --repo domains/retail-wealth-management` checks the parent layer and reasons over all published sub-domain modules together with FIBO. Its consistency check (D6) makes sure `semantic.yaml` `sub_domains`, the sub-domain folders, `includesSubDomain`, the capability map and the umbrella imports all agree. Step-by-step playbooks are in [`docs/framework/07-change-management.md`](../../docs/framework/07-change-management.md).
+Verifying this business domain checks the parent layer and reasons over all published sub-domain modules together with FIBO (see [Validate a business domain](../../README.md#validate-a-business-domain) in the root README). Its consistency check (D6) makes sure `semantic.yaml` `sub_domains`, the sub-domain folders, `includesSubDomain`, the capability map and the umbrella imports all agree. Step-by-step playbooks are in [`docs/framework/07-change-management.md`](../../docs/framework/07-change-management.md).

@@ -1,4 +1,6 @@
 .DS_Store
+venv/
 build/
 __pycache__/
 _template-check/
+fibo-extensions/vendor/omg/

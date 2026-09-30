@@ -13,13 +13,9 @@ The enterprise's governed use of FIBO, and the mechanism through which business 
 | `registry/domain-registry.ttl` | **Domain registry**: reserved namespaces `{base}domain/{business-domain}/[{sub-domain}/]` (following the folder layout, ADR-0005), domain codes, repositories, published modules | semantic review board |
 | `docs/` | Extension rules, registering a domain, upgrading FIBO | |
 
-## Setup
+## Setup and validation
 
-```bash
-git submodule update --init --depth 1           # FIBO at the pinned tag
-bash scripts/fetch-omg-dependencies.sh          # OMG Commons + LCC (needs www.omg.org)
-python enterprise-semantic-governance/tools/semtool.py verify --repo fibo-extensions   # from the repository root
-```
+Fetching FIBO and its OMG dependencies, and validating this folder, are covered in the [root README](../README.md#run-validate-and-test).
 
 ## How extension works
 

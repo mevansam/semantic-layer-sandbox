@@ -56,23 +56,155 @@ domains/
                                           knowledge graph (TriG) ──┴─▶ GraphRAG concept cards + execution models ─▶ agents
 ```
 
-## Run everything
+## Run, validate and test
+
+All commands run from the repository root. Each exits non-zero on failure. `make` on its own lists the targets. Every command, option, output and error message is explained in the [validation tooling reference](docs/framework/08-validation-tooling.md). What each gate checks is in [Gates](#gates) below.
+
+### Setup
 
 ```bash
-pip install -r enterprise-semantic-governance/requirements.txt
+python3 -m venv venv && source venv/bin/activate                 # optional; venv/ is git-ignored
+pip install -r enterprise-semantic-governance/requirements.txt   # rdflib, pyshacl, owlrl, PyYAML, openpyxl, Jinja2
 make fibo                                                        # FIBO submodule at the pinned release
-bash fibo-extensions/scripts/fetch-omg-dependencies.sh           # OMG Commons + LCC (needs www.omg.org)
-export ROBOT_JAR=/path/to/robot.jar                              # https://github.com/ontodev/robot/releases (v1.9.10)
-make verify                                                      # all repos, all gates (G1-G8)
-make changes BASE=origin/main                                    # version bumps match change classes (pull requests)
-make drift                                                       # G8 only: repeated facts and generated files agree
-make align                                                       # how each sub-domain lines up with the template
-make selftest                                                    # every check still catches its seeded defect
-make                                                             # list all targets (details: docs/framework/08-validation-tooling.md)
-make hermit                                                      # full OWL DL reasoning per business domain
+bash fibo-extensions/scripts/fetch-omg-dependencies.sh           # FIBO's OMG Commons + LCC (needs www.omg.org; git-ignored)
+export ROBOT_JAR=/path/to/robot.jar                              # Java 17 + ROBOT v1.9.10, https://github.com/ontodev/robot/releases
+alias semtool=enterprise-semantic-governance/tools/semtool.py    # used in the examples below
+make list                                                        # business domains and sub-domains found
 ```
 
-## Gates (from `enterprise-semantic-governance/GOVERNANCE.md`)
+Without the OMG dependencies, reasoning warns `unresolved imports skipped` and runs on the rest; every other check is unaffected.
+
+### Run everything
+
+```bash
+make verify         # gates G1-G8 for governance, FIBO extensions, every sub-domain and business domain, plus the template (~1 min)
+make hermit         # full OWL DL reasoning (HermiT) over each business domain with its sub-domains and FIBO
+make align          # every sub-domain still matches domain-template
+make selftest       # every check still catches the defect it is meant to catch
+```
+
+This is what CI runs on every pull request and push to `main`, plus `make changes` on pull requests.
+
+### Validate the enterprise layer
+
+```bash
+make verify-governance      # enterprise-semantic-governance: syntax, meta-shapes, consistency (incl. generated files, FIBO pin)
+make verify-fibo            # fibo-extensions: + FIBO extension rules, closure, coherence with FIBO
+make verify-template        # generate the worked sub-domains from domains/domain-template and run every gate on them
+```
+
+After changing anything enterprise-level (a standard, the meta-model, registry, profile, enterprise core, the template), run `make verify`. Every domain must still pass.
+
+### Validate a business domain
+
+```bash
+semtool verify --repo domains/retail-wealth-management                        # parent layer; ELK over all sub-domains together
+semtool reason --reasoner HermiT --repo domains/retail-wealth-management       # complete OWL DL (make hermit does all)
+```
+
+### Validate a sub-domain
+
+```bash
+semtool verify --repo domains/retail-wealth-management/financial-planning     # all 12 checks (G1-G8)
+```
+
+Or one check at a time:
+
+| Check | Command (`--repo domains/<bd>/<sd>`) |
+|---|---|
+| G1 syntax, repository structure | `semtool syntax` · `semtool structure` |
+| G2 enterprise standards (meta-shapes) | `semtool meta` |
+| G3 FIBO extension rules E1–E3 | `semtool extensions` |
+| G4 import closure, coherence with FIBO | `semtool closure` then `semtool reason` (`--reasoner HermiT` for full OWL DL) |
+| G5 business rules | `semtool rules` |
+| G6 competency questions | `semtool cq --show 5` |
+| G7 knowledge graph, GraphRAG cards | `semtool kg` · `semtool cards` |
+| G8 consistency (no drift) | `semtool drift` |
+
+### Test business rules
+
+```bash
+semtool rules --repo domains/retail-wealth-management/insights-and-analytics
+```
+
+- Positive examples (`examples/*.ttl`) must conform.
+- Each negative case in `tests/negative/expectations.yaml` must trip its rule.
+- To test a new rule, add `tests/negative/nc-NNN-<name>.ttl` and a case expecting `{PREFIX}-R-NNN`, then run `rules` and `structure`.
+
+### Query the knowledge graph
+
+```bash
+semtool kg --repo domains/retail-wealth-management/financial-planning         # -> build/kg.trig (named graphs)
+semtool cq --repo domains/retail-wealth-management/financial-planning --show 5  # answers to the competency questions
+```
+
+`build/kg.trig` can be loaded into any TriG-capable triple store, or queried with rdflib ([example](docs/framework/08-validation-tooling.md#88-build-outputs-and-how-to-inspect-them)).
+
+### Inspect GraphRAG output
+
+```bash
+semtool cards --repo domains/retail-wealth-management/financial-planning      # -> build/graphrag/cards.jsonl, edges.jsonl
+head -1 domains/retail-wealth-management/financial-planning/build/graphrag/cards.jsonl | python3 -m json.tool
+```
+
+### Check for drift
+
+```bash
+make drift                                  # gate G8 on every repository (~3 s)
+semtool drift --repo <folder>               # one repository
+```
+
+It checks that facts repeated across files agree (registry, manifests, capability map, folders, versions, graph names, dependencies, alignment) and that generated files are current. Each finding's code (D1–D10) is explained in [doc 7 §7.3](docs/framework/07-change-management.md#73-the-checks).
+
+### Before a pull request
+
+```bash
+make verify
+make changes BASE=origin/main               # version bumps match change classes; collection bumped if knowledge changed
+make changes BASE=origin/main STRICT=1      # also fail on Provisional content
+```
+
+### Create a sub-domain
+
+```bash
+# 1. declare it in enterprise-semantic-governance/capabilities/curation.yaml (sub_domains), then:
+make capabilities
+# 2. register its namespace in fibo-extensions/registry/domain-registry.ttl (status Provisional)
+# 3. write an answers file (copy domains/domain-template/answers/rwm-fp.yaml), then generate it:
+python3 domains/domain-template/scripts/new_domain.py --answers my-answers.yaml --out domains/<bd>/<sd> --no-git
+# 4. add ent-gov:includesSubDomain to domains/<bd>/domain.ttl (the script prints the line), fill in the manifest roles
+make codeowners verify align
+```
+
+`python3 domains/domain-template/scripts/compare_domain.py domains/<bd>/<sd>` shows file by file how a sub-domain lines up with the template. The full playbook is in [doc 7](docs/framework/07-change-management.md#add-a-sub-domain).
+
+### Regenerate generated files
+
+Never edit these by hand. Regenerate them and commit them together with the source change; `make drift` fails if they are stale.
+
+```bash
+make taxonomy        # taxonomy/source/enterprise-taxonomy.md -> taxonomy/enterprise-taxonomy.ttl
+make capabilities    # capabilities/source + curation.yaml + crosswalk -> capability-map.ttl + data-quality-report.md
+make codeowners      # each sub-domain's domain-manifest.ttl -> CODEOWNERS
+```
+
+### Test the tooling
+
+```bash
+make selftest                                                          # all scenarios (~30 s)
+python3 enterprise-semantic-governance/tools/tests/selftest.py -k D4 E3  # only matching scenarios
+```
+
+Run it after changing `semtool.py`, a meta-shape or the structure standard. It seeds one defect at a time into a temporary copy of the repository and expects the intended check to catch it, plus one correct change that must pass.
+
+### Upgrade FIBO
+
+Follow [`fibo-extensions/docs/upgrading-fibo.md`](fibo-extensions/docs/upgrading-fibo.md), then run `make verify hermit`. The FIBO pin in `.gitmodules` and `semantic.yaml` must agree, or `make drift` fails.
+
+## Gates
+
+From `enterprise-semantic-governance/GOVERNANCE.md`:
+
 
 - G1 syntax and domain-repo structure
 - G2 standards (meta-shapes)
@@ -89,8 +221,8 @@ On pull requests, `semtool changes` also checks that version bumps match the cha
 
 | What | Where | How |
 |---|---|---|
-| Namespace `https://ontology.example.com/` | everywhere | `python enterprise-semantic-governance/tools/semtool.py rebase --to https://ontology.<company>.com/ --all` |
-| Capability-map gaps and proposed capabilities | `enterprise-semantic-governance/capabilities/data-quality-report.md` | send to the map owners; when the map is fixed, re-run `semtool capabilities` and trim `curation.yaml` (ADR-0004) |
-| Role holders and teams | each `domain-manifest.ttl` and `domains/*/domain.ttl`, governance `semantic.yaml` | edit, then re-run `make verify` (regenerates CODEOWNERS) |
+| Namespace `https://ontology.example.com/` | everywhere | `semtool rebase --to https://ontology.<company>.com/ --all`, then `make verify` |
+| Capability-map gaps and proposed capabilities | `enterprise-semantic-governance/capabilities/data-quality-report.md` | send to the map owners; when the map is fixed, run `make capabilities` and trim `curation.yaml` (ADR-0004) |
+| Role holders and teams | each `domain-manifest.ttl` and `domains/*/domain.ttl`, governance `semantic.yaml` | edit, then `make codeowners` and commit `CODEOWNERS` |
 | Policy sources, retention periods, regulatory citations | domain `rules/`, `records/` | confirm with rule owners, Records, Legal & Compliance |
 | Control framework mappings (NIST AI RMF, ISO/IEC 42001) | `enterprise-semantic-governance/ontology/controls.ttl` | map to the enterprise control framework |

@@ -14,9 +14,7 @@ The capability map governs the semantic model. It gives:
 | `capability-map.ttl` | **Generated.** Ontology domains, business domains, curated capability tree with accountable domains. |
 | `data-quality-report.md` | **Generated.** Kept and excluded mappings with reasons, placements not imported, proposed capabilities, capability gaps. Send it to the map owners. |
 
-```bash
-python tools/semtool.py capabilities                 # re-import after any change to source or curation
-```
+After any change to the source map, `columns.yaml`, `curation.yaml` or the crosswalk, regenerate the generated files and commit them together with the change (see [Regenerate generated files](../../README.md#regenerate-generated-files) in the root README).
 
 ## Curation in one paragraph
 

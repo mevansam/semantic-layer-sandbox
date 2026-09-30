@@ -4,16 +4,9 @@ A [Copier](https://copier.readthedocs.io) template for a **sub-domain** reposito
 
 ## Create a domain
 
-1. Declare the sub-domain in `enterprise-semantic-governance/capabilities/curation.yaml` (sub_domains) and register its namespace `{base}domain/<business-domain>/<sub-domain>/` in `fibo-extensions/registry` (see `fibo-extensions/docs/registering-a-domain.md`). The business domain must exist in the capability map (ADR-0004, ADR-0005).
-2. Generate the repository, either way:
-   ```bash
-   copier copy domains/domain-template domains/<business-domain>/<sub-domain>                            # Copier >= 9
-   python domains/domain-template/scripts/new_domain.py --answers my.yaml --out domains/<business-domain>/<sub-domain>
-   ```
-   The script also scaffolds the business domain's parent layer (`domain.ttl`, `semantic.yaml`, `README.md` from `parent-template/`) if it doesn't exist yet. `answers/rwm-fp.yaml` and `answers/rwm-ia.yaml` are worked examples (Retail Wealth Management › Financial Planning / Insights and Analytics).
-3. `python enterprise-semantic-governance/tools/semtool.py verify --repo domains/<business-domain>/<sub-domain>` (also generates CODEOWNERS).
-   Check alignment any time with `python domains/domain-template/scripts/compare_domain.py domains/<business-domain>/<sub-domain>`.
-4. Replace the seed concept, rule, tool and tests with real modelling, **keeping the file names** (see below).
+1. Declare the sub-domain in `enterprise-semantic-governance/capabilities/curation.yaml` (`sub_domains`) and register its namespace `{base}domain/<business-domain>/<sub-domain>/` in `fibo-extensions/registry` (see `fibo-extensions/docs/registering-a-domain.md`). The business domain must exist in the capability map (ADR-0004, ADR-0005).
+2. Write an answers file (worked examples: `answers/rwm-fp.yaml`, `answers/rwm-ia.yaml`), generate the sub-domain, and verify it. The commands are in [Create a sub-domain](../../README.md#create-a-sub-domain) in the root README. Generation also scaffolds the business domain's parent layer from `parent-template/` if it doesn't exist yet.
+3. Replace the seed concept, rule, tool and tests with real modelling, **keeping the file names** (see below).
 
 ## The structure every domain keeps
 
@@ -64,6 +57,6 @@ parent-template/                                    → domains/<business-domain
 | Extension point | How |
 |---|---|
 | Build on another sub-domain | answer `dependencies` (path, capability IRI, published module): wires `semantic.yaml`, `ent-gov:dependsOnSubDomain` and `owl:imports` |
-| Parent layer | `parent-template/`: business-domain umbrella + parent manifest; `semtool verify --repo domains/<business-domain>` reasons over all sub-domains together |
+| Parent layer | `parent-template/`: business-domain umbrella + parent manifest; verifying the business domain reasons over all its sub-domains together |
 
-CI (`.github/workflows/template-test.yml`) generates both worked examples and runs every gate on them.
+CI generates both worked examples and runs every gate on them; how to run that yourself, and how to check a sub-domain's alignment with the template, is in the [root README](../../README.md#create-a-sub-domain).
