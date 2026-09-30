@@ -1,6 +1,6 @@
 # ADR-0004: Curated import of the enterprise capability map
 
-- **Status:** Accepted
+- **Status:** Accepted; decisions 5 (namespaces) and 6 (first domain's repository) superseded by ADR-0005
 - **Date:** 2026-09-28
 - **Supersedes:** ADR-0003
 - **Change class:** Enterprise standard (breaking for the first domain's namespace)

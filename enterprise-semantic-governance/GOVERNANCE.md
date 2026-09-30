@@ -37,7 +37,7 @@ Every change to a domain repository needs **two approvals**, generated into `COD
 1. **Domain key**: the relevant domain role (owner, rule owner, API owner, steward or records owner) approves the *meaning*.
 2. **Enterprise key**: the semantic review board approves the *representation*: standards conformance, FIBO usage, alignment impact.
 
-Collections and execution models also need the **AI risk office** and the **fabric platform** team.
+On collections and execution models the enterprise key is held by the **AI risk office** and the **fabric platform** team (CODEOWNERS), because those paths decide what reaches AI.
 
 The enterprise key never changes what a term means. If the representation cannot express the intended meaning, the board raises an ADR here instead of editing the domain's content.
 
@@ -52,6 +52,8 @@ The enterprise key never changes what a term means. If the representation cannot
 | G5 Business rules | positive examples conform; negative examples trip the expected rules | `semtool rules` |
 | G6 Competency | competency questions answer over the assembled knowledge graph | `semtool cq` |
 | G7 Publishable | knowledge graph assembles; GraphRAG cards export | `semtool kg && semtool cards` |
+| G8 Consistency (no drift) | facts repeated across files agree (registry, manifests, capability map, folders, versions, graph names, dependencies, alignment); generated files are current; FIBO pin (ADR-0006) | `semtool drift` |
+| PR Change class | version bumps match the change class; changed knowledge bumps the collection version; changes to standards carry an ADR (fails on Release content, warns on Provisional) | `semtool changes --base origin/main` |
 
 ## Change classes
 
@@ -61,3 +63,5 @@ The enterprise key never changes what a term means. If the representation cannot
 | Additive | new class, property, rule, API mapping | MINOR | two-key |
 | Breaking | removed or renamed term, narrowed rule, changed parent | MAJOR | two-key + ADR + consumer impact note |
 | Enterprise standard change | new meta-shape, new control | MINOR/MAJOR in this repo | review board + ADR, announced to all domains |
+
+While a module's version is `0.y.z`, a breaking change may bump MINOR. `semtool changes` detects the change class from the RDF diff. How to make each kind of change without drift is in `docs/framework/07-change-management.md` at the repository root.

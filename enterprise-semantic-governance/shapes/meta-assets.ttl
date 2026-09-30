@@ -204,12 +204,12 @@ ent-ms:SubDomainDependencyShape a sh:NodeShape ;
     sh:targetSubjectsOf ent-gov:dependsOnSubDomain ;
     sh:property [ sh:path ent-gov:dependsOnSubDomain ; sh:class ent-gov:SubDomain ] ;
     sh:sparql [
-        sh:message "Sub-domain dependencies must not be circular." ;
+        sh:message "Sub-domain dependencies must not be circular (directly or through other sub-domains)." ;
         sh:prefixes ent-ms:prefixes ;
         sh:select """
             SELECT $this ?value WHERE {
               $this ent-gov:describesDomain ?me ; ent-gov:dependsOnSubDomain ?value .
-              ?other ent-gov:describesDomain ?value ; ent-gov:dependsOnSubDomain ?me .
+              ?value (^ent-gov:describesDomain/ent-gov:dependsOnSubDomain)* ?me .
             }""" ] .
 
 ent-ms:prefixes a owl:Ontology ;

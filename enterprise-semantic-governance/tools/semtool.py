@@ -18,6 +18,9 @@ Commands
   kg            assemble the knowledge graph dataset (TriG, one named graph per partition)
   cards         export GraphRAG concept cards + edges from the knowledge graph
   codeowners    generate CODEOWNERS from the domain manifest
+  drift         gate G8: facts repeated across files agree (registry, manifests, capability map,
+                folders, versions, graph names, dependencies, alignment, generated files, FIBO pin)
+  changes       compare with a git ref: version bumps match the change class (pull requests)
   rebase        replace the enterprise base IRI across repositories
   verify        run every check that applies to this repository kind
 
@@ -111,10 +114,15 @@ class Repo:
         return out
 
     def all_rdf_files(self) -> list[Path]:
+        """RDF files of this repository only: nested repositories (a business domain's sub-domains)
+        are skipped, they are checked on their own."""
         skip = {"vendor", "build", ".git", "template", "node_modules"}
+        nested = {p.parent for p in self.root.rglob("semantic.yaml")
+                  if p.parent != self.root and not (set(p.relative_to(self.root).parts) & skip)}
         res = []
         for p in self.root.rglob("*"):
-            if p.suffix in (".ttl", ".trig") and not (set(p.relative_to(self.root).parts) & skip):
+            if p.suffix in (".ttl", ".trig") and not (set(p.relative_to(self.root).parts) & skip) \
+                    and not any(n in p.parents for n in nested):
                 res.append(p)
         return sorted(res)
 
@@ -576,6 +584,10 @@ def cmd_structure(repo: Repo, args) -> bool:
             problems.append(f"tests/negative/expectations.yaml: {case['file']} not found")
     for rid in sorted(rule_ids - covered):
         problems.append(f"business rule {rid} has no negative test case")
+    listed = {case["file"] for case in spec.get("cases", [])}
+    for f in sorted((root / "tests/negative").glob("nc-*.ttl")):
+        if f.name not in listed:
+            problems.append(f"tests/negative/{f.name} is not listed in expectations.yaml (it would never run)")
 
     for p in problems:
         info(p)
@@ -628,12 +640,25 @@ def local_governed_graph(repo: Repo) -> Graph:
     return load(repo.files(*keys))
 
 
+def transitive_dependencies(repo: Repo) -> list[Repo]:
+    seen: dict[Path, Repo] = {}
+    todo = list(repo.dependencies)
+    while todo:
+        d = todo.pop()
+        if d.root in seen or d.root == repo.root:
+            continue
+        seen[d.root] = d
+        if d.kind == "domain":
+            todo += d.dependencies
+    return list(seen.values())
+
+
 def cmd_meta(repo: Repo, args) -> bool:
     data = local_governed_graph(repo)
     ref = reference_view(governance_reference(repo))
     if repo.kind in ("domain", "business-domain") and repo.fibo_extensions:
         ref += reference_view(load(repo.fibo_extensions.files("ontology", "registry")))
-    for dep in repo.dependencies:
+    for dep in transitive_dependencies(repo):   # all the way down, so dependency cycles of any length are visible
         ref += reference_view(load(dep.files("ontology", "manifest")))
     data += ref
     good, _ = run_shacl(data, meta_shapes(repo), "meta-shapes")
@@ -709,6 +734,9 @@ def cmd_extensions(repo: Repo, args) -> bool:
                 if i not in allowed_fibo:
                     good = False
                     fail(f"E3 {f.relative_to(repo.root)} imports FIBO module not in enterprise profile: {short(i)}")
+            elif i.startswith(repo.base_iri + "ontology-domain/") and repo.kind in ("domain", "business-domain"):
+                good = False
+                fail(f"E3 {f.relative_to(repo.root)} imports an ontology-domain umbrella ({short(i)}); umbrellas are for consumers, domains never import them")
             elif i.startswith(repo.base_iri + "domain/") and repo.kind == "domain" and not i.startswith(repo.cfg["domain"]["namespace"]):
                 if i not in published:
                     good = False
@@ -1124,6 +1152,61 @@ def cmd_codeowners(repo: Repo, args) -> bool:
     if repo.kind != "domain":
         warn("codeowners: only generated for domain repositories")
         return True
+    (repo.root / "CODEOWNERS").write_text(codeowners_text(repo))
+    ok("codeowners: CODEOWNERS generated from domain manifest")
+    return True
+
+
+# =============================================================================
+# drift  (gate G8 - consistency: a fact stated in more than one place must agree)
+# =============================================================================
+#
+# Most facts are stated once. The few that are necessarily repeated (for tools,
+# for reasoning, for the knowledge graph) are listed in
+# docs/framework/07-change-management.md and checked here:
+#   D1 versions      owl:versionIRI = {ontology IRI}{owl:versionInfo}/ for every module
+#   D2 identity      folder = namespace = registry = manifest = capability map = template answers
+#   D3 modules       manifest ent-gov:hasOntologyModule = ontology/*.ttl; published modules exist
+#   D4 dependencies  semantic.yaml dependencies = manifest dependsOnSubDomain = domain imports
+#   D5 collections   graph names carry the publisher code, collection and collection version
+#   D6 parent layer  sub_domains = folders = includesSubDomain = capability map = umbrella imports
+#   D7 registry      every registered (non-reserved) domain exists; published modules exist
+#   D8 alignment     alignment register and enterprise core refer only to terms and domains that exist
+#   D9 generated     taxonomy, capability map, data-quality report and CODEOWNERS match their sources
+#   D10 FIBO pin     .gitmodules / submodule checkout = fibo.release_tag in semantic.yaml
+
+def monorepo_root(repo: Repo) -> Path:
+    return repo.governance.root.parent
+
+
+def ontology_headers(files) -> dict:
+    out = {}
+    for f in files:
+        g = load([f])
+        for o in g.subjects(RDF.type, OWL.Ontology):
+            out[str(o)] = {"file": f, "version": g.value(o, OWL.versionInfo), "versionIRI": g.value(o, OWL.versionIRI),
+                           "maturity": g.value(o, FIBO_AV.hasMaturityLevel), "imports": {str(i) for i in g.objects(o, OWL.imports)}}
+    return out
+
+
+def governed_rdf_files(repo: Repo) -> list[Path]:
+    return [f for f in repo.all_rdf_files() if not {"tests", "examples"} & set(f.relative_to(repo.root).parts)]
+
+
+def registry_entry(reg: Graph, GOV, namespace: str):
+    return next((s for s, o in reg.subject_objects(GOV.namespace) if str(o) == namespace), None)
+
+
+def domain_manifest(repo: Repo, GOV):
+    """(graph, manifest node) of a sub-domain (domain-manifest.ttl) or business domain (domain.ttl)."""
+    if repo.kind == "domain":
+        g = load(repo.files("manifest"))
+        return g, next(g.subjects(RDF.type, GOV.DomainManifest), None)
+    g = load(repo.files("ontology"))
+    return g, next(g.subjects(RDF.type, GOV.ParentDomainManifest), None)
+
+
+def codeowners_text(repo: Repo) -> str:
     GOV = Namespace(repo.base_iri + "governance/model/")
     m = load(repo.files("manifest"))
     teams = repo.governance.cfg["enterprise"]["teams"]
@@ -1149,8 +1232,461 @@ def cmd_codeowners(repo: Repo, args) -> bool:
         f"/domain-manifest.ttl   {' '.join(owner)} {rev}",
         f"/semantic.yaml         {' '.join(owner)} {rev}",
     ]
-    (repo.root / "CODEOWNERS").write_text("\n".join(lines) + "\n")
-    ok("codeowners: CODEOWNERS generated from domain manifest")
+    return "\n".join(lines) + "\n"
+
+
+def cmd_drift(repo: Repo, args) -> bool:
+    problems: list[str] = []
+    notes: list[str] = []
+
+    def check(cond, code, msg):
+        if not cond:
+            problems.append(f"{code} {msg}")
+        return cond
+
+    base = repo.base_iri
+    GOV = Namespace(base + "governance/model/")
+    FAB = Namespace(base + "fabric/model/")
+    gov = repo.governance
+    root = monorepo_root(repo)
+    reg = registry_graph(repo) if repo.kind != "governance" else Graph()
+    rel = lambda p: str(Path(p).relative_to(repo.root))  # noqa: E731
+
+    # ---- D1 versions --------------------------------------------------------------------
+    headers = ontology_headers(governed_rdf_files(repo))
+    for iri, h in headers.items():
+        if iri.startswith(EXTERNAL_PREFIXES) or h["version"] is None:
+            continue
+        expected = iri.rstrip("/") + "/" + str(h["version"]) + "/"
+        check(h["versionIRI"] is not None and str(h["versionIRI"]) == expected, "D1",
+              f"{rel(h['file'])}: owl:versionIRI {h['versionIRI']} does not match owl:versionInfo \"{h['version']}\" (expected {expected})")
+
+    # ---- sub-domains and business domains ---------------------------------------------------
+    if repo.kind in ("domain", "business-domain"):
+        d = repo.cfg["domain"]
+        ns, code = d["namespace"], d["code"]
+        cap = load(gov.files("reference"))
+        # D2 identity: folder <-> namespace <-> registry <-> manifest <-> capability map
+        try:
+            path = repo.root.relative_to(root / "domains").as_posix()
+        except ValueError:
+            path = None
+        if path is not None:
+            check(ns == f"{base}domain/{path}/", "D2", f"semantic.yaml namespace {ns} does not follow the folder (expected {base}domain/{path}/, ADR-0005)")
+        entry = registry_entry(reg, GOV, ns)
+        describes = None
+        if check(entry is not None, "D2", f"namespace {ns} is not registered in fibo-extensions/registry"):
+            check(str(reg.value(entry, GOV.domainCode)) == code, "D2",
+                  f"semantic.yaml code '{code}' differs from registry domainCode '{reg.value(entry, GOV.domainCode)}'")
+            check(str(reg.value(entry, GOV.registrationStatus)) != "Reserved", "D2",
+                  "registry status is still 'Reserved' but the domain has a repository (set it to 'Provisional')")
+            repo_url = reg.value(entry, GOV.codeRepository)
+            if repo_url is not None and "/tree/" in str(repo_url) and path is not None:
+                check(str(repo_url).endswith("/domains/" + path), "D2", f"registry codeRepository {repo_url} does not point at domains/{path}")
+            describes = reg.value(entry, GOV.registersDomain)
+        mg, manifest = domain_manifest(repo, GOV)
+        if check(manifest is not None, "D2", "no domain manifest found"):
+            check(str(mg.value(manifest, GOV.namespace)) == ns, "D2",
+                  f"manifest namespace {mg.value(manifest, GOV.namespace)} differs from semantic.yaml {ns}")
+            if describes is not None:
+                check(mg.value(manifest, GOV.describesDomain) == describes, "D2",
+                      f"manifest describes {mg.value(manifest, GOV.describesDomain)} but the registry registers {describes}")
+            describes = describes or mg.value(manifest, GOV.describesDomain)
+        if describes is not None:
+            kind = GOV.SubDomain if repo.kind == "domain" else GOV.BusinessDomain
+            if check((describes, RDF.type, kind) in cap, "D2", f"{describes} is not a {short(kind)} in the capability map"):
+                label = cap.value(describes, RDFS.label)
+                check(label is None or str(label) == d["name"], "D2", f"semantic.yaml name '{d['name']}' differs from capability map label '{label}'")
+        if repo.kind == "domain":
+            if describes is not None and (repo.root.parent / "semantic.yaml").exists():
+                parent = Repo(repo.root.parent)
+                check(cap.value(describes, GOV.isSubDomainOf) is not None and
+                      str(cap.value(describes, GOV.isSubDomainOf)) == str(reg.value(registry_entry(reg, GOV, parent.cfg["domain"]["namespace"]), GOV.registersDomain)),
+                      "D2", f"capability map places {short(describes)} under {cap.value(describes, GOV.isSubDomainOf)}, not under this folder's business domain")
+            answers_file = repo.root / ".copier-answers.yml"
+            if answers_file.exists():
+                a = yaml.safe_load(answers_file.read_text()) or {}
+                for key, want in (("registry_code", code), ("namespace_path", path), ("domain_name", d["name"]),
+                                  ("base_iri", base), ("capability_domain_iri", str(describes) if describes is not None else None)):
+                    if key in a and want is not None:
+                        check(str(a[key]) == str(want), "D2", f".copier-answers.yml {key} '{a[key]}' differs from the repository ('{want}')")
+            # D3 modules
+            onts = ontology_headers(repo.files("ontology"))
+            if manifest is not None:
+                declared = {str(o) for o in mg.objects(manifest, GOV.hasOntologyModule)}
+                check(declared == set(onts), "D3", f"manifest hasOntologyModule {sorted(short(x) for x in declared)} "
+                      f"differs from the modules in ontology/ {sorted(short(x) for x in onts)}")
+            for iri in onts:
+                check(iri.startswith(ns), "D3", f"ontology module {iri} is outside the namespace {ns}")
+            if entry is not None:
+                for pm in reg.objects(entry, GOV.publishedModule):
+                    check(str(pm) in onts, "D3", f"registry publishes {pm}, which is not a module in ontology/")
+            # D4 dependencies
+            deps = repo.dependencies
+            dep_domains, dep_ns = set(), {}
+            for dep in deps:
+                check(dep.root.parent == repo.root.parent, "D4", f"dependency {dep.root.name} is not a sibling sub-domain (ADR-0005)")
+                dg, dm = domain_manifest(dep, GOV)
+                if dm is not None:
+                    dep_domains.add(str(dg.value(dm, GOV.describesDomain)))
+                dep_ns[dep.cfg["domain"]["namespace"]] = dep.root.name
+            if manifest is not None:
+                declared = {str(o) for o in mg.objects(manifest, GOV.dependsOnSubDomain)}
+                check(declared == dep_domains, "D4", f"manifest dependsOnSubDomain {sorted(short(x) for x in declared)} "
+                      f"differs from semantic.yaml dependencies {sorted(short(x) for x in dep_domains)}")
+            used = set()
+            for iri, h in onts.items():
+                for imp in h["imports"]:
+                    if imp.startswith(base + "domain/") and not imp.startswith(ns):
+                        owner = next((n for n in dep_ns if imp.startswith(n)), None)
+                        if check(owner is not None, "D4", f"{rel(h['file'])} imports {imp} from a sub-domain not listed in semantic.yaml dependencies"):
+                            used.add(owner)
+            for n, name in dep_ns.items():
+                check(n in used, "D4", f"dependency {name} is declared but none of its modules is imported (stale dependency)")
+            # D5 collections
+            for coll, version, part, gname, files in collection_partitions(repo):
+                prefix = f"{base}graph/{code}/{repo.root.name}/v{version}/"
+                check(str(gname).startswith(prefix), "D5", f"graph name {gname} does not start with {prefix} (publisher code / collection / collection version)")
+                check(bool(files), "D5", f"partition {str(gname).rsplit('/', 1)[-1]} matches no files (sourcePath)")
+            cgraph = load(repo.files("collections"))
+            for coll in cgraph.subjects(RDF.type, FAB.KnowledgeCollection):
+                if describes is not None:
+                    check(cgraph.value(coll, FAB.publishedBy) == describes, "D5", f"collection {short(coll)} is published by {cgraph.value(coll, FAB.publishedBy)}, not by this sub-domain")
+        else:
+            # D6 parent layer
+            listed = set(repo.cfg.get("sub_domains") or [])
+            actual = {p.name for p in repo.root.iterdir() if (p / "semantic.yaml").exists()}
+            check(listed == actual, "D6", f"semantic.yaml sub_domains {sorted(listed)} differs from the sub-domain folders {sorted(actual)}")
+            sub_domains, published = set(), set()
+            for sd in repo.dependencies:
+                sg, sm = domain_manifest(sd, GOV)
+                if sm is not None:
+                    sub_domains.add(str(sg.value(sm, GOV.describesDomain)))
+                e = registry_entry(reg, GOV, sd.cfg["domain"]["namespace"])
+                if e is not None:
+                    published |= {str(o) for o in reg.objects(e, GOV.publishedModule)}
+            if manifest is not None:
+                included = {str(o) for o in mg.objects(manifest, GOV.includesSubDomain)}
+                check(included == sub_domains, "D6", f"includesSubDomain {sorted(short(x) for x in included)} differs from the sub-domain manifests {sorted(short(x) for x in sub_domains)}")
+            if describes is not None:
+                in_map = {str(s) for s in cap.subjects(GOV.isSubDomainOf, describes)}
+                check(in_map == sub_domains, "D6", f"capability map sub-domains {sorted(short(x) for x in in_map)} differ from the sub-domain folders {sorted(short(x) for x in sub_domains)} (capabilities/curation.yaml sub_domains)")
+            umbrella = ontology_headers(repo.files("ontology")).get(ns)
+            if check(umbrella is not None, "D6", f"domain.ttl does not declare the umbrella ontology {ns}"):
+                check(umbrella["imports"] == published, "D6", f"umbrella imports {sorted(short(x) for x in umbrella['imports'])} differ from the sub-domains' published modules {sorted(short(x) for x in published)}")
+            od = cap.value(describes, GOV.inOntologyDomain) if describes is not None else None
+            if od is not None and repo.fibo_extensions:
+                slug_ = str(od).rstrip("/").rsplit("/", 1)[-1]
+                f = repo.fibo_extensions.root / "ontology" / "ontology-domains" / f"{slug_}.ttl"
+                if check(f.exists(), "D6", f"no ontology-domain umbrella fibo-extensions/ontology/ontology-domains/{slug_}.ttl"):
+                    oh = ontology_headers([f]).get(f"{base}ontology-domain/{slug_}/")
+                    check(oh is not None and ns in oh["imports"], "D6", f"ontology-domain umbrella {slug_}.ttl does not import {ns}")
+
+    # ---- fibo-extensions: registry and umbrellas -------------------------------------------
+    if repo.kind == "fibo-extensions":
+        codes, spaces = {}, {}
+        for e in reg.subjects(RDF.type, GOV.DomainRegistration):
+            code, ns = str(reg.value(e, GOV.domainCode)), str(reg.value(e, GOV.namespace))
+            check(code not in codes, "D7", f"domain code '{code}' registered twice ({short(codes.get(code))}, {short(e)})")
+            check(ns not in spaces, "D7", f"namespace {ns} registered twice")
+            codes[code], spaces[ns] = e, e
+            if str(reg.value(e, GOV.registrationStatus)) == "Reserved":
+                continue
+            folder = root / "domains" / ns[len(base + "domain/"):].strip("/")
+            if check((folder / "semantic.yaml").exists(), "D7", f"{short(e)} is registered (not Reserved) but domains/{folder.relative_to(root / 'domains')} does not exist"):
+                r = Repo(folder)
+                check(r.cfg["domain"]["namespace"] == ns, "D7", f"domains/{folder.name}/semantic.yaml namespace differs from registry {ns}")
+                modules = ontology_headers(r.files("ontology"))
+                for pm in reg.objects(e, GOV.publishedModule):
+                    check(str(pm) in modules, "D7", f"{short(e)} publishes {pm}, which no module in {folder.relative_to(root)} declares")
+        for f in repo.files("umbrellas"):
+            for iri, h in ontology_headers([f]).items():
+                check(iri == f"{base}ontology-domain/{f.stem}/", "D7", f"{rel(f)}: umbrella IRI {iri} does not match its file name")
+                for imp in h["imports"]:
+                    if imp.startswith(base + "domain/"):
+                        e = registry_entry(reg, GOV, imp)
+                        check(e is not None, "D7", f"{rel(f)} imports {imp}, which is not a registered business-domain namespace")
+
+    # ---- governance: alignment, curation, generated files, FIBO pin ----------------------------
+    if repo.kind == "governance":
+        fx_dir = root / "fibo-extensions"
+        declared = set()
+        roots = [fx_dir] + [p.parent for p in (root / "domains").glob("*/*/semantic.yaml")] + [p.parent for p in (root / "domains").glob("*/semantic.yaml")]
+        for r in roots:
+            for f in Path(r).rglob("*.ttl"):
+                if {"vendor", "build", "tests", "examples", "template", "parent-template"} & set(f.relative_to(r).parts):
+                    continue
+                g = load([f])
+                declared |= {str(s) for s in g.subjects(RDF.type, None) if isinstance(s, URIRef)}
+        cap = load(gov.files("reference"))
+        domains_known = {str(s) for s in cap.subjects(RDF.type, GOV.BusinessDomain)} | {str(s) for s in cap.subjects(RDF.type, GOV.SubDomain)}
+        aln = load(gov.files("alignment"))
+        for dcn in aln.subjects(RDF.type, GOV.AlignmentDecision):
+            for t in aln.objects(dcn, GOV.alignsTerm):
+                check(str(t) in declared, "D8", f"{short(dcn)} aligns {t}, which no domain or enterprise-core module declares (renamed or removed?)")
+            for dm in aln.objects(dcn, GOV.consultedDomain):
+                check(str(dm) in domains_known, "D8", f"{short(dcn)} consults {dm}, which is not a domain in the capability map")
+        AV = Namespace(base + "governance/annotations/")
+        fx_reg = load((fx_dir / "registry").glob("*.ttl")) if fx_dir.exists() else Graph()
+        registered_domains = {str(o) for o in fx_reg.objects(None, GOV.registersDomain)}
+        core = load((fx_dir / "ontology" / "core").glob("*.ttl")) if fx_dir.exists() else Graph()
+        for s, o in core.subject_objects(AV.owningDomain):
+            check(str(o) in registered_domains, "D8", f"enterprise-core {short(s)} names owning domain {o}, which is not registered")
+        # curation sub_domains <-> business-domain folders
+        curation = yaml.safe_load((gov.root / "capabilities" / "curation.yaml").read_text()) or {}
+        cur = {k: {x["slug"] for x in v} for k, v in (curation.get("sub_domains") or {}).items()}
+        for p in sorted((root / "domains").glob("*/semantic.yaml")):
+            bd = Repo(p.parent)
+            if bd.kind != "business-domain":
+                continue
+            name = bd.cfg["domain"]["name"]
+            check(cur.get(name, set()) == set(bd.cfg.get("sub_domains") or []), "D9",
+                  f"capabilities/curation.yaml sub_domains for '{name}' {sorted(cur.get(name, set()))} differ from domains/{p.parent.name} {sorted(bd.cfg.get('sub_domains') or [])}")
+        # D9 generated files are current
+        import contextlib, io, shutil, tempfile  # noqa: E401
+        with tempfile.TemporaryDirectory() as tmp:
+            copy = Path(tmp) / gov.root.name
+            shutil.copytree(gov.root, copy, ignore=shutil.ignore_patterns(".git", "build", "__pycache__"))
+            with contextlib.redirect_stdout(io.StringIO()):
+                ns_args = argparse.Namespace(source=None, provisional=False)
+                cmd_taxonomy(Repo(copy), ns_args)
+                cmd_capabilities(Repo(copy), ns_args)
+            for relp, cmd in (("taxonomy/enterprise-taxonomy.ttl", "taxonomy"), ("capabilities/capability-map.ttl", "capabilities"),
+                              ("capabilities/data-quality-report.md", "capabilities")):
+                check((copy / relp).read_text() == (gov.root / relp).read_text(), "D9",
+                      f"{relp} is out of date with its sources: run `semtool {cmd}` and commit the result")
+        for p in sorted((root / "domains").glob("*/*/semantic.yaml")):
+            sd = Repo(p.parent)
+            co = sd.root / "CODEOWNERS"
+            check(co.exists() and co.read_text() == codeowners_text(sd), "D9",
+                  f"{co.relative_to(root)} is out of date with domain-manifest.ttl: run `semtool codeowners` and commit the result")
+        # D10 FIBO pin
+        tag = gov.cfg["fibo"]["release_tag"]
+        pinned = False
+        for gm in (root / ".gitmodules", fx_dir / ".gitmodules"):
+            if gm.exists():
+                m = re.search(r'\[submodule "[^"]*fibo[^"]*"\][^\[]*?branch\s*=\s*(\S+)', gm.read_text())
+                if m:
+                    pinned = True
+                    check(m.group(1) == tag, "D10", f"{gm.relative_to(root)} pins FIBO branch {m.group(1)} but semantic.yaml fibo.release_tag is {tag}")
+        if not pinned:
+            notes.append("D10 no .gitmodules pins a FIBO branch; the pin is checked only against the checkout")
+        vend = fx_dir / "vendor" / "fibo"
+        if (vend / ".git").exists():
+            r = subprocess.run(["git", "-C", str(vend), "tag", "--points-at", "HEAD"], capture_output=True, text=True)
+            tags = r.stdout.split()
+            if tags:
+                check(tag in tags, "D10", f"FIBO checkout is at {tags} but semantic.yaml fibo.release_tag is {tag}")
+            else:
+                notes.append("D10 FIBO checkout has no tag at HEAD (shallow clone?); pin not verified against the checkout")
+
+    for n in notes:
+        warn(n)
+    if problems:
+        for p in problems:
+            fail(p)
+        return False
+    ok(f"drift: {repo.kind} is consistent with the registry, manifests, capability map and generated files")
+    return True
+
+
+# =============================================================================
+# changes  (version bumps match the change class; run on pull requests)
+# =============================================================================
+
+EDITORIAL_AV = {"agentGuidance", "businessExample", "changeNote"}
+EDITORIAL_PREDICATES = {RDFS.label, RDFS.comment, SKOS.definition, SKOS.editorialNote, SKOS.example, SKOS.prefLabel,
+                        SKOS.altLabel, DCTERMS.abstract, DCTERMS.description, SH.message, SH.name, SH.description}
+TERM_TYPES = {OWL.Class, OWL.ObjectProperty, OWL.DatatypeProperty, OWL.AnnotationProperty, SH.NodeShape, SKOS.Concept}
+HEADER_PREDICATES = {OWL.versionInfo, OWL.versionIRI, DCTERMS.modified}
+LEVELS = ["none", "patch", "minor", "major"]
+
+
+def semver(v) -> tuple[int, int, int] | None:
+    m = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", str(v or ""))
+    return tuple(int(x) for x in m.groups()) if m else None
+
+
+def bump_level(old, new) -> str:
+    o, n = semver(old), semver(new)
+    if not o or not n or n <= o:
+        return "none"
+    return "major" if n[0] > o[0] else "minor" if n[1] > o[1] else "patch"
+
+
+def git_show(root: Path, ref: str, path: str) -> str | None:
+    r = subprocess.run(["git", "-C", str(root), "show", f"{ref}:{path}"], capture_output=True, text=True)
+    return r.stdout if r.returncode == 0 else None
+
+
+def classify_change(old: Graph, new: Graph, ns: str) -> tuple[str, list[str]]:
+    """Change class of a module: breaking (major), additive (minor), editorial (patch) or none."""
+    def terms(g):
+        return {s for t in TERM_TYPES for s in g.subjects(RDF.type, t) if isinstance(s, URIRef) and str(s).startswith(ns)}
+
+    def body(g):
+        # version numbers and graph names are release bookkeeping, not content
+        return {(s, p, o) for s, p, o in g if not (p in HEADER_PREDICATES and (s, RDF.type, OWL.Ontology) in g)
+                and p != OWL.versionInfo and not str(p).endswith("/fabric/model/graphName")
+                and not isinstance(s, BNode) and not isinstance(o, BNode)}
+
+    ot, nt = terms(old), terms(new)
+    why = []
+    removed, added = ot - nt, nt - ot
+    if removed:
+        why.append("removed: " + ", ".join(sorted(short(x) for x in removed)[:6]))
+    for s in ot & nt:
+        for p in (RDFS.subClassOf, RDFS.subPropertyOf, RDFS.domain, RDFS.range, SH.targetClass):
+            gone = {o for o in old.objects(s, p) if isinstance(o, URIRef)} - {o for o in new.objects(s, p) if isinstance(o, URIRef)}
+            if gone:
+                why.append(f"{short(s)} {short(p)} changed")
+    if why:
+        return "major", why
+    if added:
+        return "minor", ["added: " + ", ".join(sorted(short(x) for x in added)[:6])]
+    old_b, new_b = body(old), body(new)
+
+    def editorial(p):
+        # labels, definitions, notes, messages and agent-facing prose; NOT ruleStatement, governedBy, policySource,
+        # owningDomain, regulatoryCitation ... (annotation-profile values that carry meaning or accountability)
+        return p in EDITORIAL_PREDICATES or str(p).rsplit("/", 1)[-1] in EDITORIAL_AV
+
+    def bnode_part(g, drop_editorial=False):
+        from rdflib.compare import to_isomorphic
+        part = Graph()
+        for t in g:
+            if (isinstance(t[0], BNode) or isinstance(t[2], BNode)) and not str(t[1]).endswith("/fabric/model/graphName") \
+                    and not (drop_editorial and editorial(t[1])):
+                part.add(t)
+        return to_isomorphic(part)
+
+    blank_changed = bnode_part(old, drop_editorial=True) != bnode_part(new, drop_editorial=True)
+    blank_text_changed = bnode_part(old) != bnode_part(new)
+    if old_b != new_b or blank_changed or blank_text_changed:
+        # constraint or axiom changes on existing terms (bnodes) need at least minor; label/definition text is patch
+        structural = any(not editorial(p) for _, p, _ in (old_b ^ new_b))
+        return ("minor" if structural or blank_changed else "patch"), ["statements or constraints changed" if (structural or blank_changed) else "annotations only"]
+    return "none", []
+
+
+def cmd_changes(repo: Repo, args) -> bool:
+    """Compare the working tree with --base: every changed module bumps its version by at least the change
+    class; changed knowledge bumps the collection version; standard changes carry an ADR."""
+    if not args.base:
+        sys.exit("changes: --base <git ref> is required (e.g. origin/main)")
+    top = Path(subprocess.run(["git", "-C", str(repo.root), "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip())
+    nested = [f":(exclude){p.parent.relative_to(top)}" for p in repo.root.rglob("semantic.yaml") if p.parent != repo.root]
+    diff = subprocess.run(["git", "-C", str(top), "diff", "--name-status", "--find-renames", args.base, "--", str(repo.root), *nested],
+                          capture_output=True, text=True)
+    if diff.returncode != 0:
+        fail(f"changes: git diff against {args.base} failed: {diff.stderr.strip()}")
+        return False
+    untracked = subprocess.run(["git", "-C", str(top), "ls-files", "--others", "--exclude-standard", "--", str(repo.root), *nested],
+                               capture_output=True, text=True).stdout.split()
+    changed: dict[str, str | None] = {}   # new path -> old path (None = added)
+    deleted: list[str] = []
+    for line in diff.stdout.splitlines():
+        parts = line.split("\t")
+        st = parts[0]
+        if st.startswith("R"):
+            changed[parts[2]] = parts[1]
+        elif st == "D":
+            deleted.append(parts[1])
+        elif st == "A":
+            changed[parts[1]] = None
+        else:
+            changed[parts[1]] = parts[1]
+    for u in untracked:
+        changed.setdefault(u, None)
+    strict = args.strict
+    base = repo.base_iri
+    problems, warnings, summary = [], [], []
+
+    def report(release: bool, msg: str):
+        (problems if (release or strict) else warnings).append(msg)
+
+    governed = {str(p.relative_to(top)) for p in governed_rdf_files(repo)}
+    for path in deleted:
+        if path.endswith(".ttl") and not {"tests", "examples", "build"} & set(Path(path).parts):
+            old_txt = git_show(top, args.base, path) or ""
+            old = Graph().parse(data=old_txt, format="turtle") if old_txt else Graph()
+            for o in old.subjects(RDF.type, OWL.Ontology):
+                release = old.value(o, FIBO_AV.hasMaturityLevel) == FIBO_AV.Release
+                report(release, f"{path}: module {o} was deleted (breaking: deprecate its terms instead, and raise an ADR)")
+    for path, old_path in sorted(changed.items()):
+        if path not in governed:
+            continue
+        new = Graph().parse(str(top / path), format=guess_format(path))
+        old_txt = git_show(top, args.base, old_path) if old_path else None
+        if not old_txt:
+            summary.append(f"{path}: new module")
+            continue
+        old = Graph().parse(data=old_txt, format="turtle")
+        for o in old.subjects(RDF.type, OWL.Ontology):
+            if (o, RDF.type, OWL.Ontology) not in new:
+                release = old.value(o, FIBO_AV.hasMaturityLevel) == FIBO_AV.Release
+                ov = old.value(o, OWL.versionInfo)
+                need = "minor" if semver(ov) and semver(ov)[0] == 0 else "major"
+                bumped = any(LEVELS.index(bump_level(ov, new.value(n, OWL.versionInfo))) >= LEVELS.index(need)
+                             for n in new.subjects(RDF.type, OWL.Ontology))
+                msg = f"{path}: module IRI {o} no longer declared (renamed?) - importers break; breaking change"
+                if bumped:
+                    warnings.append(msg + " - an ADR and a consumer impact note are required")
+                else:
+                    report(release, msg + f", needs a {need} version bump and an ADR")
+        for o in new.subjects(RDF.type, OWL.Ontology):
+            if (o, RDF.type, OWL.Ontology) not in old:
+                continue
+            ns = str(o) if repo.kind != "domain" else repo.cfg["domain"]["namespace"]
+            cls, why = classify_change(old, new, ns)
+            if cls == "none":
+                continue
+            ov, nv = old.value(o, OWL.versionInfo), new.value(o, OWL.versionInfo)
+            got = bump_level(ov, nv)
+            need = cls
+            if semver(ov) and semver(ov)[0] == 0 and need == "major":
+                need = "minor"   # 0.y.z: breaking changes bump MINOR until the first 1.0.0 release
+            release = new.value(o, FIBO_AV.hasMaturityLevel) == FIBO_AV.Release
+            summary.append(f"{path}: {cls} change ({'; '.join(why)}), version {ov} -> {nv}")
+            if LEVELS.index(got) < LEVELS.index(need):
+                report(release, f"{path}: {cls} change ({'; '.join(why)}) needs a {need} version bump, got {ov} -> {nv}"
+                       + (" (maturity Release)" if release else ""))
+            if cls == "major" and release:
+                warnings.append(f"{path}: breaking change to Release content - an ADR and a consumer impact note are required")
+    # collections: changed knowledge => new collection version (the KG serves by version)
+    if repo.kind == "domain":
+        FAB = Namespace(base + "fabric/model/")
+        cfile = repo.files("collections")
+        new_c = load(cfile)
+        old_c = Graph()
+        for f in cfile:
+            t = git_show(top, args.base, str(f.relative_to(top)))
+            if t:
+                old_c.parse(data=t, format="turtle")
+        for coll, version, part, gname, files in collection_partitions(repo):
+            touched = [str(f.relative_to(top)) for f in files if str(f.relative_to(top)) in changed]
+            if touched:
+                old_v = next((str(v) for v in old_c.objects(coll, OWL.versionInfo)), None)
+                if old_v is not None and old_v == version:
+                    release = any(new_c.value(o, FIBO_AV.hasMaturityLevel) == FIBO_AV.Release for o in new_c.subjects(RDF.type, OWL.Ontology))
+                    report(release, f"collection {short(coll)} v{version}: partition '{str(gname).rsplit('/', 1)[-1]}' changed "
+                           f"({', '.join(touched[:3])}) but the collection version was not bumped (graph names must change with content)")
+    # enterprise standards: machine-checked standard changes need an ADR
+    if repo.kind == "governance":
+        std = [p for p in list(changed) + deleted if p.startswith(str(repo.root.relative_to(top)) + "/shapes/")
+               or p.startswith(str(repo.root.relative_to(top)) + "/standards/")]
+        adr = [p for p in changed if "/docs/adr/" in p]
+        if std and not adr:
+            problems.append(f"enterprise standard changed ({', '.join(std[:3])}) without an ADR in docs/adr/ (change class: enterprise standard)")
+    for s in summary:
+        info(s)
+    for w in sorted(set(warnings)):
+        warn(w)
+    if problems:
+        for p in problems:
+            fail(p)
+        return False
+    ok(f"changes vs {args.base}: versions match the change classes" + (f" ({len(warnings)} warning(s) on Provisional content)" if warnings else ""))
     return True
 
 
@@ -1163,17 +1699,26 @@ def cmd_rebase(repo: Repo, args) -> bool:
     new = args.to if args.to.endswith("/") else args.to + "/"
     targets = [repo.governance.root]
     if args.all:
-        targets = [p for p in repo.governance.root.parent.iterdir() if (p / "semantic.yaml").exists()]
+        # every repository, sub-domain, business domain and the domain template, at any depth
+        top = repo.governance.root.parent
+        skip = {"vendor", ".git", "build", "_template-check", "node_modules"}
+        found = {p.parent for pat in ("semantic.yaml", "copier.yml") for p in top.rglob(pat)
+                 if not skip & set(p.relative_to(top).parts)}
+        targets = sorted(t for t in found if not any(t != o and o in t.parents for o in found))  # outermost only
     n = 0
+    seen: set[Path] = set()
     for t in targets:
         for p in t.rglob("*"):
-            if p.is_file() and p.suffix in (".ttl", ".yaml", ".yml", ".rq", ".md", ".json", ".jinja", ".py") \
+            if p in seen or not p.is_file():
+                continue
+            seen.add(p)
+            if p.suffix in (".ttl", ".yaml", ".yml", ".rq", ".md", ".json", ".jinja", ".py", ".csv") \
                     and not {"vendor", ".git", "build"} & set(p.relative_to(t).parts):
                 s = p.read_text()
                 if old in s:
                     p.write_text(s.replace(old, new))
                     n += 1
-    ok(f"rebase: {old} -> {new} in {n} files")
+    ok(f"rebase: {old} -> {new} in {n} files ({len(targets)} repositories)")
     return True
 
 
@@ -1183,7 +1728,7 @@ def cmd_rebase(repo: Repo, args) -> bool:
 
 def cmd_verify(repo: Repo, args) -> bool:
     print(f"{BOLD}== verify {repo.root.name} ({repo.kind}){RESET}")
-    steps = [cmd_syntax, cmd_structure, cmd_meta]
+    steps = [cmd_syntax, cmd_structure, cmd_meta, cmd_drift]
     if repo.kind in ("fibo-extensions", "domain", "business-domain"):
         steps += [cmd_extensions, cmd_closure, cmd_reason]
     if repo.kind == "domain":
@@ -1211,7 +1756,9 @@ def main():
     ap.add_argument("--reasoner", default="ELK", help="reason: ELK (default) or HermiT")
     ap.add_argument("--show", type=int, default=0, help="cq: print first N rows")
     ap.add_argument("--to", help="rebase: new base IRI")
-    ap.add_argument("--all", action="store_true", help="rebase: all sibling repositories")
+    ap.add_argument("--all", action="store_true", help="rebase: all repositories, sub-domains and the domain template")
+    ap.add_argument("--base", help="changes: git ref to compare with (e.g. origin/main)")
+    ap.add_argument("--strict", action="store_true", help="changes: treat findings on Provisional content as failures")
     args = ap.parse_args()
     fn = globals().get("cmd_" + args.command.replace("-", "_"))
     if not fn:

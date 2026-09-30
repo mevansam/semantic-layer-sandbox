@@ -5,6 +5,9 @@ on:
     branches: [main]
 jobs:
   semantic:
-    # Gates G1-G7: syntax, standards, FIBO extension rules, coherence with FIBO,
-    # business rules, competency questions, knowledge-graph + GraphRAG export.
+    # Gates G1-G8: syntax and structure, standards, FIBO extension rules, coherence with FIBO,
+    # business rules, competency questions, knowledge-graph + GraphRAG export, consistency (no drift).
+    # Used when this sub-domain lives in its own repository; in the monorepo the root workflow runs.
     uses: example-org/enterprise-semantic-governance/.github/workflows/semantic-ci.yml@main
+    with:
+      path: domains/retail-wealth-management/insights-and-analytics

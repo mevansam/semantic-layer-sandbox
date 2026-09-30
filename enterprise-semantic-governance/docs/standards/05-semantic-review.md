@@ -6,7 +6,7 @@ Owner: semantic review board (`@example-org/semantic-review-board`).
 
 | The board checks | The board does **not** decide |
 |---|---|
-| Conformance to standards 01–08 (CI gates G1–G7 are necessary, not sufficient) | Whether a definition is *correct* for the business |
+| Conformance to standards 01–08 (CI gates G1–G8 are necessary, not sufficient) | Whether a definition is *correct* for the business |
 | Correct FIBO parent choice and absence of FIBO duplication | Business rule thresholds and policy |
 | Impact on other domains, and whether an alignment decision is needed | API product decisions |
 | Modularity, naming, reuse of fabric assets | Retention periods (records owner plus Legal) |
@@ -14,7 +14,7 @@ Owner: semantic review board (`@example-org/semantic-review-board`).
 
 ## Checklist (copy into the PR)
 
-- [ ] CI gates G1–G7 green
+- [ ] CI gates G1–G8 green, and `make changes` shows no failures (version bumps match the change class)
 - [ ] New classes have the closest correct FIBO parent; any FIBO gaps noted with `FIBO-GAP`
 - [ ] No term duplicates an enterprise-core or other-domain term (search the KG); an alignment decision is recorded if terms overlap
 - [ ] Rules have statement, policy source, owner and a negative test

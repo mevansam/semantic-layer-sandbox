@@ -4,7 +4,7 @@ TEMPLATE := domains/domain-template
 SUBDOMAINS := $(patsubst %/semantic.yaml,%,$(wildcard domains/*/*/semantic.yaml))
 BUSINESS_DOMAINS := $(filter-out $(TEMPLATE),$(patsubst %/semantic.yaml,%,$(wildcard domains/*/semantic.yaml)))
 
-.PHONY: fibo verify verify-governance verify-fibo verify-domains verify-template align hermit taxonomy capabilities list
+.PHONY: fibo verify verify-governance verify-fibo verify-domains verify-template drift changes align hermit taxonomy capabilities codeowners list
 
 # FIBO is a git submodule pinned to a release. Works whether this is one monorepo
 # (submodule registered at the root) or separate repositories (registered in fibo-extensions).
@@ -32,9 +32,20 @@ verify-template:
 	$(SEMTOOL) verify --repo _template-check/rwm/insights-and-analytics
 	rm -rf _template-check
 
+# Gate G8 on its own: facts repeated across files agree, generated files are current (also part of `verify`).
+drift:
+	@set -e; for d in enterprise-semantic-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) drift --repo $$d; done
+
+# Pull requests: every changed module bumps its version by at least its change class; changed knowledge
+# bumps the collection version; changes to machine-checked standards carry an ADR.  make changes BASE=origin/main
+BASE ?= origin/main
+changes:
+	@set -e; for d in enterprise-semantic-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) changes --base $(BASE) --repo $$d; done
+
 # How each sub-domain lines up with the template (unchanged / edited / added / seed-only).
 align:
-	@set -e; for d in $(SUBDOMAINS); do echo "== $$d"; python3 $(TEMPLATE)/scripts/compare_domain.py $$d | tail -1; done
+	@rc=0; for d in $(SUBDOMAINS); do echo "== $$d"; out=$$(python3 $(TEMPLATE)/scripts/compare_domain.py $$d) || rc=1; \
+	  echo "$$out" | awk '/^(DRIFTED|MISSING)/{p=1} /^$$/{p=0} p'; echo "$$out" | tail -1; done; exit $$rc
 
 # Full OWL DL reasoning (HermiT) over each business domain with all its sub-domains and FIBO.
 hermit:
@@ -45,6 +56,10 @@ taxonomy:
 
 capabilities:
 	$(SEMTOOL) capabilities --repo enterprise-semantic-governance
+
+# Regenerate every sub-domain's CODEOWNERS from its domain-manifest.ttl (commit the result).
+codeowners:
+	@set -e; for d in $(SUBDOMAINS); do $(SEMTOOL) codeowners --repo $$d; done
 
 list:
 	@echo "business domains: $(BUSINESS_DOMAINS)"; echo "sub-domains:      $(SUBDOMAINS)"

@@ -5,9 +5,26 @@ An ontology-based semantic layer for grounding AI agents in business meaning, ru
 > **Business domains are accountable for meaning, rules, data, records and APIs.
 > The enterprise governs how that knowledge is represented, shared and consumed by AI.**
 
+## Documentation
+
+**Start with the [framework guide](docs/framework/README.md).** It explains:
+- enterprise governance
+- how the federated repository structure keeps independent domains and sub-domains consistent
+- how the semantic model and the ontology are managed at each level
+- the logical and physical models, as diagrams
+- how to make every kind of change without drift
+
+| | |
+|---|---|
+| [1 Overview](docs/framework/01-overview.md) | [5 Logical model](docs/framework/05-logical-model.md) |
+| [2 Enterprise governance](docs/framework/02-enterprise-governance.md) | [6 Physical model: how files link](docs/framework/06-physical-model.md) |
+| [3 Federated repository structure](docs/framework/03-federated-repository-structure.md) | [7 Change management without drift](docs/framework/07-change-management.md) |
+| [4 Semantic model and ontology](docs/framework/04-semantic-model-and-ontology.md) | Standards: `enterprise-semantic-governance/docs/standards/`; ADRs: `…/docs/adr/` |
+
 ## Layout
 
 ```
+docs/framework/                      Framework guide (start here)
 enterprise-semantic-governance/      Enterprise governance + semantic fabric: standards, meta-shapes, AI controls,
                                      alignment, taxonomy, capability map, GraphRAG contract, semtool, CI
 fibo-extensions/                     FIBO (pinned submodule), enterprise FIBO profile, enterprise core, domain registry,
@@ -44,14 +61,25 @@ pip install -r enterprise-semantic-governance/requirements.txt
 make fibo                                                        # FIBO submodule at the pinned release
 bash fibo-extensions/scripts/fetch-omg-dependencies.sh           # OMG Commons + LCC (needs www.omg.org)
 export ROBOT_JAR=/path/to/robot.jar                              # https://github.com/ontodev/robot/releases (v1.9.10)
-make verify                                                      # all repos, all gates
+make verify                                                      # all repos, all gates (G1-G8)
+make changes BASE=origin/main                                    # version bumps match change classes (pull requests)
+make drift                                                       # G8 only: repeated facts and generated files agree
 make align                                                       # how each sub-domain lines up with the template
 make hermit                                                      # full OWL DL reasoning per business domain
 ```
 
 ## Gates (from `enterprise-semantic-governance/GOVERNANCE.md`)
 
-G1 syntax and domain-repo structure · G2 standards (meta-shapes) · G3 FIBO extension rules · G4 coherence with FIBO (ELK in `verify`, plus HermiT in CI) · G5 business rules (positive and negative tests) · G6 competency questions · G7 knowledge graph plus GraphRAG export.
+- G1 syntax and domain-repo structure
+- G2 standards (meta-shapes)
+- G3 FIBO extension rules
+- G4 coherence with FIBO (ELK in `verify`, plus HermiT in CI)
+- G5 business rules (positive and negative tests)
+- G6 competency questions
+- G7 knowledge graph plus GraphRAG export
+- G8 consistency: no drift between files that repeat a fact, or between generated files and their sources
+
+On pull requests, `semtool changes` also checks that version bumps match the change class. See [doc 7](docs/framework/07-change-management.md).
 
 ## Placeholders to replace
 

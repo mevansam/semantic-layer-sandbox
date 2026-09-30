@@ -16,12 +16,12 @@ These rules let many domains extend FIBO independently without fragmenting it.
 
 ```turtle
 # Specialize a FIBO class (E1, E4)
-sdp:FinancialGoal a owl:Class ;
+fp:FinancialGoal a owl:Class ;
     rdfs:subClassOf fibo-fnd-gao-obj:FinancialObjective ;
     ent-av:governedBy ent-tax:customers.customer-intelligence-and-analytics.customer-financial-goals-and-plans .
 
 # Specialize a FIBO property
-sdp:hasPlanGoal a owl:ObjectProperty ;
+fp:hasPlanGoal a owl:ObjectProperty ;
     rdfs:subPropertyOf fibo-fnd-gao-obj:hasObjective .   # only if the FIBO semantics truly apply
 
 # NEVER (violates E1):

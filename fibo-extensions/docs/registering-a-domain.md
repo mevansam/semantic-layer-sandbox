@@ -19,5 +19,5 @@
    # (the business domain's parent layer is scaffolded on first use)
    ```
 4. **Fill in the domain manifest** (accountable roles and review teams) and run `semtool codeowners`.
-5. **Model a first slice**, get CI green (gates G1–G7), then request semantic review.
+5. **Model a first slice**, get CI green (gates G1–G8), then request semantic review.
 6. **Publish modules for reuse** by adding `ent-gov:publishedModule` to your registration, once another domain needs them. Also add it to the business domain's umbrella (`domains/<business-domain>/domain.ttl`).

@@ -29,7 +29,7 @@ domains/retail-wealth-management/   ← first business domain: financial-plannin
 | `docs/standards/01…08` | all | Standards documents |
 | `docs/adr/` | all | Architecture decision records |
 | `tools/semtool.py` | all | The one CLI used by every repo, locally and in CI |
-| `.github/workflows/semantic-ci.yml` | all | Reusable CI workflow (gates G1–G7) |
+| `.github/workflows/semantic-ci.yml` | all | Reusable CI workflow (gates G1–G8) |
 
 ## Quick start
 
@@ -48,6 +48,9 @@ python tools/semtool.py verify --repo ../domains/retail-wealth-management/financ
 | Re-import the capability map | replace `capabilities/source/capability-map.csv`, review `capabilities/curation.yaml`, run `python tools/semtool.py capabilities` |
 | Adopt the real enterprise namespace | `python tools/semtool.py rebase --to https://ontology.<company>.com/ --all` |
 | Add a control | edit `ontology/controls.ttl`, update `docs/standards/06`, raise an ADR |
+| Check that repeated facts and generated files agree (gate G8) | `python tools/semtool.py drift --repo <folder>` or `make drift` at the root |
+| Check version bumps against the change class before a PR | `make changes BASE=origin/main` at the root |
+| Understand the framework end to end | `docs/framework/` at the repository root |
 
 ## Configuration
 

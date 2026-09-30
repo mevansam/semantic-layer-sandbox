@@ -1,6 +1,10 @@
 # Reusable CI for every semantic repository.
 # Callers:  jobs: semantic: uses: example-org/enterprise-semantic-governance/.github/workflows/semantic-ci.yml@v0
-# Layout:   repositories are checked out side by side, matching the relative paths in semantic.yaml.
+#           with: { path: domains/<business-domain>/<sub-domain> }   # where the repo sits in the monorepo layout
+# Layout:   repositories are checked out in the monorepo layout, matching the relative paths in semantic.yaml.
+#           The monorepo root workflow (.github/workflows/semantic-ci.yml) is the primary CI; this reusable
+#           workflow is for repositories split out of it. Cross-repository consistency checks (G8: D6-D9)
+#           need every repository present, so run them in an integration job that assembles the monorepo.
 name: semantic-ci
 
 on:
@@ -15,6 +19,9 @@ on:
       robot-version:
         type: string
         default: v1.9.10
+      path:
+        type: string
+        default: ""   # empty = repository name at the root (governance, fibo-extensions)
 
 jobs:
   verify:
@@ -23,7 +30,7 @@ jobs:
       - name: Checkout repository under test
         uses: actions/checkout@v4
         with:
-          path: ${{ github.event.repository.name }}
+          path: ${{ inputs.path || github.event.repository.name }}
 
       - name: Checkout enterprise-semantic-governance
         if: github.event.repository.name != 'enterprise-semantic-governance'
@@ -65,17 +72,17 @@ jobs:
           curl -sSL -o robot.jar https://github.com/ontodev/robot/releases/download/${{ inputs.robot-version }}/robot.jar
           echo "ROBOT_JAR=$PWD/robot.jar" >> "$GITHUB_ENV"
 
-      - name: Verify (gates G1-G7 as applicable)
-        run: python enterprise-semantic-governance/tools/semtool.py verify --repo ${{ github.event.repository.name }}
+      - name: Verify (gates G1-G8 as applicable)
+        run: python enterprise-semantic-governance/tools/semtool.py verify --repo ${{ inputs.path || github.event.repository.name }}
 
       - name: Full OWL DL coherence (HermiT)
         if: github.event.repository.name != 'enterprise-semantic-governance'
-        run: python enterprise-semantic-governance/tools/semtool.py reason --reasoner HermiT --repo ${{ github.event.repository.name }}
+        run: python enterprise-semantic-governance/tools/semtool.py reason --reasoner HermiT --repo ${{ inputs.path || github.event.repository.name }}
 
       - name: Upload knowledge graph + GraphRAG cards
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: semantic-build
-          path: ${{ github.event.repository.name }}/build/
+          path: ${{ inputs.path || github.event.repository.name }}/build/
           if-no-files-found: ignore

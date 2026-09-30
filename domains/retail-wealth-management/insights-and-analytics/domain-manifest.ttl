@@ -30,7 +30,8 @@ ia-m:Manifest a ent-gov:DomainManifest ;
     ent-gov:describesDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/insights-and-analytics> ;
     ent-gov:namespace "https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/"^^xsd:anyURI ;
     ent-gov:codeRepository "https://github.com/example-org/semantic-layer-sandbox"^^xsd:anyURI ;
-    ent-gov:hasOntologyModule <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> ;
+    ent-gov:hasOntologyModule <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/insights/> ,
+        <https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/assessments/> ;
     ent-gov:dependsOnSubDomain <https://ontology.example.com/capability/domain/investment-servicing/retail-wealth-management/financial-planning> ;
     ent-gov:anchoredTo ent-tax:customers.customer-intelligence-and-analytics.customer-portfolio-analytics ;
     ent-gov:anchoredTo ent-tax:customers.customer-intelligence-and-analytics.customer-financial-health-scores ;

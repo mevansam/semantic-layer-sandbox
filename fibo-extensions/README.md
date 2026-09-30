@@ -10,7 +10,7 @@ The enterprise's governed use of FIBO, and the mechanism through which business 
 | `ontology/core/` | **Enterprise core**: FIBO specializations shared by several domains (each with one owning domain) | semantic review board hosts; owning domain decides meaning |
 | `ontology/alignment/` | Cross-domain alignment axioms (implements decisions from the governance alignment register) | semantic review board |
 | `ontology/ontology-domains/` | One umbrella ontology per capability-map ontology domain, importing its domains' published modules | semantic review board |
-| `registry/domain-registry.ttl` | **Domain registry**: reserved namespaces `{base}domain/{ontology-domain}/{business-domain}/`, domain codes, repositories, published modules | semantic review board |
+| `registry/domain-registry.ttl` | **Domain registry**: reserved namespaces `{base}domain/{business-domain}/[{sub-domain}/]` (following the folder layout, ADR-0005), domain codes, repositories, published modules | semantic review board |
 | `docs/` | Extension rules, registering a domain, upgrading FIBO | |
 
 ## Setup
@@ -40,4 +40,4 @@ The rules are enforced by `semtool extensions` and the meta-shapes. Details are 
 - **E3**: import only profile modules, enterprise modules, and other domains' *published* modules.
 - **E4** (meta-shape): every business class has a FIBO or enterprise parent and a taxonomy anchor.
 
-To create a new domain, see `docs/registering-a-domain.md`, then scaffold it from `domain-template`.
+To create a new domain, see `docs/registering-a-domain.md`, then scaffold it from `domains/domain-template`. How these files link to the rest of the repository, and how to change them without drift, is in `docs/framework/` at the repository root (documents 3, 6 and 7).
