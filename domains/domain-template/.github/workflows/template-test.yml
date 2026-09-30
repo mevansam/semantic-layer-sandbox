@@ -15,5 +15,4 @@ jobs:
       - run: |
           pip install -r enterprise-semantic-governance/requirements.txt
           bash fibo-extensions/scripts/fetch-omg-dependencies.sh
-          curl -sSL -o robot.jar https://github.com/ontodev/robot/releases/download/v1.9.10/robot.jar
-          ROBOT_JAR=$PWD/robot.jar make verify-template
+          make verify-template   # make tools runs first: checks Java, downloads ROBOT to build/tools/

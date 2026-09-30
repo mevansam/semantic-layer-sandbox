@@ -19,11 +19,15 @@ jobs:
         with: { python-version: "3.11" }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: "17" }
+      - name: Cache ROBOT (build/tools)
+        uses: actions/cache@v4
+        with:
+          path: build/tools
+          key: robot-${{ hashFiles('Makefile') }}
       - name: Install tooling
         run: |
           pip install -r enterprise-semantic-governance/requirements.txt
-          curl -sSL -o robot.jar https://github.com/ontodev/robot/releases/download/v1.9.10/robot.jar
-          echo "ROBOT_JAR=$PWD/robot.jar" >> "$GITHUB_ENV"
+          make tools            # checks Java, downloads ROBOT to build/tools/ (make exports ROBOT_JAR)
       - name: Fetch FIBO's OMG Commons / LCC dependencies
         run: bash fibo-extensions/scripts/fetch-omg-dependencies.sh
       - name: Verify (gates G1-G8)

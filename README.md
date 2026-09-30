@@ -67,10 +67,18 @@ python3 -m venv venv && source venv/bin/activate                 # optional; ven
 pip install -r enterprise-semantic-governance/requirements.txt   # rdflib, pyshacl, owlrl, PyYAML, openpyxl, Jinja2
 make fibo                                                        # FIBO submodule at the pinned release
 bash fibo-extensions/scripts/fetch-omg-dependencies.sh           # FIBO's OMG Commons + LCC (needs www.omg.org; git-ignored)
-export ROBOT_JAR=/path/to/robot.jar                              # Java 17 + ROBOT v1.9.10, https://github.com/ontodev/robot/releases
+make tools                                                       # checks Java (>= 11; 17 recommended), downloads ROBOT v1.9.10 to build/tools/
 alias semtool=enterprise-semantic-governance/tools/semtool.py    # used in the examples below
 make list                                                        # business domains and sub-domains found
 ```
+
+Java must be installed first (macOS: `brew install --cask temurin@17`; Ubuntu: `sudo apt-get install -y openjdk-17-jre-headless`). `make tools` fails with a clear message if Java is missing, doesn't run, or is older than 11.
+
+You don't have to run `make tools` yourself. Every target that reasons (`verify`, `verify-fibo`, `verify-domains`, `verify-template`, `hermit`) runs it first, and `make` exports `ROBOT_JAR` to every command it runs.
+- **`semtool` run directly:** it finds the jar in `build/tools/` on its own. To set the variable in your shell anyway, run `eval "$(make -s env)"`.
+- **Your own ROBOT:** `make verify ROBOT_JAR=/path/to/robot.jar`, or export `ROBOT_JAR`.
+- **Another version:** `make tools ROBOT_VERSION=v1.9.x`.
+- **Re-download:** `make clean-tools`.
 
 Without the OMG dependencies, reasoning warns `unresolved imports skipped` and runs on the rest; every other check is unaffected.
 

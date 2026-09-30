@@ -828,7 +828,11 @@ def cmd_closure(repo: Repo, args) -> bool:
 
 
 def robot_cmd() -> list[str]:
+    """ROBOT_JAR (set by make), else the jar `make tools` downloads to build/tools/, else `robot` on the PATH."""
     jar = os.environ.get("ROBOT_JAR")
+    if not jar:
+        found = sorted((GOV_ROOT.parent / "build" / "tools").glob("robot-*.jar"))
+        jar = str(found[-1]) if found else None
     if jar:
         return ["java", "-Xmx6g", "-jar", jar]
     return ["robot"]
@@ -844,7 +848,8 @@ def cmd_reason(repo: Repo, args) -> bool:
     try:
         r = subprocess.run(cmd, capture_output=True, text=True)
     except FileNotFoundError:
-        fail(f"reason ({args.reasoner}): '{cmd[0]}' not found - install Java 17 and ROBOT, then export ROBOT_JAR=/path/to/robot.jar")
+        fail(f"reason ({args.reasoner}): '{cmd[0]}' not found - run `make tools` at the repository root "
+             "(checks Java, downloads ROBOT to build/tools/), or export ROBOT_JAR=/path/to/robot.jar")
         return False
     log = [ln for ln in (r.stdout + r.stderr).splitlines() if ln.strip() and not ln.startswith("Picked up")]
     if r.returncode != 0:

@@ -19,7 +19,7 @@ How to install, run, read and extend the tools that validate the semantic model 
 | Requirement | Why | How |
 |---|---|---|
 | Python 3.11 (as in CI) | `semtool`, scripts | `pip install -r enterprise-semantic-governance/requirements.txt` (rdflib, pyshacl, owlrl, PyYAML, openpyxl, Jinja2) |
-| Java 17 + ROBOT 1.9.10 | gate G4 reasoning (ELK, HermiT) | download `robot.jar` from https://github.com/ontodev/robot/releases, then `export ROBOT_JAR=/path/to/robot.jar` (without it, `semtool` calls a `robot` command on the `PATH`) |
+| Java ≥ 11 (17 recommended, as in CI) + ROBOT 1.9.10 | gate G4 reasoning (ELK, HermiT) | Install a JDK (macOS `brew install --cask temurin@17`; Ubuntu `sudo apt-get install -y openjdk-17-jre-headless`). Then `make tools` checks Java, downloads ROBOT to `build/tools/robot-<version>.jar` (git-ignored) and checks that the jar runs. Targets that reason run `make tools` automatically, and `make` exports `ROBOT_JAR` to every command. `semtool` run directly uses, in order: `ROBOT_JAR` if set, the jar in `build/tools/`, then a `robot` command on the `PATH` |
 | FIBO submodule | the upper ontology | `make fibo`, or clone with `--recurse-submodules` |
 | OMG Commons + LCC | FIBO's own imports | `bash fibo-extensions/scripts/fetch-omg-dependencies.sh` (needs access to www.omg.org). Without it, `closure` warns `unresolved imports skipped … Commons x20, LCC x1` and reasoning runs on the rest; every other check is unaffected |
 | git | `semtool changes`, `make fibo` | the repository must be a git checkout; CI uses `fetch-depth: 0` so the base branch is available |
@@ -63,6 +63,10 @@ Run from the repository root. Each target exits non-zero on failure, so they can
 | `make taxonomy` | regenerate `taxonomy/enterprise-taxonomy.ttl` | generator | |
 | `make capabilities` | regenerate `capabilities/capability-map.ttl` and `data-quality-report.md` | generator | |
 | `make codeowners` | regenerate `CODEOWNERS` in every sub-domain | generator | |
+| `make tools` | check Java (≥ 11), download ROBOT to `build/tools/` once, verify the jar runs. Prerequisite of `verify`, `verify-fibo`, `verify-domains`, `verify-template` and `hermit`. Variables: `ROBOT_VERSION` (default `v1.9.10`), `ROBOT_JAR` (use your own jar), `JAVA_MIN` (default 11) | setup | first run: download |
+| `make check-java` | only the Java check | setup | |
+| `eval "$(make -s env)"` | set `ROBOT_JAR` in your shell (optional; `semtool` finds `build/tools/` itself) | setup | |
+| `make clean-tools` | remove `build/tools/` (re-downloaded on next use) | setup | |
 | `make fibo` | check out the pinned FIBO submodule | setup | |
 | `make list` | list business domains and sub-domains | info | |
 
@@ -320,7 +324,7 @@ Any TriG-capable triple store (Apache Jena Fuseki, GraphDB, Oxigraph and others)
 
 | Workflow | Runs | Steps |
 |---|---|---|
-| `.github/workflows/semantic-ci.yml` (monorepo, primary) | push to `main`, every pull request | install tooling and ROBOT → fetch OMG dependencies → `make verify` → on pull requests `make changes BASE=origin/<base>` → `make hermit` → `make align` → `make selftest` → upload `build/` |
+| `.github/workflows/semantic-ci.yml` (monorepo, primary) | push to `main`, every pull request | install tooling and `make tools` (Java check, ROBOT cached in `build/tools/`) → fetch OMG dependencies → `make verify` → on pull requests `make changes BASE=origin/<base>` → `make hermit` → `make align` → `make selftest` → upload `build/` |
 | `enterprise-semantic-governance/.github/workflows/semantic-ci.yml` (reusable) | called by repositories split out of the monorepo | `semtool verify` and HermiT for one repository. Inputs: `path` (where the repository sits in the monorepo layout), `governance-ref`, `fibo-extensions-ref` (default `main`), `robot-version` |
 | `domains/domain-template/.github/workflows/template-test.yml` | when the template lives in its own repository | `make verify-template` |
 
@@ -332,7 +336,9 @@ Make the CI job a required status check on `main`, together with CODEOWNERS revi
 |---|---|---|
 | `No semantic.yaml in …` | `--repo` doesn't point at a repository folder | point at `enterprise-semantic-governance`, `fibo-extensions`, `domains/<bd>` or `domains/<bd>/<sd>` |
 | `WARN closure: unresolved imports skipped … Commons x20, LCC x1` | FIBO's OMG dependencies aren't downloaded | `bash fibo-extensions/scripts/fetch-omg-dependencies.sh` (optional locally; CI does it) |
-| `FAIL reason (ELK): 'robot' not found …` (or `'java'`) | ROBOT or Java isn't available | install Java 17, download ROBOT, `export ROBOT_JAR=/path/to/robot.jar` |
+| `FAIL reason (ELK): 'robot' not found …` (or `'java'`) | ROBOT or Java isn't available to a direct `semtool` call | run `make tools` (or any `make` target that reasons) |
+| `ERROR: Java not found` / `'java' is on the PATH but does not run` / `Java 8 found; ROBOT needs Java >= 11` (from `make`) | no JDK, a stub `java` without a JDK (macOS), or a JDK that is too old | install a JDK 17 (see §8.2) and open a new shell |
+| `ERROR: download failed: https://github.com/ontodev/robot/…` | no network access to GitHub releases | download `robot.jar` elsewhere and use `make verify ROBOT_JAR=/path/robot.jar` |
 | `FAIL reason (…): … unsatisfiable …` | contradictory axioms | see `closure` and `reason` in §8.5; check recent parent/restriction changes and cross-sub-domain imports |
 | `[violation] … : <message>` then `FAIL meta-shapes` | a standard isn't met | the message says what; standards 01–08 explain each |
 | `E1` / `E2` / `E3` | FIBO extension rule broken | see `extensions` in §8.5 and `fibo-extensions/docs/extension-rules.md` |
