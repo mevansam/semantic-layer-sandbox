@@ -28,7 +28,8 @@ domains/retail-wealth-management/   ← first business domain: financial-plannin
 | `fabric/graphrag/retrieval-contract.yaml` | Semantic fabric | What GraphRAG retrieves, as which unit, with which citations and runtime obligations |
 | `docs/standards/01…08` | all | Standards documents |
 | `docs/adr/` | all | Architecture decision records |
-| `tools/semtool.py` | all | The one CLI used by every repo, locally and in CI |
+| `tools/semtool.py` | all | The one CLI used by every repo, locally and in CI (see `tools/README.md` and `docs/framework/08-validation-tooling.md` at the root) |
+| `tools/tests/selftest.py` | all | Self-test: every check must catch a seeded defect (`make selftest`) |
 | `.github/workflows/semantic-ci.yml` | all | Reusable CI workflow (gates G1–G8) |
 
 ## Quick start

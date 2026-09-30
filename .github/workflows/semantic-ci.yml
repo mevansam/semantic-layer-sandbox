@@ -35,6 +35,8 @@ jobs:
         run: make hermit
       - name: Template alignment
         run: make align
+      - name: Tooling self-test (each check catches a seeded defect)
+        run: make selftest
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -17,15 +17,16 @@ It is the entry point. The detailed rules live in the standards, ADRs and tool d
 | 5 | [Logical model](05-logical-model.md) | Diagrams of the logical relationships: capability map, governance meta-model, domain assets, fabric, FIBO grounding, and the worked example |
 | 6 | [Physical model](06-physical-model.md) | Diagrams of how the files are physically linked: `owl:imports`, IRI references, `semantic.yaml` wiring, build pipeline, generated files |
 | 7 | [Change management without drift](07-change-management.md) | Where every fact is stated, what checks it, how versions work, and step-by-step playbooks for every kind of change |
+| 8 | [Validation tooling reference](08-validation-tooling.md) | How to install and run the validation tools: every command and `make` target, outputs, CI, troubleshooting, the self-test, and how to extend the tooling |
 
 ## Reading paths
 
 | You are… | Read |
 |---|---|
 | New to the framework | 1, then 4, then 5 |
-| A domain or sub-domain owner, rule owner, API owner, data steward or records owner | 1, 3, 4, then the playbooks in 7 |
+| A domain or sub-domain owner, rule owner, API owner, data steward or records owner | 1, 3, 4, the playbooks in 7, and the recipes in 8 |
 | On the semantic review board, in the AI risk office or on the fabric platform team | 2, 4, 7 |
-| An engineer working on the tooling or CI | 6, 7, then `enterprise-semantic-governance/tools/semtool.py` |
+| An engineer working on the tooling or CI | 6, 7, 8 |
 
 ## Vocabulary used throughout
 

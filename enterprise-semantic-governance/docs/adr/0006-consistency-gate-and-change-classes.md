@@ -50,7 +50,7 @@ Nothing enforced the change classes in `GOVERNANCE.md` either. A module could ch
 - The Insights and Analytics manifest now declares both its modules (`insights`, `assessments`).
 - The Financial Planning and Insights and Analytics `collections.ttl` each held a stray duplicate block: 8 partitions attached to the risk assessment, and a second policy definition. It has been removed; each collection has one policy and 8 partitions.
 - CI runs `make verify` (now G1–G8) and, on pull requests, `make changes BASE=origin/<base>`. The checkout uses `fetch-depth: 0`.
-- Every drift code was mutation-tested: 17 seeded inconsistencies, each caught by the intended code.
+- Every check is mutation-tested by `tools/tests/selftest.py` (`make selftest`, run in CI). It seeds 30 defects, each of which must be caught by the intended check, plus one correct change that must pass.
 - Domains need no content changes. Unversioned edits to Provisional content produce warnings until the content is released.
 
 ## Alternatives considered

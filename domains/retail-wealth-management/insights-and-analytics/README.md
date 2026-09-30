@@ -41,7 +41,7 @@ python enterprise-semantic-governance/tools/semtool.py verify --repo domains/ret
 python enterprise-semantic-governance/tools/semtool.py cq --repo domains/retail-wealth-management/insights-and-analytics --show 5
 ```
 
-`verify` runs gates G1–G8 and writes `build/kg.trig` (knowledge graph) and `build/graphrag/cards.jsonl` (GraphRAG concept cards).
+`verify` runs gates G1–G8 and writes `build/kg.trig` (knowledge graph) and `build/graphrag/cards.jsonl` (GraphRAG concept cards). Every command, its output and how to fix a failure: `docs/framework/08-validation-tooling.md` at the repository root. Before a pull request, also run `make changes BASE=origin/main` from the root.
 
 ## Changing things
 

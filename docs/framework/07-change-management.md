@@ -64,7 +64,7 @@ This document lists where each fact lives, what checks it, how versions work, an
 | **D9** | Taxonomy, capability map, data-quality report and every `CODEOWNERS` equal a fresh regeneration; `curation.yaml` `sub_domains` = each business domain's `semantic.yaml` `sub_domains` (which D6 ties to the folders) | governance |
 | **D10** | The FIBO branch pinned in `.gitmodules` (root and `fibo-extensions/`), and the checked-out tag when available, = `fibo.release_tag`; warns if nothing pins a branch | governance |
 
-Every check was mutation-tested: each of the 17 seeded drift scenarios is caught by the intended code (ADR-0006).
+Every check is mutation-tested by `make selftest`: each code has at least one seeded defect it must catch ([doc 8 §8.7](08-validation-tooling.md#87-self-test-testing-the-checks-themselves)).
 
 ### Pull requests: `semtool changes --base <ref>` (`make changes BASE=origin/main`)
 
@@ -138,7 +138,10 @@ Local commands:
 | `make hermit` | Full OWL DL reasoning per business domain |
 | `make align` | How each sub-domain lines up with the template |
 | `make taxonomy` · `make capabilities` · `make codeowners` | Regenerate generated files (commit the result) |
+| `make selftest` | Prove every check still catches its seeded defect (after changing the tooling or a standard) |
 | `python enterprise-semantic-governance/tools/semtool.py <command> --repo <folder>` | Any single check on one repository |
+
+Every command, option, output and error message is explained in [doc 8](08-validation-tooling.md).
 
 ## 7.5 Versions
 
@@ -338,3 +341,5 @@ Each playbook lists the steps, then what catches a missed step.
 - [ ] Breaking change to Release content: ADR and consumer impact note
 - [ ] Standard, template or control change: ADR, and every domain still passes
 - [ ] Collections and execution models: risk assessment still approved
+
+Next: [Validation tooling reference →](08-validation-tooling.md)

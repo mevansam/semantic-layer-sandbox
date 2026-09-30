@@ -4,7 +4,25 @@ TEMPLATE := domains/domain-template
 SUBDOMAINS := $(patsubst %/semantic.yaml,%,$(wildcard domains/*/*/semantic.yaml))
 BUSINESS_DOMAINS := $(filter-out $(TEMPLATE),$(patsubst %/semantic.yaml,%,$(wildcard domains/*/semantic.yaml)))
 
-.PHONY: fibo verify verify-governance verify-fibo verify-domains verify-template drift changes align hermit taxonomy capabilities codeowners list
+.PHONY: help fibo verify verify-governance verify-fibo verify-domains verify-template drift changes selftest align hermit taxonomy capabilities codeowners list
+
+# `make` or `make help` lists the targets. Full reference: docs/framework/08-validation-tooling.md
+help:
+	@echo "Validation (see docs/framework/08-validation-tooling.md)"
+	@echo "  make verify            all gates G1-G8 for every repository, sub-domain, business domain + template check"
+	@echo "  make drift             gate G8 only (repeated facts agree, generated files current) - fast"
+	@echo "  make changes BASE=ref  version bumps match change classes against a git ref (default origin/main)"
+	@echo "  make hermit            full OWL DL reasoning (HermiT) per business domain"
+	@echo "  make align             sub-domains still match domain-template (fails on drifted template-owned files)"
+	@echo "  make selftest          prove every check still catches what it should (after changing the tooling)"
+	@echo "Generate (commit the result)"
+	@echo "  make taxonomy          taxonomy/source/*.md  -> taxonomy/enterprise-taxonomy.ttl"
+	@echo "  make capabilities      capabilities/source + curation.yaml -> capability-map.ttl + data-quality-report.md"
+	@echo "  make codeowners        domain-manifest.ttl -> CODEOWNERS for every sub-domain"
+	@echo "Setup and info"
+	@echo "  make fibo              check out FIBO (pinned submodule)"
+	@echo "  make list              list business domains and sub-domains"
+	@echo "  make verify-template   generate the worked examples from the template and verify them"
 
 # FIBO is a git submodule pinned to a release. Works whether this is one monorepo
 # (submodule registered at the root) or separate repositories (registered in fibo-extensions).
@@ -41,6 +59,10 @@ drift:
 BASE ?= origin/main
 changes:
 	@set -e; for d in enterprise-semantic-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) changes --base $(BASE) --repo $$d; done
+
+# Self-test of the tooling: each check must catch a seeded defect (enterprise-semantic-governance/tools/tests).
+selftest:
+	python3 enterprise-semantic-governance/tools/tests/selftest.py
 
 # How each sub-domain lines up with the template (unchanged / edited / added / seed-only).
 align:

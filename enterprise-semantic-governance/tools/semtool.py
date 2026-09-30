@@ -841,7 +841,11 @@ def cmd_reason(repo: Repo, args) -> bool:
     out = repo.root / "build" / "reasoned.ttl"
     cmd = robot_cmd() + ["reason", "--reasoner", args.reasoner, "--input", str(closure),
                          "--equivalent-classes-allowed", "all", "--output", str(out)]
-    r = subprocess.run(cmd, capture_output=True, text=True)
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True)
+    except FileNotFoundError:
+        fail(f"reason ({args.reasoner}): '{cmd[0]}' not found - install Java 17 and ROBOT, then export ROBOT_JAR=/path/to/robot.jar")
+        return False
     log = [ln for ln in (r.stdout + r.stderr).splitlines() if ln.strip() and not ln.startswith("Picked up")]
     if r.returncode != 0:
         detail = [ln.split(" - ", 1)[-1].strip() for ln in log
@@ -1448,7 +1452,7 @@ def cmd_drift(repo: Repo, args) -> bool:
             copy = Path(tmp) / gov.root.name
             shutil.copytree(gov.root, copy, ignore=shutil.ignore_patterns(".git", "build", "__pycache__"))
             with contextlib.redirect_stdout(io.StringIO()):
-                ns_args = argparse.Namespace(source=None, provisional=False)
+                ns_args = argparse.Namespace(source=None)
                 cmd_taxonomy(Repo(copy), ns_args)
                 cmd_capabilities(Repo(copy), ns_args)
             for relp, cmd in (("taxonomy/enterprise-taxonomy.ttl", "taxonomy"), ("capabilities/capability-map.ttl", "capabilities"),
@@ -1752,7 +1756,6 @@ def main():
     ap.add_argument("command")
     ap.add_argument("--repo", default=".")
     ap.add_argument("--source", help="capabilities: capability map file (csv/xlsx)")
-    ap.add_argument("--provisional", action="store_true")
     ap.add_argument("--reasoner", default="ELK", help="reason: ELK (default) or HermiT")
     ap.add_argument("--show", type=int, default=0, help="cq: print first N rows")
     ap.add_argument("--to", help="rebase: new base IRI")

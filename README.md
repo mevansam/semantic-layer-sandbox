@@ -19,7 +19,9 @@ An ontology-based semantic layer for grounding AI agents in business meaning, ru
 | [1 Overview](docs/framework/01-overview.md) | [5 Logical model](docs/framework/05-logical-model.md) |
 | [2 Enterprise governance](docs/framework/02-enterprise-governance.md) | [6 Physical model: how files link](docs/framework/06-physical-model.md) |
 | [3 Federated repository structure](docs/framework/03-federated-repository-structure.md) | [7 Change management without drift](docs/framework/07-change-management.md) |
-| [4 Semantic model and ontology](docs/framework/04-semantic-model-and-ontology.md) | Standards: `enterprise-semantic-governance/docs/standards/`; ADRs: `…/docs/adr/` |
+| [4 Semantic model and ontology](docs/framework/04-semantic-model-and-ontology.md) | [8 Validation tooling reference](docs/framework/08-validation-tooling.md) |
+
+Standards are in `enterprise-semantic-governance/docs/standards/` and ADRs in `enterprise-semantic-governance/docs/adr/`.
 
 ## Layout
 
@@ -65,6 +67,8 @@ make verify                                                      # all repos, al
 make changes BASE=origin/main                                    # version bumps match change classes (pull requests)
 make drift                                                       # G8 only: repeated facts and generated files agree
 make align                                                       # how each sub-domain lines up with the template
+make selftest                                                    # every check still catches its seeded defect
+make                                                             # list all targets (details: docs/framework/08-validation-tooling.md)
 make hermit                                                      # full OWL DL reasoning per business domain
 ```
 
