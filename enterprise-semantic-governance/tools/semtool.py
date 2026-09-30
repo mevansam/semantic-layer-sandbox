@@ -116,7 +116,7 @@ class Repo:
     def all_rdf_files(self) -> list[Path]:
         """RDF files of this repository only: nested repositories (a business domain's sub-domains)
         are skipped, they are checked on their own."""
-        skip = {"vendor", "build", ".git", "template", "node_modules"}
+        skip = {"vendor", "venv", ".venv", "build", ".git", "template", "node_modules"}
         nested = {p.parent for p in self.root.rglob("semantic.yaml")
                   if p.parent != self.root and not (set(p.relative_to(self.root).parts) & skip)}
         res = []
@@ -821,7 +821,7 @@ def cmd_closure(repo: Repo, args) -> bool:
     merged.serialize(str(out), format="turtle")
     ok(f"closure: {len(loaded_files)} ontology files, {len(merged)} triples -> {out.relative_to(repo.root)}")
     if missing:
-        warn("closure: unresolved imports skipped (run fibo-extensions/scripts/fetch-omg-dependencies.sh "
+        warn("closure: unresolved imports skipped (FIBO's OMG Commons/LCC are missing: run `make omg` "
              "on a network that can reach omg.org): " + ", ".join(f"{k} x{v}" for k, v in sorted(missing.items())))
     (out.parent / "closure-unresolved.json").write_text(json.dumps(missing, indent=2))
     return True
@@ -1710,7 +1710,7 @@ def cmd_rebase(repo: Repo, args) -> bool:
     if args.all:
         # every repository, sub-domain, business domain and the domain template, at any depth
         top = repo.governance.root.parent
-        skip = {"vendor", ".git", "build", "_template-check", "node_modules"}
+        skip = {"vendor", "venv", ".venv", ".git", "build", "_template-check", "node_modules"}
         found = {p.parent for pat in ("semantic.yaml", "copier.yml") for p in top.rglob(pat)
                  if not skip & set(p.relative_to(top).parts)}
         targets = sorted(t for t in found if not any(t != o and o in t.parents for o in found))  # outermost only
@@ -1722,7 +1722,7 @@ def cmd_rebase(repo: Repo, args) -> bool:
                 continue
             seen.add(p)
             if p.suffix in (".ttl", ".yaml", ".yml", ".rq", ".md", ".json", ".jinja", ".py", ".csv") \
-                    and not {"vendor", ".git", "build"} & set(p.relative_to(t).parts):
+                    and not {"vendor", "venv", ".venv", ".git", "build"} & set(p.relative_to(t).parts):
                 s = p.read_text()
                 if old in s:
                     p.write_text(s.replace(old, new))

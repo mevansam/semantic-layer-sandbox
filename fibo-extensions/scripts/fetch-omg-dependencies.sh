@@ -3,7 +3,8 @@
 # vendor/omg/ and write vendor/omg/catalog-v001.xml so builds resolve them offline.
 #
 # FIBO (since 2024) imports OMG Commons and LCC modules by IRI from www.omg.org.
-# Run this once after `git submodule update --init`, and again after bumping FIBO.
+# `make` runs it automatically (once per FIBO pin) before any target that reasons;
+# running it by hand is never required. Re-runs reuse files already fetched.
 # Requires network access to www.omg.org.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -19,6 +20,25 @@ queue = set()
 for f in (root / "fibo").rglob("*.rdf"):
     queue |= set(imp.findall(f.read_text(errors="ignore")))
 
+def fetch(iri, target):
+    r = subprocess.run(["curl", "-fsL", "--connect-timeout", "10", "--max-time", "60", "--retry", "2",
+                        "-H", "Accept: application/rdf+xml", "-o", str(target), iri], capture_output=True)
+    return r.returncode == 0
+
+def valid(target):
+    return target.exists() and b"<rdf:RDF" in target.read_bytes()[:4000]
+
+if not queue:
+    sys.exit("FIBO is not checked out in vendor/fibo (nothing to resolve)")
+
+# Fail fast when www.omg.org is not reachable, instead of trying every module.
+probe = sorted(queue)[0]
+probe_target = out / (probe.split("/spec/", 1)[1].strip("/") + ".rdf")
+probe_target.parent.mkdir(parents=True, exist_ok=True)
+if not valid(probe_target) and not fetch(probe, probe_target):
+    probe_target.unlink(missing_ok=True)
+    sys.exit(f"cannot reach www.omg.org ({probe}); OMG Commons/LCC not fetched")
+
 done, entries, failed = set(), [], []
 while queue:
     iri = queue.pop()
@@ -28,8 +48,10 @@ while queue:
     rel = iri.split("/spec/", 1)[1].strip("/") + ".rdf"
     target = out / rel
     target.parent.mkdir(parents=True, exist_ok=True)
-    r = subprocess.run(["curl", "-fsSL", "-H", "Accept: application/rdf+xml", "-o", str(target), iri])
-    if r.returncode != 0 or not target.exists() or b"<rdf:RDF" not in target.read_bytes()[:4000]:
+    if not valid(target):   # re-runs reuse what was fetched before
+        fetch(iri, target)
+    if not valid(target):
+        target.unlink(missing_ok=True)
         failed.append(iri)
         continue
     entries.append((iri, rel))
@@ -40,8 +62,8 @@ cat = ['<?xml version="1.0" encoding="UTF-8"?>',
 cat += [f'  <uri name="{su.escape(i)}" uri="./{su.escape(r)}"/>' for i, r in sorted(entries)]
 cat.append("</catalog>")
 (out / "catalog-v001.xml").write_text("\n".join(cat) + "\n")
-print(f"fetched {len(entries)} OMG ontologies into vendor/omg; catalog written")
+print(f"{len(entries)} OMG ontologies in vendor/omg; catalog written")
 if failed:
-    print("could not fetch:", *failed, sep="\n  ", file=sys.stderr)
+    print(f"could not fetch {len(failed)} of {len(done)} OMG ontologies, e.g. {sorted(failed)[0]}", file=sys.stderr)
     sys.exit(1)
 PY

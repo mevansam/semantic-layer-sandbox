@@ -62,25 +62,29 @@ All commands run from the repository root. Each exits non-zero on failure. `make
 
 ### Setup
 
+Install **Java** (JDK 11+, 17 recommended; macOS `brew install --cask temurin@17`, Ubuntu `sudo apt-get install -y openjdk-17-jre-headless`), **Python 3.10+**, `git`, `make` and `curl`. Everything else is set up by `make` itself, automatically, the first time a target needs it:
+
+| What | Where | When it's (re)done |
+|---|---|---|
+| Python virtualenv with the requirements | `venv/` | missing, or `requirements.txt` changed |
+| Java check (≥ 11) + ROBOT `v1.9.10` | `build/tools/` | missing, or another `ROBOT_VERSION` |
+| FIBO checkout at the pinned commit | `fibo-extensions/vendor/fibo` | missing, or the pin changed |
+| FIBO's OMG Commons + LCC ontologies (from www.omg.org) | `fibo-extensions/vendor/omg/` | once per FIBO pin |
+
+All of these are git-ignored. To do everything up front instead:
+
 ```bash
-python3 -m venv venv && source venv/bin/activate                 # optional; venv/ is git-ignored
-pip install -r enterprise-semantic-governance/requirements.txt   # rdflib, pyshacl, owlrl, PyYAML, openpyxl, Jinja2
-make fibo                                                        # FIBO submodule at the pinned release
-bash fibo-extensions/scripts/fetch-omg-dependencies.sh           # FIBO's OMG Commons + LCC (needs www.omg.org; git-ignored)
-make tools                                                       # checks Java (>= 11; 17 recommended), downloads ROBOT v1.9.10 to build/tools/
-alias semtool=enterprise-semantic-governance/tools/semtool.py    # used in the examples below
-make list                                                        # business domains and sub-domains found
+make setup                                                          # venv, Java check, ROBOT, FIBO, OMG Commons/LCC
+alias semtool='venv/bin/python3 enterprise-semantic-governance/tools/semtool.py'   # used in the examples below
+make list                                                           # business domains and sub-domains found
 ```
 
-Java must be installed first (macOS: `brew install --cask temurin@17`; Ubuntu: `sudo apt-get install -y openjdk-17-jre-headless`). `make tools` fails with a clear message if Java is missing, doesn't run, or is older than 11.
-
-You don't have to run `make tools` yourself. Every target that reasons (`verify`, `verify-fibo`, `verify-domains`, `verify-template`, `hermit`) runs it first, and `make` exports `ROBOT_JAR` to every command it runs.
-- **`semtool` run directly:** it finds the jar in `build/tools/` on its own. To set the variable in your shell anyway, run `eval "$(make -s env)"`.
-- **Your own ROBOT:** `make verify ROBOT_JAR=/path/to/robot.jar`, or export `ROBOT_JAR`.
-- **Another version:** `make tools ROBOT_VERSION=v1.9.x`.
-- **Re-download:** `make clean-tools`.
-
-Without the OMG dependencies, reasoning warns `unresolved imports skipped` and runs on the rest; every other check is unaffected.
+Notes:
+- **Java missing, not running or older than 11:** `make` stops with install instructions.
+- **Python older than 3.10:** macOS ships 3.9. Install a newer one and point `make` at it: `make setup PYTHON_BOOT=python3.12`. To use your own environment instead of `venv/`, add `USE_VENV=0` (you install the requirements yourself).
+- **ROBOT:** `make` exports `ROBOT_JAR` to every command it runs. `semtool` run directly finds `build/tools/` on its own; `eval "$(make -s env)"` sets the variable in your shell. You can also use your own jar (`ROBOT_JAR=/path/robot.jar`) or another version (`ROBOT_VERSION=v1.9.x`).
+- **OMG Commons/LCC:** if www.omg.org can't be reached, `make` warns once and continues; reasoning then runs without those imports (`closure` warns `unresolved imports`). Later runs print a one-line note instead of retrying. `make omg` retries, and `SKIP_OMG=1` skips it.
+- **Start again:** `make clean-tools` removes ROBOT and the OMG download; delete `venv/` to rebuild the Python environment.
 
 ### Run everything
 

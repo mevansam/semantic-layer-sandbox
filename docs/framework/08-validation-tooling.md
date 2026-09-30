@@ -11,32 +11,33 @@ How to install, run, read and extend the tools that validate the semantic model 
 | **Self-test** | `enterprise-semantic-governance/tools/tests/selftest.py` (`make selftest`) | Prove every check still catches the defect it is meant to catch, after you change the tooling or a standard |
 | **`new_domain.py`** | `domains/domain-template/scripts/` | Generate a new sub-domain (and its business-domain parent layer) from the template |
 | **`compare_domain.py`** | `domains/domain-template/scripts/` (`make align`) | Show how a sub-domain lines up with the template |
-| **`fetch-omg-dependencies.sh`** | `fibo-extensions/scripts/` | Download FIBO's OMG Commons and LCC dependencies for complete reasoning |
+| **`fetch-omg-dependencies.sh`** | `fibo-extensions/scripts/` | Download FIBO's OMG Commons and LCC dependencies for complete reasoning (run by `make`; never needed by hand) |
 | **CI** | `.github/workflows/semantic-ci.yml` | Run all of the above on every pull request and every push to `main` |
 
 ## 8.2 Setup
 
 | Requirement | Why | How |
 |---|---|---|
-| Python 3.11 (as in CI) | `semtool`, scripts | `pip install -r enterprise-semantic-governance/requirements.txt` (rdflib, pyshacl, owlrl, PyYAML, openpyxl, Jinja2) |
 | Java ≥ 11 (17 recommended, as in CI) + ROBOT 1.9.10 | gate G4 reasoning (ELK, HermiT) | Install a JDK (macOS `brew install --cask temurin@17`; Ubuntu `sudo apt-get install -y openjdk-17-jre-headless`). Then `make tools` checks Java, downloads ROBOT to `build/tools/robot-<version>.jar` (git-ignored) and checks that the jar runs. Targets that reason run `make tools` automatically, and `make` exports `ROBOT_JAR` to every command. `semtool` run directly uses, in order: `ROBOT_JAR` if set, the jar in `build/tools/`, then a `robot` command on the `PATH` |
-| FIBO submodule | the upper ontology | `make fibo`, or clone with `--recurse-submodules` |
-| OMG Commons + LCC | FIBO's own imports | `bash fibo-extensions/scripts/fetch-omg-dependencies.sh` (needs access to www.omg.org). Without it, `closure` warns `unresolved imports skipped … Commons x20, LCC x1` and reasoning runs on the rest; every other check is unaffected |
-| git | `semtool changes`, `make fibo` | the repository must be a git checkout; CI uses `fetch-depth: 0` so the base branch is available |
+| Python packages | `semtool`, scripts | `make` creates `venv/` and installs `requirements.txt` into it the first time a target needs it, and again when `requirements.txt` changes. Python ≥ 3.10 is required (`PYTHON_BOOT=python3.12` picks the interpreter). `USE_VENV=0` uses your own `python3` |
+| FIBO submodule | the upper ontology | checked out by `make` at the pinned commit when missing or when the pin changes (`make fibo` does only this) |
+| OMG Commons + LCC | FIBO's own imports | fetched by `make` into `fibo-extensions/vendor/omg/` once per FIBO pin (needs access to www.omg.org). A failed fetch is a warning; later runs print a one-line note until `make omg` retries it. `SKIP_OMG=1` skips it. Without it, `closure` warns `unresolved imports skipped … Commons x20, LCC x1` and reasoning runs on the rest; every other check is unaffected |
+| git, make, curl | FIBO checkout, `semtool changes`, downloads | the repository must be a git checkout; CI uses `fetch-depth: 0` so the base branch is available |
 
-Check the setup:
+You only install Java, Python ≥ 3.10, git, make and curl; `make` does the rest. To do it all up front and check:
 
 ```bash
-make list                                                   # business domains and sub-domains found
-python3 enterprise-semantic-governance/tools/semtool.py -h  # command list
-make verify                                                 # everything (about 1 minute on this repository)
+make setup                                                       # venv, Java check, ROBOT, FIBO, OMG Commons/LCC
+make list                                                        # business domains and sub-domains found
+venv/bin/python3 enterprise-semantic-governance/tools/semtool.py -h   # command list
+make verify                                                      # everything (about 1 minute on this repository)
 ```
 
 ## 8.3 Everyday recipes
 
 | Situation | Run |
 |---|---|
-| I edited a sub-domain and want quick feedback | `python3 enterprise-semantic-governance/tools/semtool.py verify --repo domains/<bd>/<sd>` |
+| I edited a sub-domain and want quick feedback | `semtool verify --repo domains/<bd>/<sd>` (the `semtool` alias from the root README uses `venv/`) |
 | … just one check | `semtool <command> --repo domains/<bd>/<sd>` (e.g. `rules`, `meta`, `drift`) |
 | Before opening a pull request | `make verify && make changes BASE=origin/main` |
 | I changed a published module, a dependency or the parent layer | `make verify` (verifies dependents and the business domain in one go), then `make hermit` |
@@ -67,7 +68,10 @@ Run from the repository root. Each target exits non-zero on failure, so they can
 | `make check-java` | only the Java check | setup | |
 | `eval "$(make -s env)"` | set `ROBOT_JAR` in your shell (optional; `semtool` finds `build/tools/` itself) | setup | |
 | `make clean-tools` | remove `build/tools/` (re-downloaded on next use) | setup | |
-| `make fibo` | check out the pinned FIBO submodule | setup | |
+| `make setup` | everything a target might need, up front: `venv/`, Java check, ROBOT, FIBO checkout, OMG Commons/LCC (all otherwise automatic) | setup | first run: downloads |
+| `make python` | only the `venv/` with the requirements | setup | |
+| `make fibo` | only the FIBO checkout at the pinned commit | setup | |
+| `make omg` | (re)try fetching FIBO's OMG Commons/LCC dependencies | setup | |
 | `make list` | list business domains and sub-domains | info | |
 
 \* measured on this repository without the OMG dependencies; with them, closure and reasoning take longer.
@@ -75,7 +79,7 @@ Run from the repository root. Each target exits non-zero on failure, so they can
 ## 8.5 `semtool`
 
 ```text
-python3 enterprise-semantic-governance/tools/semtool.py <command> [--repo PATH] [options]
+venv/bin/python3 enterprise-semantic-governance/tools/semtool.py <command> [--repo PATH] [options]   # or the semtool alias
 ```
 
 - **`--repo`** is the folder of *one* repository: `enterprise-semantic-governance`, `fibo-extensions`, `domains/<bd>` (business domain) or `domains/<bd>/<sd>` (sub-domain). The default is the current folder. The folder must contain `semantic.yaml`. Its `repo_kind` decides which checks apply, and its relative paths lead `semtool` to the other repositories.
@@ -98,7 +102,7 @@ python3 enterprise-semantic-governance/tools/semtool.py <command> [--repo PATH] 
 Example, one sub-domain:
 
 ```text
-$ python3 enterprise-semantic-governance/tools/semtool.py verify --repo domains/retail-wealth-management/financial-planning
+$ semtool verify --repo domains/retail-wealth-management/financial-planning
 == verify financial-planning (domain)
 PASS syntax: 13 RDF files parse cleanly
 PASS structure: conforms to the domain repository standard
@@ -109,7 +113,7 @@ PASS E2 namespace registered: domain/retail-wealth-management/financial-planning
 PASS E2 all 58 minted IRIs are inside the domain namespace
 PASS E3 imports respect the enterprise FIBO profile and published domain modules
 PASS closure: 53 ontology files, 13546 triples -> build/closure.ttl
-WARN closure: unresolved imports skipped (run fibo-extensions/scripts/fetch-omg-dependencies.sh ...): Commons x20, LCC x1
+WARN closure: unresolved imports skipped (FIBO's OMG Commons/LCC are missing: run `make omg` ...): Commons x20, LCC x1
 PASS reason (ELK): closure is coherent, no unsatisfiable classes
 PASS codeowners: CODEOWNERS generated from domain manifest
 PASS rules on positive examples (1 file(s)): conforms
@@ -263,9 +267,12 @@ It exits 1 on DRIFTED or MISSING. `make align` runs it for every sub-domain.
 
 ### `fetch-omg-dependencies.sh`
 ```text
-bash fibo-extensions/scripts/fetch-omg-dependencies.sh
+make omg        # the only way you normally need; make also runs it automatically once per FIBO pin
 ```
-Finds every OMG IRI that FIBO imports, downloads the modules into `fibo-extensions/vendor/omg/`, and writes an XML catalog there so `closure` resolves them offline. Run it after `make fibo` and after every FIBO upgrade. It needs access to www.omg.org.
+Finds every OMG IRI that FIBO imports and downloads the modules, recursively, into `fibo-extensions/vendor/omg/`. It then writes an XML catalog there so `closure` resolves them offline.
+- Re-runs reuse files already fetched.
+- It stops after one request if www.omg.org can't be reached.
+- `make` treats a failure as a warning.
 
 ## 8.7 Self-test: testing the checks themselves
 
@@ -324,7 +331,7 @@ Any TriG-capable triple store (Apache Jena Fuseki, GraphDB, Oxigraph and others)
 
 | Workflow | Runs | Steps |
 |---|---|---|
-| `.github/workflows/semantic-ci.yml` (monorepo, primary) | push to `main`, every pull request | install tooling and `make tools` (Java check, ROBOT cached in `build/tools/`) → fetch OMG dependencies → `make verify` → on pull requests `make changes BASE=origin/<base>` → `make hermit` → `make align` → `make selftest` → upload `build/` |
+| `.github/workflows/semantic-ci.yml` (monorepo, primary) | push to `main`, every pull request | `make setup` (venv, Java check, ROBOT, FIBO, OMG Commons/LCC; `build/tools` and `vendor/omg` cached per FIBO pin) → `make verify` → on pull requests `make changes BASE=origin/<base>` → `make hermit` → `make align` → `make selftest` → upload `build/` |
 | `enterprise-semantic-governance/.github/workflows/semantic-ci.yml` (reusable) | called by repositories split out of the monorepo | `semtool verify` and HermiT for one repository. Inputs: `path` (where the repository sits in the monorepo layout), `governance-ref`, `fibo-extensions-ref` (default `main`), `robot-version` |
 | `domains/domain-template/.github/workflows/template-test.yml` | when the template lives in its own repository | `make verify-template` |
 
@@ -335,7 +342,7 @@ Make the CI job a required status check on `main`, together with CODEOWNERS revi
 | You see | Meaning | Do |
 |---|---|---|
 | `No semantic.yaml in …` | `--repo` doesn't point at a repository folder | point at `enterprise-semantic-governance`, `fibo-extensions`, `domains/<bd>` or `domains/<bd>/<sd>` |
-| `WARN closure: unresolved imports skipped … Commons x20, LCC x1` | FIBO's OMG dependencies aren't downloaded | `bash fibo-extensions/scripts/fetch-omg-dependencies.sh` (optional locally; CI does it) |
+| `WARN closure: unresolved imports skipped … Commons x20, LCC x1` | FIBO's OMG dependencies aren't downloaded (www.omg.org unreachable when `make` tried) | `make omg` when you have access (optional; every other check is unaffected) |
 | `FAIL reason (ELK): 'robot' not found …` (or `'java'`) | ROBOT or Java isn't available to a direct `semtool` call | run `make tools` (or any `make` target that reasons) |
 | `ERROR: Java not found` / `'java' is on the PATH but does not run` / `Java 8 found; ROBOT needs Java >= 11` (from `make`) | no JDK, a stub `java` without a JDK (macOS), or a JDK that is too old | install a JDK 17 (see §8.2) and open a new shell |
 | `ERROR: download failed: https://github.com/ontodev/robot/…` | no network access to GitHub releases | download `robot.jar` elsewhere and use `make verify ROBOT_JAR=/path/robot.jar` |

@@ -1,4 +1,22 @@
-SEMTOOL := python3 enterprise-semantic-governance/tools/semtool.py
+# Every prerequisite is set up automatically, once, by the targets that need it:
+#   Python packages (venv/)  ->  every target that runs the tools
+#   FIBO checkout + OMG Commons/LCC + Java check + ROBOT  ->  targets that reason (verify, hermit, ...)
+# `make setup` does all of it up front. Nothing needs to be run by hand.
+
+# ---- Python environment ---------------------------------------------------------------------
+# A virtualenv in venv/ (git-ignored), (re)installed when requirements.txt changes.
+# USE_VENV=0 uses the current python3 as is (you install the requirements yourself).
+USE_VENV      ?= 1
+VENV          := $(CURDIR)/venv
+REQUIREMENTS  := enterprise-semantic-governance/requirements.txt
+ifeq ($(USE_VENV),1)
+PYTHON        := $(VENV)/bin/python3
+PY_READY      := $(VENV)/.installed
+else
+PYTHON        ?= python3
+PY_READY      :=
+endif
+SEMTOOL := $(PYTHON) enterprise-semantic-governance/tools/semtool.py
 TEMPLATE := domains/domain-template
 # Every sub-domain (a folder with semantic.yaml under domains/<business-domain>/) and every parent layer.
 SUBDOMAINS := $(patsubst %/semantic.yaml,%,$(wildcard domains/*/*/semantic.yaml))
@@ -14,7 +32,22 @@ ROBOT_JAR     ?= $(TOOLS_DIR)/robot-$(ROBOT_VERSION).jar
 ROBOT_URL     := https://github.com/ontodev/robot/releases/download/$(ROBOT_VERSION)/robot.jar
 export ROBOT_JAR
 
-.PHONY: help tools check-java env clean-tools fibo verify verify-governance verify-fibo verify-domains verify-template drift changes selftest align hermit taxonomy capabilities codeowners list
+# ---- FIBO and its OMG dependencies ----------------------------------------------------------
+# FIBO is a git submodule pinned by the repository (gitlink). It is (re)checked out when missing or
+# when the pin changes. FIBO's OMG Commons + LCC imports are fetched from www.omg.org into
+# fibo-extensions/vendor/omg/ (git-ignored) once per FIBO pin. If www.omg.org can't be reached the
+# build continues with a warning (reasoning runs without them) and the fetch is retried next time;
+# SKIP_OMG=1 skips it.
+FIBO_DIR      := fibo-extensions/vendor/fibo
+OMG_DIR       := fibo-extensions/vendor/omg
+FIBO_PIN      := $(shell git ls-files -s $(FIBO_DIR) 2>/dev/null | awk '{print $$2}')
+FIBO_READY    := $(TOOLS_DIR)/fibo-$(or $(FIBO_PIN),unpinned).stamp
+OMG_READY     := $(OMG_DIR)/.fetched-$(or $(FIBO_PIN),unpinned)
+
+# Everything the reasoning targets need.
+REASONING_DEPS := $(PY_READY) tools $(FIBO_READY) $(OMG_READY)
+
+.PHONY: help setup python tools check-java omg env clean-tools fibo verify verify-governance verify-fibo verify-domains verify-template drift changes selftest align hermit taxonomy capabilities codeowners list
 
 # `make` or `make help` lists the targets. Full reference: docs/framework/08-validation-tooling.md
 help:
@@ -29,15 +62,35 @@ help:
 	@echo "  make taxonomy          taxonomy/source/*.md  -> taxonomy/enterprise-taxonomy.ttl"
 	@echo "  make capabilities      capabilities/source + curation.yaml -> capability-map.ttl + data-quality-report.md"
 	@echo "  make codeowners        domain-manifest.ttl -> CODEOWNERS for every sub-domain"
-	@echo "Setup and info"
-	@echo "  make tools             check Java (>= $(JAVA_MIN)) and download ROBOT $(ROBOT_VERSION) to build/tools/ (automatic for targets that reason)"
+	@echo "Setup (all automatic when a target needs it; listed for doing it up front)"
+	@echo "  make setup             everything below: Python venv, Java check, ROBOT, FIBO checkout, OMG dependencies"
+	@echo "  make python            venv/ with the Python requirements (USE_VENV=0 to use your own python3)"
+	@echo "  make tools             check Java (>= $(JAVA_MIN)) and download ROBOT $(ROBOT_VERSION) to build/tools/"
+	@echo "  make fibo              check out FIBO at the pinned commit"
+	@echo "  make omg               fetch FIBO's OMG Commons + LCC dependencies (SKIP_OMG=1 to skip)"
 	@echo "  make env               print 'export ROBOT_JAR=...' for running semtool directly: eval \"\$$(make -s env)\""
-	@echo "  make clean-tools       remove build/tools/ (downloaded on next use)"
-	@echo "  make fibo              check out FIBO (pinned submodule)"
+	@echo "  make clean-tools       remove build/tools/ and the OMG download (fetched again on next use)"
 	@echo "  make list              list business domains and sub-domains"
 	@echo "  make verify-template   generate the worked examples from the template and verify them"
 
-# ---- Toolchain ------------------------------------------------------------------------------
+# ---- Setup ----------------------------------------------------------------------------------
+setup: $(PY_READY) tools $(FIBO_READY) $(OMG_READY)
+	@echo "Setup complete."
+
+python: $(PY_READY)
+
+# PYTHON_BOOT is the interpreter that creates the venv (e.g. make setup PYTHON_BOOT=python3.12).
+PYTHON_BOOT ?= python3
+$(VENV)/.installed: $(REQUIREMENTS)
+	@command -v $(PYTHON_BOOT) >/dev/null 2>&1 || { echo "ERROR: $(PYTHON_BOOT) not found. Install Python >= 3.10 (macOS: brew install python@3.12)"; exit 1; }
+	@$(PYTHON_BOOT) -c 'import sys; sys.exit(sys.version_info < (3, 10))' || { \
+	   echo "ERROR: $$($(PYTHON_BOOT) --version 2>&1) is too old; Python >= 3.10 is required."; \
+	   echo "       Install one (macOS: brew install python@3.12) and run: make setup PYTHON_BOOT=python3.12"; exit 1; }
+	@test -x $(PYTHON) || { echo "Creating Python virtualenv in venv/ ($$($(PYTHON_BOOT) --version 2>&1))"; $(PYTHON_BOOT) -m venv $(VENV); }
+	@echo "Installing Python requirements into venv/"
+	@$(VENV)/bin/pip install -q --disable-pip-version-check -r $(REQUIREMENTS)
+	@touch $@
+
 tools: check-java $(ROBOT_JAR)
 	@echo "ROBOT ready: $(ROBOT_JAR)"
 
@@ -64,70 +117,102 @@ $(ROBOT_JAR): | check-java
 	@java -jar $@.part --version >/dev/null 2>&1 || { rm -f $@.part; echo "ERROR: downloaded file is not a working ROBOT jar"; exit 1; }
 	@mv $@.part $@
 
-# For running semtool outside make:  eval "$$(make -s env)"
+# For running semtool outside make:  eval "$$(make -s env)"  (activates nothing; just sets ROBOT_JAR)
 env:
 	@echo "export ROBOT_JAR=$(ROBOT_JAR)"
 
 clean-tools:
-	rm -rf $(TOOLS_DIR)
+	rm -rf $(TOOLS_DIR) $(OMG_DIR)
 
-# FIBO is a git submodule pinned to a release. Works whether this is one monorepo
-# (submodule registered at the root) or separate repositories (registered in fibo-extensions).
-fibo:
-	git submodule update --init --depth 1 fibo-extensions/vendor/fibo 2>/dev/null || git -C fibo-extensions submodule update --init --depth 1
+fibo: $(FIBO_READY)
+
+# Check out FIBO at the pinned commit (monorepo: submodule at the root; split repos: in fibo-extensions).
+$(FIBO_READY):
+	@mkdir -p $(dir $@)
+	@if [ -n "$(FIBO_PIN)" ]; then \
+	   echo "Checking out FIBO at the pinned commit $(FIBO_PIN)"; \
+	   git submodule update --init --depth 1 $(FIBO_DIR) 2>/dev/null \
+	   || git -C fibo-extensions submodule update --init --depth 1 2>/dev/null \
+	   || echo "WARNING: could not update the FIBO submodule; using the existing checkout"; \
+	 fi
+	@test -f $(FIBO_DIR)/catalog-v001.xml || { \
+	   echo "ERROR: FIBO is not checked out in $(FIBO_DIR). Clone the repository with git (FIBO is a submodule)"; \
+	   echo "       and make sure github.com/edmcouncil/fibo is reachable."; exit 1; }
+	@rm -f $(TOOLS_DIR)/fibo-*.stamp; touch $@
+
+# `make omg` (re)tries the fetch explicitly, e.g. after a failed automatic attempt.
+omg:
+	@rm -f $(OMG_DIR)/.failed-*
+	@$(MAKE) --no-print-directory $(OMG_READY)
+
+# Automatic: attempted once per FIBO pin. A failure is a warning, never a build failure; it is
+# remembered (.failed-<pin>) so later runs don't retry until `make omg`. SKIP_OMG=1 skips it.
+$(OMG_READY): $(FIBO_READY)
+	@if [ -n "$(SKIP_OMG)" ]; then exit 0; fi; \
+	 failed=$(OMG_DIR)/.failed-$(or $(FIBO_PIN),unpinned); \
+	 if [ -f $$failed ]; then \
+	   echo "Note: FIBO's OMG Commons/LCC dependencies are not available (last fetch failed); reasoning runs without them. Retry: make omg"; exit 0; fi; \
+	 echo "Fetching FIBO's OMG Commons + LCC dependencies into $(OMG_DIR)"; \
+	 if bash fibo-extensions/scripts/fetch-omg-dependencies.sh; then \
+	   rm -f $(OMG_DIR)/.fetched-* $(OMG_DIR)/.failed-*; touch $@; \
+	 else \
+	   mkdir -p $(OMG_DIR); touch $$failed; \
+	   echo "WARNING: OMG Commons/LCC could not be fetched (is www.omg.org reachable?). Reasoning continues without"; \
+	   echo "         them (closure warns 'unresolved imports'). Retry later with: make omg"; \
+	 fi
 
 verify: verify-governance verify-fibo verify-domains verify-template
 
-verify-governance:
+verify-governance: $(PY_READY)
 	$(SEMTOOL) verify --repo enterprise-semantic-governance
 
-verify-fibo: tools
+verify-fibo: $(REASONING_DEPS)
 	$(SEMTOOL) verify --repo fibo-extensions
 
 # Sub-domains first, then each business domain's parent layer (reasons over all its sub-domains together).
-verify-domains: tools
+verify-domains: $(REASONING_DEPS)
 	@set -e; for d in $(SUBDOMAINS) $(BUSINESS_DOMAINS); do $(SEMTOOL) verify --repo $$d; done
 
 # Generate throw-away sub-domains from the template (both worked examples) and run every gate on them.
-verify-template: tools
+verify-template: $(REASONING_DEPS)
 	rm -rf _template-check
-	python3 $(TEMPLATE)/scripts/new_domain.py --answers $(TEMPLATE)/answers/rwm-fp.yaml --out _template-check/rwm/financial-planning --no-git
-	python3 $(TEMPLATE)/scripts/new_domain.py --answers $(TEMPLATE)/answers/rwm-ia.yaml --out _template-check/rwm/insights-and-analytics --no-git
+	$(PYTHON) $(TEMPLATE)/scripts/new_domain.py --answers $(TEMPLATE)/answers/rwm-fp.yaml --out _template-check/rwm/financial-planning --no-git
+	$(PYTHON) $(TEMPLATE)/scripts/new_domain.py --answers $(TEMPLATE)/answers/rwm-ia.yaml --out _template-check/rwm/insights-and-analytics --no-git
 	$(SEMTOOL) verify --repo _template-check/rwm/financial-planning
 	$(SEMTOOL) verify --repo _template-check/rwm/insights-and-analytics
 	rm -rf _template-check
 
 # Gate G8 on its own: facts repeated across files agree, generated files are current (also part of `verify`).
-drift:
+drift: $(PY_READY)
 	@set -e; for d in enterprise-semantic-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) drift --repo $$d; done
 
 # Pull requests: every changed module bumps its version by at least its change class; changed knowledge
 # bumps the collection version; changes to machine-checked standards carry an ADR.  make changes BASE=origin/main
 BASE ?= origin/main
-changes:
+changes: $(PY_READY)
 	@set -e; for d in enterprise-semantic-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) changes --base $(BASE) --repo $$d $(if $(STRICT),--strict,); done
 
 # Self-test of the tooling: each check must catch a seeded defect (enterprise-semantic-governance/tools/tests).
-selftest:
-	python3 enterprise-semantic-governance/tools/tests/selftest.py
+selftest: $(PY_READY)
+	$(PYTHON) enterprise-semantic-governance/tools/tests/selftest.py
 
 # How each sub-domain lines up with the template (unchanged / edited / added / seed-only).
-align:
-	@rc=0; for d in $(SUBDOMAINS); do echo "== $$d"; out=$$(python3 $(TEMPLATE)/scripts/compare_domain.py $$d) || rc=1; \
+align: $(PY_READY)
+	@rc=0; for d in $(SUBDOMAINS); do echo "== $$d"; out=$$($(PYTHON) $(TEMPLATE)/scripts/compare_domain.py $$d) || rc=1; \
 	  echo "$$out" | awk '/^(DRIFTED|MISSING)/{p=1} /^$$/{p=0} p'; echo "$$out" | tail -1; done; exit $$rc
 
 # Full OWL DL reasoning (HermiT) over each business domain with all its sub-domains and FIBO.
-hermit: tools
+hermit: $(REASONING_DEPS)
 	@set -e; for d in $(BUSINESS_DOMAINS); do $(SEMTOOL) reason --reasoner HermiT --repo $$d; done
 
-taxonomy:
+taxonomy: $(PY_READY)
 	$(SEMTOOL) taxonomy --repo enterprise-semantic-governance
 
-capabilities:
+capabilities: $(PY_READY)
 	$(SEMTOOL) capabilities --repo enterprise-semantic-governance
 
 # Regenerate every sub-domain's CODEOWNERS from its domain-manifest.ttl (commit the result).
-codeowners:
+codeowners: $(PY_READY)
 	@set -e; for d in $(SUBDOMAINS); do $(SEMTOOL) codeowners --repo $$d; done
 
 list:

@@ -238,7 +238,7 @@ flowchart LR
 `semtool closure` never downloads. It resolves each `owl:imports` IRI to a local file:
 
 1. It scans every `.ttl` in the governance repository, FIBO extensions, the repository under test and its dependencies, and maps each `owl:Ontology` IRI to its file.
-2. It then reads FIBO's `catalog-v001.xml` and the OMG `catalog-v001.xml` (fetched by `scripts/fetch-omg-dependencies.sh`) to map FIBO and OMG IRIs to files under `vendor/`.
+2. It then reads FIBO's `catalog-v001.xml` and the OMG `catalog-v001.xml` (fetched automatically by `make`, see `make omg`) to map FIBO and OMG IRIs to files under `vendor/`.
 3. It follows imports transitively from the roots: own modules, enterprise core and alignment, and the profile. It merges everything into `build/closure.ttl`, and records unresolved IRIs in `build/closure-unresolved.json`. It warns about them rather than failing, because OMG Commons and LCC are absent until `vendor/omg` has been fetched.
 
 This is why the **ontology IRI in a file's header is load-bearing**. If a header IRI changes without every importer changing too, the import stops resolving. The closure only warns, and the reasoner then checks less than intended. D1, D3, D4 and D6 catch the usual versions of that mistake: version IRIs, manifest module lists, dependency imports and umbrella imports. E3 rejects an import of a module that is no longer published.

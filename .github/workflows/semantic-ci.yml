@@ -19,17 +19,18 @@ jobs:
         with: { python-version: "3.11" }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: "17" }
-      - name: Cache ROBOT (build/tools)
+      - name: FIBO pin (cache key)
+        id: pin
+        run: echo "fibo=$(git ls-files -s fibo-extensions/vendor/fibo | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - name: Cache ROBOT and FIBO's OMG dependencies
         uses: actions/cache@v4
         with:
-          path: build/tools
-          key: robot-${{ hashFiles('Makefile') }}
-      - name: Install tooling
-        run: |
-          pip install -r enterprise-semantic-governance/requirements.txt
-          make tools            # checks Java, downloads ROBOT to build/tools/ (make exports ROBOT_JAR)
-      - name: Fetch FIBO's OMG Commons / LCC dependencies
-        run: bash fibo-extensions/scripts/fetch-omg-dependencies.sh
+          path: |
+            build/tools
+            fibo-extensions/vendor/omg
+          key: deps-${{ hashFiles('Makefile') }}-${{ steps.pin.outputs.fibo }}
+      - name: Set up (venv, Java check, ROBOT, FIBO, OMG Commons/LCC)
+        run: make setup
       - name: Verify (gates G1-G8)
         run: make verify
       - name: Version bumps match change classes (pull requests)

@@ -182,7 +182,7 @@ CLEAN_CHANGES = [
 # ---- runner ---------------------------------------------------------------------------------------
 
 def copy_repo(dest: Path):
-    ignore = shutil.ignore_patterns(".git", "vendor", "build", "_template-check", "__pycache__", "*.tar.gz")
+    ignore = shutil.ignore_patterns(".git", "vendor", "venv", "build", "_template-check", "__pycache__", "*.tar.gz")
     shutil.copytree(ROOT, dest, ignore=ignore)
     (dest / FX / "vendor").mkdir(exist_ok=True)
 
