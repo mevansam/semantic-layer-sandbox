@@ -74,9 +74,10 @@ Install **Java** (JDK 11+, 17 recommended; macOS `brew install --cask temurin@17
 All of these are git-ignored. To do everything up front instead:
 
 ```bash
-make setup                                                          # venv, Java check, ROBOT, FIBO, OMG Commons/LCC
+make setup    # venv, Java check, ROBOT, FIBO, OMG Commons/LCC
+make list     # business domains and sub-domains found
+
 alias semtool='venv/bin/python3 enterprise-semantic-governance/tools/semtool.py'   # used in the examples below
-make list                                                           # business domains and sub-domains found
 ```
 
 Notes:
