@@ -30,7 +30,8 @@ let mermaidSeq = 0;
 function loadMermaid() {
   if (!mermaidLoad) {
     mermaidLoad = import("mermaid").then((m) => {
-      m.default.initialize({ startOnLoad: false, securityLevel: "strict", theme: "neutral", fontFamily: "inherit" });
+      // SVG text labels (not HTML in foreignObject): they survive sanitising and need no extra rules
+      m.default.initialize({ startOnLoad: false, securityLevel: "strict", theme: "neutral", fontFamily: "inherit", htmlLabels: false, flowchart: { htmlLabels: false } });
       return m.default;
     });
   }

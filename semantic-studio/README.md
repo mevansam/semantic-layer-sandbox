@@ -53,6 +53,8 @@ Press **Ctrl K** (or **/**) anywhere to search. The **Technical detail** switch 
 
 ## How it works
 
+The full description (build pipeline, data formats, the SPARQL store and engine, the browser app, the server, health data, deployment, how to extend it) is in [docs/architecture.md](docs/architecture.md). In brief:
+
 ```
 repositories ──▶ exporter/export_site_data.py ──▶ build/site/data/   meta, graph, docs, cards, health (JSON),
    + build/reports/*.json                                           kg.trig, files/
