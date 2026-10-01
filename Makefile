@@ -289,7 +289,7 @@ check-docker:
 # To add or upgrade a dependency: edit package.json, run `npm install` in semantic-studio/, commit both files.
 $(STUDIO_NODE_READY): $(STUDIO_DIR)/package.json $(STUDIO_DIR)/package-lock.json | check-node
 	@echo "Installing Semantic Studio's JavaScript dependencies into $(STUDIO_DIR)/node_modules/"
-	cd $(STUDIO_DIR) && npm ci --no-audit --no-fund || { \
+	@cd $(STUDIO_DIR) && npm ci --no-audit --no-fund || { \
 	  echo "ERROR: npm ci failed. If the npm proxy refused a package as too new, run: make studio-lock"; exit 1; }
 	@touch $@
 
