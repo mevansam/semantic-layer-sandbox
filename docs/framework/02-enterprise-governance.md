@@ -171,5 +171,6 @@ Enterprise-level decisions are ADRs in `enterprise-semantic-governance/docs/adr/
 | 0004 | Curated import of the capability map (partly amended by 0005) |
 | 0005 | Business domains with sub-domains; IRIs follow the folder layout |
 | 0006 | Consistency gate G8 and pull-request change-class check (no drift) |
+| 0007 | Known defects in the pinned FIBO/OMG release are patched out of the build closure only |
 
 Next: [Federated repository structure →](03-federated-repository-structure.md)

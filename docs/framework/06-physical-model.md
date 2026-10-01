@@ -241,6 +241,8 @@ flowchart LR
 2. It then reads FIBO's `catalog-v001.xml` and the OMG `catalog-v001.xml` (fetched automatically by `make`, see `make omg`) to map FIBO and OMG IRIs to files under `vendor/`.
 3. It follows imports transitively from the roots: own modules, enterprise core and alignment, and the profile. It merges everything into `build/closure.ttl`, and records unresolved IRIs in `build/closure-unresolved.json`. It warns about them rather than failing, because OMG Commons and LCC are absent until `vendor/omg` has been fetched.
 
+4. It removes the axioms of known defects in the pinned FIBO/OMG release, listed in `fibo-extensions/profile/upstream-issues.yaml` (ADR-0007), from `build/closure.ttl` only. `vendor/` is never modified.
+
 This is why the **ontology IRI in a file's header is load-bearing**. If a header IRI changes without every importer changing too, the import stops resolving. The closure only warns, and the reasoner then checks less than intended. D1, D3, D4 and D6 catch the usual versions of that mistake: version IRIs, manifest module lists, dependency imports and umbrella imports. E3 rejects an import of a module that is no longer published.
 
 Next: [Change management without drift →](07-change-management.md)

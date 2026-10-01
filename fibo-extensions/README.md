@@ -6,6 +6,7 @@ The enterprise's governed use of FIBO, and the mechanism through which business 
 |---|---|---|
 | `vendor/fibo/` | **FIBO, read-only**: git submodule pinned to `master_2026Q2` | EDM Council (upstream) |
 | `vendor/omg/` | FIBO's OMG Commons and LCC dependencies, fetched automatically by `make` (`scripts/fetch-omg-dependencies.sh`; git-ignored) | OMG (upstream) |
+| `profile/upstream-issues.yaml` | **Known defects in the pinned FIBO/OMG release**: axioms removed from the build closure only, never from `vendor/` (ADR-0007). Re-validated on every FIBO upgrade | semantic review board |
 | `profile/enterprise-fibo-profile.ttl` | **Enterprise FIBO profile**: the FIBO modules the enterprise adopts. Domains may import only these. | semantic review board |
 | `ontology/core/` | **Enterprise core**: FIBO specializations shared by several domains (each with one owning domain) | semantic review board hosts; owning domain decides meaning |
 | `ontology/alignment/` | Cross-domain alignment axioms (implements decisions from the governance alignment register) | semantic review board |

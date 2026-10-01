@@ -29,7 +29,7 @@ This document lists where each fact lives, what checks it, how versions work, an
 | Fact | Authoritative location | Also stated in | Kept in step by |
 |---|---|---|---|
 | Enterprise base IRI | governance `semantic.yaml` `base_iri` | every IRI in every file | `semtool rebase --all` (the only supported way to change it) |
-| FIBO release | governance `semantic.yaml` `fibo.release_tag` | `.gitmodules` branch; submodule checkout | **D10** |
+| FIBO release | governance `semantic.yaml` `fibo.release_tag` | `.gitmodules` branch; submodule checkout; `fibo_release` of the known-upstream-defects register | **D10** |
 | Which FIBO modules may be used | `fibo-extensions/profile/enterprise-fibo-profile.ttl` | domain `owl:imports` | **E3** |
 | A sub-domain's identity (name, code, namespace) | the folder path (ADR-0005) and the registry entry | `semantic.yaml` `domain.*`; manifest `ent-gov:namespace` and `describesDomain`; `.copier-answers.yml`; capability-map label | **D2**, E2 |
 | A sub-domain's place in the business domain | capability map (`isSubDomainOf`, generated from `curation.yaml`) | the folder location; parent `semantic.yaml` `sub_domains`; parent manifest `includesSubDomain` | **D2**, **D6**, **D9** |
@@ -62,7 +62,7 @@ This document lists where each fact lives, what checks it, how versions work, an
 | **D7** | Every registered, non-reserved domain has its folder with a matching namespace; published modules exist; codes and namespaces are unique; ontology-domain umbrellas import only registered domains | fibo-extensions |
 | **D8** | Alignment decisions refer to terms that still exist and to domains in the capability map; enterprise-core owning domains are registered | governance |
 | **D9** | Taxonomy, capability map, data-quality report and every `CODEOWNERS` equal a fresh regeneration; `curation.yaml` `sub_domains` = each business domain's `semantic.yaml` `sub_domains` (which D6 ties to the folders) | governance |
-| **D10** | The FIBO branch pinned in `.gitmodules` (root and `fibo-extensions/`), and the checked-out tag when available, = `fibo.release_tag`; warns if nothing pins a branch | governance |
+| **D10** | The FIBO branch pinned in `.gitmodules` (root and `fibo-extensions/`), the commit of the release tag (fetched by `make`), and `fibo_release` in `fibo-extensions/profile/upstream-issues.yaml` all equal `fibo.release_tag`; notes if nothing pins a branch or the tag is unavailable | governance |
 
 Every check is mutation-tested by `make selftest`: each code has at least one seeded defect it must catch ([doc 8 §8.7](08-validation-tooling.md#87-self-test-testing-the-checks-themselves)).
 
@@ -258,12 +258,15 @@ Each playbook lists the steps, then what catches a missed step.
 
 1. Follow `fibo-extensions/docs/upgrading-fibo.md`:
    - move the submodule to the new `master_YYYYQn` tag
-   - update the `.gitmodules` branch **and** `fibo.release_tag` in governance `semantic.yaml`
-   - re-fetch the OMG dependencies
-2. `make verify` and `make hermit`. Fix domain classes whose FIBO parent was deprecated or moved (owning domains, before merge).
-3. List the relevant FIBO release notes in the PR.
+   - update the `.gitmodules` branch **and** `fibo.release_tag` in governance `semantic.yaml` (`make` then fetches the new OMG dependencies itself)
+2. Re-validate every entry of `fibo-extensions/profile/upstream-issues.yaml` (known FIBO/OMG defects, ADR-0007):
+   - remove entries fixed upstream (`closure` reports them as no longer applying)
+   - record any new defect that makes the closure incoherent
+   - set `fibo_release` to the new tag
+3. `make verify` and `make hermit`. Fix domain classes whose FIBO parent was deprecated or moved (owning domains, before merge).
+4. List the relevant FIBO release notes in the PR.
 
-*Caught if missed:* D10 (pin mismatch), G4 (parents gone or incoherent), E1 (FIBO IRIs now used differently).
+*Caught if missed:* D10 (pin mismatch, or the defects register not re-validated), G4 (parents gone or incoherent; new upstream defects), E1 (FIBO IRIs now used differently).
 
 #### Change a standard (meta-shape, structure standard, control, meta-model)
 

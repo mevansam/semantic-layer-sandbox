@@ -60,7 +60,7 @@ Run from the repository root. Each target exits non-zero on failure, so they can
 | `make changes BASE=<ref> [STRICT=1]` | `semtool changes --base <ref>` for every repository (default `BASE=origin/main`; `STRICT=1` adds `--strict`) | PR check | ~1 s |
 | `make hermit` | full OWL DL reasoning (HermiT) over each business domain with all its sub-domains and FIBO | G4 (complete) | ~25 s |
 | `make align` | `compare_domain.py` for every sub-domain; fails if a template-owned file drifted or a template file is missing | template conformance | ~5 s |
-| `make selftest` | seeds 30 defects one at a time and expects each to be caught, plus one correct change that must pass | the checks themselves | ~30 s |
+| `make selftest` | seeds 31 defects one at a time and expects each to be caught, plus one correct change that must pass | the checks themselves | ~30 s |
 | `make taxonomy` | regenerate `taxonomy/enterprise-taxonomy.ttl` | generator | |
 | `make capabilities` | regenerate `capabilities/capability-map.ttl` and `data-quality-report.md` | generator | |
 | `make codeowners` | regenerate `CODEOWNERS` in every sub-domain | generator | |
@@ -164,6 +164,7 @@ The FIBO extension rules:
 
 #### `closure` and `reason` (G4)
 - `closure` resolves `owl:imports` transitively (own modules, dependencies' published modules, enterprise core and alignment, the FIBO profile; FIBO and OMG through XML catalogs) and writes `build/closure.ttl`, plus `build/closure-unresolved.json`. Unresolved imports are a **warning**.
+- **Known upstream defects.** Axioms listed in `fibo-extensions/profile/upstream-issues.yaml` (ADR-0007) are removed from `build/closure.ttl`, never from `vendor/`. `closure` reports the entries it applied, for example `(known upstream defects patched out: UP-001)`. It warns when an entry no longer applies, which usually means it was fixed upstream.
 - `reason` classifies the closure with ROBOT and writes `build/reasoned.ttl`. Options: `--reasoner ELK` (default, fast, OWL EL) or `--reasoner HermiT` (complete OWL DL; `make hermit`). It **fails** on unsatisfiable classes or inconsistency, and names the first unsatisfiable class.
 - **Fix:** an unsatisfiable class usually means conflicting parents or restrictions, often between two sub-domains. Find the axioms that meet in that class. If they come from different domains, it is an alignment question (standard 07).
 
@@ -285,8 +286,8 @@ A check that silently stops failing is worse than no check. The self-test:
 1. Copies the repository to a temporary folder, commits it there as a git baseline, and confirms that every command it will use passes on the clean copy.
 2. Runs each **scenario**. A scenario seeds one defect, runs one command against one repository, and expects a failure containing specific text.
 
-There are 30 defect scenarios:
-- all drift codes, D1–D10
+There are 31 defect scenarios:
+- all drift codes, D1–D10 (D10 twice: the FIBO pin, and the known-defects register after a FIBO change)
 - E1–E3
 - a dependency cycle and a rule without a policy source (G2)
 - two structure cases (G1)
@@ -343,6 +344,8 @@ Make the CI job a required status check on `main`, together with CODEOWNERS revi
 |---|---|---|
 | `No semantic.yaml in …` | `--repo` doesn't point at a repository folder | point at `enterprise-semantic-governance`, `fibo-extensions`, `domains/<bd>` or `domains/<bd>/<sd>` |
 | `WARN closure: unresolved imports skipped … Commons x20, LCC x1` | FIBO's OMG dependencies aren't downloaded (www.omg.org unreachable when `make` tried) | `make omg` when you have access (optional; every other check is unaffected) |
+| `FAIL reason (…): There are N unsatisfiable properties/classes` listing only FIBO/OMG IRIs | a defect in the pinned FIBO/OMG release (often only visible once OMG Commons is downloaded) | follow §8.10 "When reasoning fails on a FIBO or OMG term"; record it in `upstream-issues.yaml` (ADR-0007) |
+| `WARN D10 release tag … is not available in the FIBO checkout` | the FIBO tag couldn't be fetched (offline) | run any `make` target with network access; D10 then compares the checkout with the release |
 | `FAIL reason (ELK): 'robot' not found …` (or `'java'`) | ROBOT or Java isn't available to a direct `semtool` call | run `make tools` (or any `make` target that reasons) |
 | `ERROR: Java not found` / `'java' is on the PATH but does not run` / `Java 8 found; ROBOT needs Java >= 11` (from `make`) | no JDK, a stub `java` without a JDK (macOS), or a JDK that is too old | install a JDK 17 (see §8.2) and open a new shell |
 | `ERROR: download failed: https://github.com/ontodev/robot/…` | no network access to GitHub releases | download `robot.jar` elsewhere and use `make verify ROBOT_JAR=/path/robot.jar` |
@@ -360,6 +363,17 @@ Make the CI job a required status check on `main`, together with CODEOWNERS revi
 | `NOT ALIGNED … template-owned file(s) drifted` (`make align`) | CI, `.gitignore` or `semantic.yaml` wiring edited in a sub-domain | revert, or change the template and re-render / `copier update` |
 | `BASELINE FAILS` (`make selftest`) | the repository itself doesn't pass | run `make verify` first; the self-test needs a clean baseline |
 | `MISSED <scenario>` (`make selftest`) | a check no longer catches its defect | fix the check (or, if the scenario's mutation no longer applies, update the scenario) |
+
+### When reasoning fails on a FIBO or OMG term
+
+If `reason` lists only `https://spec.edmcouncil.org/…` or `https://www.omg.org/…` terms as unsatisfiable, the defect is in the pinned FIBO/OMG release, not in this repository. `semtool` says so. Rule E1 means we don't edit FIBO, so:
+
+1. **Find the conflict.** Look up the term in `build/closure.ttl` of the failing repository. For a property, compare its `rdfs:domain` and `rdfs:range` with those of its `rdfs:subPropertyOf` parents. For a class, compare its parents and restrictions. Then look for `owl:disjointWith` or `owl:AllDisjointClasses` between the classes involved. Example (UP-001): `hasVestedInIt` has a role as its domain, its parent `hasCapacity` has domain `Party`, and OMG Commons declares `Party` disjoint with `Role`.
+2. **Pick the smallest fix.** Choose the one axiom whose removal makes the closure coherent. Confirm it with ROBOT on a copy of the closure, for example `java -jar build/tools/robot-*.jar reason --reasoner HermiT --input <patched copy>`.
+3. **Record it** as a new entry in `fibo-extensions/profile/upstream-issues.yaml`: evidence, resolution, upstream report, and the exact `remove` triple(s). The entry needs semantic review.
+4. **Run `make verify hermit`**, and report the defect to the EDM Council.
+
+If the unsatisfiable terms are enterprise or domain terms, the problem is ours. Check their parents, restrictions, domains and ranges, and any cross-sub-domain imports.
 
 ## 8.11 Extending the tooling
 

@@ -41,7 +41,8 @@ export ROBOT_JAR
 FIBO_DIR      := fibo-extensions/vendor/fibo
 OMG_DIR       := fibo-extensions/vendor/omg
 FIBO_PIN      := $(shell git ls-files -s $(FIBO_DIR) 2>/dev/null | awk '{print $$2}')
-FIBO_READY    := $(TOOLS_DIR)/fibo-$(or $(FIBO_PIN),unpinned).stamp
+FIBO_TAG      := $(shell sed -n 's/^ *release_tag: *//p' enterprise-semantic-governance/semantic.yaml | head -1)
+FIBO_READY    := $(TOOLS_DIR)/fibo-$(or $(FIBO_PIN),unpinned)-$(FIBO_TAG).stamp
 OMG_READY     := $(OMG_DIR)/.fetched-$(or $(FIBO_PIN),unpinned)
 
 # Everything the reasoning targets need.
@@ -135,6 +136,8 @@ $(FIBO_READY):
 	   || git -C fibo-extensions submodule update --init --depth 1 2>/dev/null \
 	   || echo "WARNING: could not update the FIBO submodule; using the existing checkout"; \
 	 fi
+	@git -C $(FIBO_DIR) fetch -q --depth 1 origin tag $(FIBO_TAG) 2>/dev/null \
+	   || echo "Note: could not fetch FIBO tag $(FIBO_TAG); 'make drift' (D10) then can't confirm the checkout is that release"
 	@test -f $(FIBO_DIR)/catalog-v001.xml || { \
 	   echo "ERROR: FIBO is not checked out in $(FIBO_DIR). Clone the repository with git (FIBO is a submodule)"; \
 	   echo "       and make sure github.com/edmcouncil/fibo is reachable."; exit 1; }

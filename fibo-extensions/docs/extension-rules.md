@@ -12,6 +12,8 @@ These rules let many domains extend FIBO independently without fragmenting it.
 | E6 | **Terms shared by several domains move to enterprise core** after an alignment decision, and keep one owning domain. | Avoids duplicated meaning without centralizing ownership. | semantic review |
 | E7 | **Restrictions (OWL) express meaning; SHACL expresses rules.** Don't encode business policy thresholds as OWL axioms. | OWL is open-world and inferential; business rules are closed-world checks owned by rule owners. | semantic review |
 
+The one governed exception to E1 is a **known defect** in the pinned FIBO/OMG release that makes the closure incoherent. It is recorded in `profile/upstream-issues.yaml`, and its axiom is removed from the build closure only, never from `vendor/` (ADR-0007).
+
 ## Patterns
 
 ```turtle

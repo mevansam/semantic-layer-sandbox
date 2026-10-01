@@ -10,6 +10,9 @@ catalogs:
   - vendor/fibo/catalog-v001.xml
   - vendor/omg/catalog-v001.xml
 
+# Known defects in the pinned FIBO/OMG release, removed from the build closure only (ADR-0007).
+upstream_issues: profile/upstream-issues.yaml
+
 paths:
   ontology:
     - ontology/core/*.ttl

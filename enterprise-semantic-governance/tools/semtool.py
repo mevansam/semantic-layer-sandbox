@@ -816,15 +816,44 @@ def cmd_closure(repo: Repo, args) -> bool:
         for t in g:
             if t[1] != OWL.imports:
                 merged.add(t)
+    patched = apply_upstream_issues(repo, merged)
     out = repo.root / "build" / "closure.ttl"
     out.parent.mkdir(exist_ok=True)
     merged.serialize(str(out), format="turtle")
-    ok(f"closure: {len(loaded_files)} ontology files, {len(merged)} triples -> {out.relative_to(repo.root)}")
+    ok(f"closure: {len(loaded_files)} ontology files, {len(merged)} triples -> {out.relative_to(repo.root)}"
+       + (f" (known upstream defects patched out: {', '.join(patched)})" if patched else ""))
     if missing:
         warn("closure: unresolved imports skipped (FIBO's OMG Commons/LCC are missing: run `make omg` "
              "on a network that can reach omg.org): " + ", ".join(f"{k} x{v}" for k, v in sorted(missing.items())))
     (out.parent / "closure-unresolved.json").write_text(json.dumps(missing, indent=2))
     return True
+
+
+def upstream_issues(repo: Repo) -> dict:
+    fx = repo.fibo_extensions
+    rel = fx.cfg.get("upstream_issues") if fx else None
+    if not rel or not (fx.root / rel).exists():
+        return {}
+    return yaml.safe_load((fx.root / rel).read_text()) or {}
+
+
+def apply_upstream_issues(repo: Repo, g: Graph) -> list[str]:
+    """Remove the axioms of known FIBO/OMG defects from the build closure only (ADR-0007).
+    FIBO stays read-only: vendor/ is never modified. Entries whose axiom is absent are reported as stale."""
+    applied = []
+    for issue in upstream_issues(repo).get("issues", []) or []:
+        found = False
+        for ax in issue.get("remove", []) or []:
+            t = (URIRef(ax["subject"]), URIRef(ax["predicate"]), URIRef(ax["object"]))
+            if t in g:
+                g.remove(t)
+                found = True
+        if found:
+            applied.append(issue["id"])
+        else:
+            warn(f"closure: upstream issue {issue['id']} ({issue.get('title', '')}) no longer applies - the axiom is not in "
+                 "the closure (fixed upstream?). Re-validate and remove it from fibo-extensions/profile/upstream-issues.yaml")
+    return applied
 
 
 def robot_cmd() -> list[str]:
@@ -858,6 +887,14 @@ def cmd_reason(repo: Repo, args) -> bool:
         fail(f"reason ({args.reasoner}): " + (detail[0] if detail else (log[-1] if log else "error")))
         for d in detail[1:]:
             info(d)
+        bad = re.findall(r"unsatisfiable (?:class|property): (\S+)", "\n".join(detail))
+        if bad and all(b.startswith(EXTERNAL_PREFIXES) for b in bad):
+            info("All unsatisfiable entities are FIBO/OMG terms: this is a defect in the pinned FIBO/OMG release, not in")
+            info("this repository. Find the conflicting axioms (docs/framework/08-validation-tooling.md, troubleshooting),")
+            info("then record the defect in fibo-extensions/profile/upstream-issues.yaml (ADR-0007).")
+        elif bad:
+            info("Unsatisfiable enterprise/domain terms: check their parents, restrictions, domains and ranges, and any")
+            info("cross-sub-domain imports (an alignment question if two domains' axioms meet).")
         return False
     ok(f"reason ({args.reasoner}): closure is coherent, no unsatisfiable classes")
     return True
@@ -1480,14 +1517,23 @@ def cmd_drift(repo: Repo, args) -> bool:
                     check(m.group(1) == tag, "D10", f"{gm.relative_to(root)} pins FIBO branch {m.group(1)} but semantic.yaml fibo.release_tag is {tag}")
         if not pinned:
             notes.append("D10 no .gitmodules pins a FIBO branch; the pin is checked only against the checkout")
+        ui_file = fx_dir / "profile" / "upstream-issues.yaml"
+        if ui_file.exists():
+            ui = yaml.safe_load(ui_file.read_text()) or {}
+            check(str(ui.get("fibo_release")) == tag, "D10",
+                  f"fibo-extensions/profile/upstream-issues.yaml is for FIBO {ui.get('fibo_release')} but the pinned release is {tag}: "
+                  "re-validate every entry against the new release, then update fibo_release (ADR-0007)")
         vend = fx_dir / "vendor" / "fibo"
         if (vend / ".git").exists():
-            r = subprocess.run(["git", "-C", str(vend), "tag", "--points-at", "HEAD"], capture_output=True, text=True)
-            tags = r.stdout.split()
-            if tags:
-                check(tag in tags, "D10", f"FIBO checkout is at {tags} but semantic.yaml fibo.release_tag is {tag}")
+            def git_out(*a):
+                return subprocess.run(["git", "-C", str(vend), *a], capture_output=True, text=True).stdout.strip()
+            head, tag_commit = git_out("rev-parse", "HEAD"), git_out("rev-parse", "-q", "--verify", f"refs/tags/{tag}^{{commit}}")
+            if tag_commit:
+                check(head == tag_commit, "D10", f"FIBO checkout is at {head[:12]} but release tag {tag} is {tag_commit[:12]}: "
+                      "the submodule pin and fibo.release_tag disagree")
             else:
-                notes.append("D10 FIBO checkout has no tag at HEAD (shallow clone?); pin not verified against the checkout")
+                notes.append(f"D10 release tag {tag} is not available in the FIBO checkout (make fetches it; offline?); "
+                             "the checkout was not compared with the release")
 
     for n in notes:
         warn(n)

@@ -1,0 +1,34 @@
+# KNOWN UPSTREAM DEFECTS (FIBO / OMG Commons / LCC) - ADR-0007
+#
+# FIBO and its OMG dependencies are read-only (rule E1). When the pinned release contains a modelling
+# defect that makes the import closure incoherent, the offending axiom is listed here and removed from
+# the BUILD closure only (build/closure.ttl), never from vendor/. Everything else is reasoned as is, so
+# our own extensions are still checked against the rest of FIBO.
+#
+# Rules:
+# - one entry per defect, with evidence, the axiom(s) removed, and the upstream report
+# - `fibo_release` must equal fibo.release_tag in enterprise-semantic-governance/semantic.yaml;
+#   `make drift` (D10) fails after a FIBO upgrade until every entry is re-validated and the release updated
+# - an entry whose axiom no longer exists in the closure is reported as stale (fixed upstream): remove it
+# - changes to this file need semantic review board approval
+fibo_release: master_2026Q2
+
+issues:
+  - id: UP-001
+    title: "fibo-be-oac-exec:hasVestedInIt is unsatisfiable"
+    found: 2026-09-30
+    affects: [FIBO master_2026Q2 BE/OwnershipAndControl/Executives, OMG Commons 20250801]
+    evidence: >
+      hasVestedInIt has rdfs:domain cmns-ba:LegallyDelegatedAuthority, which is a role
+      (LegallyDelegatedAuthority -> AuthorizedParty -> PartyRole -> ... -> cmns-rlcmp:Role). It is declared
+      rdfs:subPropertyOf fibo-fnd-law-lcap:hasCapacity, whose rdfs:domain is cmns-pts:Party. OMG Commons
+      declares Party owl:disjointWith Role, so nothing can have the property: ELK and HermiT report it as
+      an unsatisfiable property. It only appears when OMG Commons is present (the disjointness is in Commons).
+    resolution: >
+      Drop the subPropertyOf link to hasCapacity (keeps the property's own domain, range and definition).
+      Verified: with this axiom removed, the fibo-extensions closure classifies with ELK and HermiT.
+    upstream: "to be raised with the EDM Council: https://github.com/edmcouncil/fibo/issues"
+    remove:
+      - subject:   https://spec.edmcouncil.org/fibo/ontology/BE/OwnershipAndControl/Executives/hasVestedInIt
+        predicate: http://www.w3.org/2000/01/rdf-schema#subPropertyOf
+        object:    https://spec.edmcouncil.org/fibo/ontology/FND/Law/LegalCapacity/hasCapacity

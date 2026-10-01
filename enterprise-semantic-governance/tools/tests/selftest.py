@@ -128,6 +128,8 @@ SCENARIOS = [
      lambda w: sub(w, f"{GOV}/taxonomy/source/enterprise-taxonomy.md", "Customers", "Clients & Customers"), "D9"),
     ("D10 FIBO pin mismatch", GOV, "drift",
      lambda w: sub(w, f"{FX}/.gitmodules", "branch = master_2026Q2", "branch = master_2026Q1"), "D10"),
+    ("D10 upstream defects not re-validated for the FIBO release", GOV, "drift",
+     lambda w: sub(w, f"{FX}/profile/upstream-issues.yaml", "fibo_release: master_2026Q2", "fibo_release: master_2026Q1"), "D10"),
     # G3 extension rules
     ("E1 statement about a FIBO term", FP, "extensions",
      lambda w: append(w, f"{FP}/ontology/planning.ttl",
