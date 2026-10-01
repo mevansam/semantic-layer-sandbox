@@ -172,5 +172,6 @@ Enterprise-level decisions are ADRs in `enterprise-semantic-governance/docs/adr/
 | 0005 | Business domains with sub-domains; IRIs follow the folder layout |
 | 0006 | Consistency gate G8 and pull-request change-class check (no drift) |
 | 0007 | Known defects in the pinned FIBO/OMG release are patched out of the build closure only |
+| 0008 | Semantic Studio: a read-only web view generated from the repositories |
 
 Next: [Federated repository structure →](03-federated-repository-structure.md)

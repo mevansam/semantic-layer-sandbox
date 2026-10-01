@@ -184,7 +184,7 @@ CLEAN_CHANGES = [
 # ---- runner ---------------------------------------------------------------------------------------
 
 def copy_repo(dest: Path):
-    ignore = shutil.ignore_patterns(".git", "vendor", "venv", "build", "_template-check", "__pycache__", "*.tar.gz")
+    ignore = shutil.ignore_patterns(".git", "vendor", "venv", "build", "_template-check", "__pycache__", "*.tar.gz", "node_modules")
     shutil.copytree(ROOT, dest, ignore=ignore)
     (dest / FX / "vendor").mkdir(exist_ok=True)
 
@@ -208,6 +208,9 @@ def main() -> int:
     pick = lambda sid: not a.k or any(k.lower() in sid.lower() for k in a.k)  # noqa: E731
     failures = 0
     t0 = time.time()
+    results = []
+    if not a.k:   # a full run replaces the report; one that stops early must not leave the previous one behind
+        (ROOT / "build" / "reports" / "selftest.json").unlink(missing_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp) / "base"
         copy_repo(base)
@@ -243,11 +246,22 @@ def main() -> int:
             failures += not ok
             detail = next((ln.strip()[:110] for ln in fails), "") if expect else ""
             print(f"{label} {sid:<48} {detail}")
+            results.append({"id": sid, "repo": repo, "command": command, "kind": "defect" if expect else "clean-change",
+                            "outcome": label.strip(), "ok": ok, "detail": detail})
             if not ok:
                 print("        " + "\n        ".join(out.strip().splitlines()[-8:]))
     total = sum(1 for s in SCENARIOS + CLEAN_CHANGES if pick(s[0]))
     print(f"\n{'OK' if not failures else 'FAILED'}: {total - failures}/{total} scenarios behave as expected "
           f"({time.time() - t0:.0f}s)")
+    if not a.k:   # a full run leaves a report for semantic-studio's Health page (build/ is git-ignored)
+        import datetime
+        import json
+        head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+        out = ROOT / "build" / "reports" / "selftest.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps({"command": "selftest", "finished": datetime.datetime.now(datetime.timezone.utc)
+                                   .strftime("%Y-%m-%dT%H:%M:%SZ"), "commit": head or None, "passed": not failures,
+                                   "total": total, "failures": failures, "scenarios": results}, indent=1) + "\n")
     return 1 if failures else 0
 
 

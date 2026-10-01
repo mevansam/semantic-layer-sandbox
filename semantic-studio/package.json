@@ -1,0 +1,29 @@
+{
+  "name": "semantic-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Semantic Studio: browse the enterprise semantic layer (Explore mode, read-only).",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --serve",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cytoscape": "3.33.3",
+    "dompurify": "3.4.2",
+    "marked": "18.0.3",
+    "mermaid": "11.14.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "esbuild": "0.27.7",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

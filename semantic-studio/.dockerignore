@@ -1,0 +1,6 @@
+# Only the sources and the exported data go into the image (see Dockerfile).
+node_modules
+build/*
+!build/site
+build/site/*
+!build/site/data

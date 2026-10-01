@@ -4,3 +4,4 @@ build/
 __pycache__/
 _template-check/
 fibo-extensions/vendor/omg/
+node_modules/

@@ -60,10 +60,19 @@ if not sys.stdout.isatty():
     RESET = RED = GREEN = YELLOW = BOLD = ""
 
 
-def ok(msg): print(f"{GREEN}PASS{RESET} {msg}")
-def warn(msg): print(f"{YELLOW}WARN{RESET} {msg}")
-def fail(msg): print(f"{RED}FAIL{RESET} {msg}")
-def info(msg): print(f"     {msg}")
+# Every message is also recorded, so each run can leave a machine-readable report in
+# build/reports/<command>.json (read by semantic-studio's Health page; see write_report).
+_MESSAGES: list[dict] = []
+
+
+def _record(level: str, msg) -> None:
+    _MESSAGES.append({"level": level, "text": str(msg)})
+
+
+def ok(msg): print(f"{GREEN}PASS{RESET} {msg}"); _record("pass", msg)
+def warn(msg): print(f"{YELLOW}WARN{RESET} {msg}"); _record("warn", msg)
+def fail(msg): print(f"{RED}FAIL{RESET} {msg}"); _record("fail", msg)
+def info(msg): print(f"     {msg}"); _record("info", msg)
 
 
 # =============================================================================
@@ -1790,14 +1799,58 @@ def cmd_verify(repo: Repo, args) -> bool:
         steps += [cmd_codeowners, cmd_rules, cmd_kg, cmd_cq, cmd_cards]
     results = []
     for step in steps:
+        start = len(_MESSAGES)
         try:
             results.append(step(repo, args))
         except Exception as e:  # noqa: BLE001
             fail(f"{step.__name__[4:]}: {type(e).__name__}: {e}")
             results.append(False)
+        name = step.__name__[4:]
+        _STEPS.append({"step": name, "gate": GATE_OF_STEP.get(name), "passed": results[-1],
+                       "messages": _MESSAGES[start:]})
     passed = all(results)
     (ok if passed else fail)(f"verify {repo.root.name}: {sum(results)}/{len(results)} checks passed")
     return passed
+
+
+# =============================================================================
+# run reports  (build/reports/<command>.json, read by semantic-studio)
+# =============================================================================
+
+# The gate each verify step belongs to (docs/framework/02-enterprise-governance.md); codeowners is
+# housekeeping (regenerates CODEOWNERS; D9 checks it is current).
+GATE_OF_STEP = {"syntax": "G1", "structure": "G1", "meta": "G2", "extensions": "G3", "closure": "G4",
+                "reason": "G4", "rules": "G5", "cq": "G6", "kg": "G7", "cards": "G7", "drift": "G8",
+                "codeowners": None}
+_STEPS: list[dict] = []
+REPORTED = {"verify", "syntax", "structure", "meta", "extensions", "closure", "reason", "rules", "cq", "kg",
+            "cards", "drift", "changes"}
+
+
+def _now() -> str:
+    import datetime
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def write_report(repo: Repo, args, passed: bool, started: str) -> None:
+    """Leave the outcome of this run where tools can read it: the checks run, pass/fail and every message.
+    Reports are build output (git-ignored); a failure to write one never fails the check."""
+    if args.command not in REPORTED:
+        return
+    name = args.command + (f"-{args.reasoner.lower()}" if args.command == "reason" else "")
+    steps = _STEPS or [{"step": args.command, "gate": GATE_OF_STEP.get(args.command), "passed": passed,
+                        "messages": _MESSAGES}]
+    try:
+        head = subprocess.run(["git", "-C", str(repo.root), "rev-parse", "HEAD"], capture_output=True,
+                              text=True).stdout.strip()
+        report = {"command": args.command, "reasoner": args.reasoner if args.command == "reason" else None,
+                  "repo": repo.root.name, "kind": repo.kind, "started": started, "finished": _now(),
+                  "commit": head or None, "passed": passed, "steps": steps}
+        out = repo.root / "build" / "reports" / f"{name}.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(report, indent=1) + "\n")
+    except OSError:
+        pass
 
 
 # =============================================================================
@@ -1817,7 +1870,11 @@ def main():
     fn = globals().get("cmd_" + args.command.replace("-", "_"))
     if not fn:
         sys.exit(f"unknown command {args.command}")
-    sys.exit(0 if fn(Repo(args.repo), args) else 1)
+    repo = Repo(args.repo)
+    started = _now()
+    passed = bool(fn(repo, args))
+    write_report(repo, args, passed, started)
+    sys.exit(0 if passed else 1)
 
 
 if __name__ == "__main__":

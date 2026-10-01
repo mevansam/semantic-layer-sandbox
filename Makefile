@@ -48,7 +48,8 @@ OMG_READY     := $(OMG_DIR)/.fetched-$(or $(FIBO_PIN),unpinned)
 # Everything the reasoning targets need.
 REASONING_DEPS := $(PY_READY) tools $(FIBO_READY) $(OMG_READY)
 
-.PHONY: help setup python tools check-java omg env clean-tools fibo verify verify-governance verify-fibo verify-domains verify-template drift changes selftest align hermit taxonomy capabilities codeowners list
+.PHONY: help setup python tools check-java omg env clean-tools fibo verify verify-governance verify-fibo verify-domains verify-template drift changes selftest align hermit taxonomy capabilities codeowners list \
+        studio studio-data studio-app studio-serve studio-docker studio-fresh check-node check-docker clean-studio
 
 # `make` or `make help` lists the targets. Full reference: docs/framework/08-validation-tooling.md
 help:
@@ -73,6 +74,12 @@ help:
 	@echo "  make clean-tools       remove build/tools/ and the OMG download (fetched again on next use)"
 	@echo "  make list              list business domains and sub-domains"
 	@echo "  make verify-template   generate the worked examples from the template and verify them"
+	@echo "Semantic Studio (semantic-studio/README.md)"
+	@echo "  make studio            export the data and build the site into semantic-studio/build/site (needs Node >= $(NODE_MIN))"
+	@echo "  make studio-serve      build, then serve it with SPARQL on http://localhost:$(STUDIO_PORT)/"
+	@echo "  make studio-docker     export the data, then build and run the studio in Docker (Node not needed)"
+	@echo "  make studio-fresh      verify + hermit + selftest first, so the Health page is current, then studio"
+	@echo "  make studio-data       export the data only (semantic-studio/build/site/data)"
 
 # ---- Setup ----------------------------------------------------------------------------------
 setup: $(PY_READY) tools $(FIBO_READY) $(OMG_READY)
@@ -173,8 +180,9 @@ verify-fibo: $(REASONING_DEPS)
 	$(SEMTOOL) verify --repo fibo-extensions
 
 # Sub-domains first, then each business domain's parent layer (reasons over all its sub-domains together).
+# Every repository is verified even when an earlier one fails (so each has a current report); fails at the end.
 verify-domains: $(REASONING_DEPS)
-	@set -e; for d in $(SUBDOMAINS) $(BUSINESS_DOMAINS); do $(SEMTOOL) verify --repo $$d; done
+	@rc=0; for d in $(SUBDOMAINS) $(BUSINESS_DOMAINS); do $(SEMTOOL) verify --repo $$d || rc=1; done; exit $$rc
 
 # Generate throw-away sub-domains from the template (both worked examples) and run every gate on them.
 verify-template: $(REASONING_DEPS)
@@ -206,7 +214,7 @@ align: $(PY_READY)
 
 # Full OWL DL reasoning (HermiT) over each business domain with all its sub-domains and FIBO.
 hermit: $(REASONING_DEPS)
-	@set -e; for d in $(BUSINESS_DOMAINS); do $(SEMTOOL) reason --reasoner HermiT --repo $$d; done
+	@rc=0; for d in $(BUSINESS_DOMAINS); do $(SEMTOOL) reason --reasoner HermiT --repo $$d || rc=1; done; exit $$rc
 
 taxonomy: $(PY_READY)
 	$(SEMTOOL) taxonomy --repo enterprise-semantic-governance
@@ -220,3 +228,59 @@ codeowners: $(PY_READY)
 
 list:
 	@echo "business domains: $(BUSINESS_DOMAINS)"; echo "sub-domains:      $(SUBDOMAINS)"
+
+# ---- Semantic Studio (semantic-studio/, ADR-0008) --------------------------------------------
+# A read-only web view of everything above. `make studio` exports the data (Python, from the repositories
+# and the reports `make verify` / `hermit` / `selftest` leave in build/reports) and builds the site (Node).
+# The Health page shows the gate results of the last runs: `make studio-fresh` runs them first.
+STUDIO_DIR    := semantic-studio
+STUDIO_SITE   := $(STUDIO_DIR)/build/site
+STUDIO_PORT   ?= 8787
+STUDIO_IMAGE  ?= semantic-studio
+NODE_MIN      ?= 20
+STUDIO_NODE_READY := $(STUDIO_DIR)/node_modules/.installed
+
+studio: studio-data studio-app
+	@echo "Semantic Studio built: $(STUDIO_SITE)/  (serve it with: make studio-serve)"
+
+studio-data: $(PY_READY) $(FIBO_READY)
+	$(PYTHON) $(STUDIO_DIR)/exporter/export_site_data.py
+
+studio-app: $(STUDIO_NODE_READY)
+	cd $(STUDIO_DIR) && node build.mjs
+
+studio-serve: studio
+	$(PYTHON) $(STUDIO_DIR)/server/studio_server.py --site $(STUDIO_SITE) --port $(STUDIO_PORT)
+
+# The checks may fail: the studio is built anyway, to show what failed (make reports the failures, exit 0).
+studio-fresh:
+	-$(MAKE) -k --no-print-directory verify
+	-$(MAKE) --no-print-directory hermit
+	-$(MAKE) --no-print-directory selftest
+	$(MAKE) --no-print-directory studio
+
+# Docker builds the site in the image (Node stage), so Node is not needed; the data is exported here with the
+# usual Python setup. The port is published on this machine only (127.0.0.1).
+studio-docker: check-docker studio-data
+	docker build -t $(STUDIO_IMAGE) $(STUDIO_DIR)
+	@echo "Semantic Studio: http://localhost:$(STUDIO_PORT)/   (Ctrl-C to stop)"
+	docker run --rm $$( [ -t 0 ] && echo -it ) -p 127.0.0.1:$(STUDIO_PORT):8787 $(STUDIO_IMAGE)
+
+check-node:
+	@command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1 || { \
+	  echo "ERROR: Node.js not found. Install Node >= $(NODE_MIN) (macOS: brew install node), or use make studio-docker"; exit 1; }
+	@major=$$(node -p 'process.versions.node.split(".")[0]'); if [ "$$major" -lt $(NODE_MIN) ]; then \
+	  echo "ERROR: Node $$major found; Semantic Studio needs Node >= $(NODE_MIN) (or use make studio-docker)"; exit 1; fi
+
+check-docker:
+	@command -v docker >/dev/null 2>&1 || { echo "ERROR: Docker not found. Install Docker Desktop (or use make studio-serve)"; exit 1; }
+	@docker info >/dev/null 2>&1 || { echo "ERROR: Docker is installed but not running. Start Docker Desktop and retry."; exit 1; }
+
+# JavaScript dependencies, (re)installed when package.json changes.
+$(STUDIO_NODE_READY): $(STUDIO_DIR)/package.json | check-node
+	@echo "Installing Semantic Studio's JavaScript dependencies into $(STUDIO_DIR)/node_modules/"
+	cd $(STUDIO_DIR) && npm install --no-audit --no-fund
+	@touch $@
+
+clean-studio:
+	rm -rf $(STUDIO_DIR)/build $(STUDIO_DIR)/node_modules
