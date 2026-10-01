@@ -6,8 +6,8 @@
 # ---- 1. build the site (Node) ----
 FROM node:22-alpine AS app
 WORKDIR /app
-COPY package.json ./
-RUN npm install --no-audit --no-fund
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 COPY build.mjs tsconfig.json ./
 COPY public ./public
 COPY src ./src

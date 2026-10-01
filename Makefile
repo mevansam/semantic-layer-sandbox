@@ -276,10 +276,11 @@ check-docker:
 	@command -v docker >/dev/null 2>&1 || { echo "ERROR: Docker not found. Install Docker Desktop (or use make studio-serve)"; exit 1; }
 	@docker info >/dev/null 2>&1 || { echo "ERROR: Docker is installed but not running. Start Docker Desktop and retry."; exit 1; }
 
-# JavaScript dependencies, (re)installed when package.json changes.
-$(STUDIO_NODE_READY): $(STUDIO_DIR)/package.json | check-node
+# JavaScript dependencies at the versions in package-lock.json (npm ci), reinstalled when either file changes.
+# To add or upgrade a dependency: edit package.json, run `npm install` in semantic-studio/, commit both files.
+$(STUDIO_NODE_READY): $(STUDIO_DIR)/package.json $(STUDIO_DIR)/package-lock.json | check-node
 	@echo "Installing Semantic Studio's JavaScript dependencies into $(STUDIO_DIR)/node_modules/"
-	cd $(STUDIO_DIR) && npm install --no-audit --no-fund
+	cd $(STUDIO_DIR) && npm ci --no-audit --no-fund
 	@touch $@
 
 clean-studio:

@@ -129,7 +129,7 @@ sequenceDiagram
   X->>S: Repo model, all_rdf_files(), catalog_map(), cmd_cards(), cmd_drift()
   X->>X: parse every governed RDF file and the 12 FIBO modules
   X->>X: write graph.json, kg.trig, docs.json, cards.json, health.json, files/, meta.json
-  M->>M: npm install (first time, or when package.json changes)
+  M->>M: npm ci (first time, or when package.json or package-lock.json changes)
   M->>E: node build.mjs
   E->>E: bundle src/ into assets/main.js + chunks, copy public/, write config.json if missing
 ```
@@ -309,7 +309,7 @@ flowchart TB
 ```
 
 - **The image.** It contains the exported data, not the repositories. Its build context is limited by `.dockerignore` to the sources and `build/site/data`. It runs as an unprivileged user and has a health check on `config.json`.
-- **The dependency gap.** There is no `package-lock.json` yet, because the registry could not be reached when this was written. Commit the one that the first `npm install` creates, and the Docker build can switch to `npm ci`.
+- **Pinned dependencies.** `package-lock.json` fixes every JavaScript dependency, direct and indirect. `make` and the Docker build install with `npm ci`, so every build uses exactly those versions. To add or upgrade one, edit `package.json`, run `npm install` in `semantic-studio/` and commit both files.
 
 ## 8. Extending it
 

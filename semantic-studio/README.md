@@ -23,7 +23,7 @@ make studio-fresh     # run verify, hermit and selftest first, so the Health pag
 | `make studio-fresh` | `verify`, `hermit`, `selftest`, then `studio`; the studio is built even if a check fails, so you can see what failed |
 | `make clean-studio` | remove `build/` and `node_modules/` |
 
-`make` installs the JavaScript dependencies into `node_modules/` the first time, and again whenever `package.json` changes. Python, FIBO and everything else come from the usual automatic setup.
+`make` installs the JavaScript dependencies into `node_modules/` with `npm ci` (the versions in `package-lock.json`) the first time, and again whenever `package.json` or `package-lock.json` changes. Python, FIBO and everything else come from the usual automatic setup.
 
 ### On an internal static host
 
@@ -85,6 +85,8 @@ make studio-data                    # once, and whenever the repositories change
 cd semantic-studio && npm run dev   # rebuilds on change, http://localhost:5173/
 ```
 
-The dev server serves the site but not `/sparql`. To query while developing, run `make studio-serve` in another terminal and set `"sparqlEndpoint": "http://localhost:8787/sparql"` in `build/site/config.json`. `npm run typecheck` runs TypeScript.
+The dev server serves the site but not `/sparql`. To query while developing, run `make studio-serve` in another terminal and set `"sparqlEndpoint": "http://localhost:8787/sparql"` in `build/site/config.json`. `npm run typecheck` runs TypeScript over `src/` (strict mode).
+
+Dependencies are pinned by `package-lock.json` and installed with `npm ci`. To add or upgrade one, edit `package.json`, run `npm install` here, and commit both files.
 
 To show a new kind of asset in its own section, add it to `src/model.ts` (kinds) and to the relevant page in `src/pages/`. Anything not given a section still shows up on its term page, with all its facts and references.
