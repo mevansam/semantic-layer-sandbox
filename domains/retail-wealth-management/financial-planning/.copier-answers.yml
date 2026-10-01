@@ -18,7 +18,7 @@ domain_owner_team: '@example-org/rwm-fp-domain-owners'
 domain_slug: financial-planning
 fibo_extensions_path: ../../../fibo-extensions
 github_org: example-org
-governance_path: ../../../enterprise-semantic-governance
+governance_path: ../../../enterprise-governance
 module_name: planning
 namespace_path: retail-wealth-management/financial-planning
 ontology_domain_name: Investment Servicing

@@ -139,7 +139,7 @@ Local commands:
 | `make align` | How each sub-domain lines up with the template |
 | `make taxonomy` · `make capabilities` · `make codeowners` | Regenerate generated files (commit the result) |
 | `make selftest` | Prove every check still catches its seeded defect (after changing the tooling or a standard) |
-| `python enterprise-semantic-governance/tools/semtool.py <command> --repo <folder>` | Any single check on one repository |
+| `python enterprise-governance/tools/semtool.py <command> --repo <folder>` | Any single check on one repository |
 
 Every command, option, output and error message is explained in [doc 8](08-validation-tooling.md).
 
@@ -312,7 +312,7 @@ Each playbook lists the steps, then what catches a missed step.
 
 #### Adopt the real enterprise namespace
 
-1. `python enterprise-semantic-governance/tools/semtool.py rebase --to https://ontology.<company>.com/ --all`. This rewrites every repository, sub-domain, business domain and the template.
+1. `python enterprise-governance/tools/semtool.py rebase --to https://ontology.<company>.com/ --all`. This rewrites every repository, sub-domain, business domain and the template.
 2. `make verify`.
 
 *Caught if missed:* D2/D7 (a namespace or registry entry left on the old base), E2.

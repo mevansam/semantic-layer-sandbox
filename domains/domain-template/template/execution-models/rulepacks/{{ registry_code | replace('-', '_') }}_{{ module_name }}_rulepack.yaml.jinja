@@ -9,7 +9,7 @@ source_rules:
     shapes:
       - {{ base_iri }}domain/{{ namespace_path }}/rules/ReferenceCodeRule   # {{ rule_prefix }}-R-000
 reusable_shapes:
-  - enterprise-semantic-governance/fabric/reusable-assets/common-shapes.ttl
+  - enterprise-governance/fabric/reusable-assets/common-shapes.ttl
 input:
   graph: proposed {{ seed_class_label }} data as RDF using the {{ module_name }} ontology
 on_violation:

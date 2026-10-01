@@ -20,7 +20,7 @@ domain_owner_team: '@example-org/rwm-ia-domain-owners'
 domain_slug: insights-and-analytics
 fibo_extensions_path: ../../../fibo-extensions
 github_org: example-org
-governance_path: ../../../enterprise-semantic-governance
+governance_path: ../../../enterprise-governance
 module_name: insights
 namespace_path: retail-wealth-management/insights-and-analytics
 ontology_domain_name: Investment Servicing

@@ -7,8 +7,8 @@ How to install, run, read and extend the tools that validate the semantic model 
 | Tool | Where | Use it to |
 |---|---|---|
 | **`make`** targets | `Makefile` (repository root) | Run everything the way CI does. `make` alone lists the targets |
-| **`semtool`** | `enterprise-semantic-governance/tools/semtool.py` | Run any single check on any one repository; generate the taxonomy, capability map and CODEOWNERS; rebase the namespace |
-| **Self-test** | `enterprise-semantic-governance/tools/tests/selftest.py` (`make selftest`) | Prove every check still catches the defect it is meant to catch, after you change the tooling or a standard |
+| **`semtool`** | `enterprise-governance/tools/semtool.py` | Run any single check on any one repository; generate the taxonomy, capability map and CODEOWNERS; rebase the namespace |
+| **Self-test** | `enterprise-governance/tools/tests/selftest.py` (`make selftest`) | Prove every check still catches the defect it is meant to catch, after you change the tooling or a standard |
 | **`new_domain.py`** | `domains/domain-template/scripts/` | Generate a new sub-domain (and its business-domain parent layer) from the template |
 | **`compare_domain.py`** | `domains/domain-template/scripts/` (`make align`) | Show how a sub-domain lines up with the template |
 | **`fetch-omg-dependencies.sh`** | `fibo-extensions/scripts/` | Download FIBO's OMG Commons and LCC dependencies for complete reasoning (run by `make`; never needed by hand) |
@@ -29,7 +29,7 @@ You only install Java, Python ≥ 3.10, git, make and curl; `make` does the rest
 ```bash
 make setup                                                       # venv, Java check, ROBOT, FIBO, OMG Commons/LCC
 make list                                                        # business domains and sub-domains found
-venv/bin/python3 enterprise-semantic-governance/tools/semtool.py -h   # command list
+venv/bin/python3 enterprise-governance/tools/semtool.py -h   # command list
 make verify                                                      # everything (about 1 minute on this repository)
 ```
 
@@ -74,16 +74,17 @@ Run from the repository root. Each target exits non-zero on failure, so they can
 | `make omg` | (re)try fetching FIBO's OMG Commons/LCC dependencies | setup | |
 | `make list` | list business domains and sub-domains | info | |
 | `make studio` · `studio-serve` · `studio-docker` · `studio-fresh` | build and serve [Semantic Studio](../../semantic-studio/README.md), the read-only web view; it shows the reports below | viewer | ~15 s |
+| `make studio-lock` · `studio-lock-check` | re-resolve, or check, Semantic Studio's npm dependencies so every version is at least 72 hours old (`STUDIO_MIN_AGE_HOURS`), as the enterprise npm proxy requires | viewer setup | ~10 s · ~1 min |
 
 \* measured on this repository without the OMG dependencies; with them, closure and reasoning take longer.
 
 ## 8.5 `semtool`
 
 ```text
-venv/bin/python3 enterprise-semantic-governance/tools/semtool.py <command> [--repo PATH] [options]   # or the semtool alias
+venv/bin/python3 enterprise-governance/tools/semtool.py <command> [--repo PATH] [options]   # or the semtool alias
 ```
 
-- **`--repo`** is the folder of *one* repository: `enterprise-semantic-governance`, `fibo-extensions`, `domains/<bd>` (business domain) or `domains/<bd>/<sd>` (sub-domain). The default is the current folder. The folder must contain `semantic.yaml`. Its `repo_kind` decides which checks apply, and its relative paths lead `semtool` to the other repositories.
+- **`--repo`** is the folder of *one* repository: `enterprise-governance`, `fibo-extensions`, `domains/<bd>` (business domain) or `domains/<bd>/<sd>` (sub-domain). The default is the current folder. The folder must contain `semantic.yaml`. Its `repo_kind` decides which checks apply, and its relative paths lead `semtool` to the other repositories.
 - **Output.** One line per result: `PASS …`, `WARN …` (does not fail) or `FAIL …`. Indented lines give details, for example each SHACL violation as `[violation] <focus node> <path>: <message>`. Colours are used only on a terminal.
 - **Exit code.** `0` when the command passed (warnings allowed), `1` when anything failed. A missing `semantic.yaml`, a missing `--base` for `changes`, or an unknown command stops with a message.
 
@@ -138,7 +139,7 @@ Each entry gives the gate, the repository kinds it applies to, what it reads, wh
 Parses every `.ttl` and `.trig` of the repository, skipping `build/`, `vendor/`, the template and nested sub-domains. **Fails** with the file and the parser's message; fix the Turtle at that line.
 
 #### `structure` (G1, sub-domains)
-Checks the folder against `enterprise-semantic-governance/standards/domain-repo-structure.yaml`:
+Checks the folder against `enterprise-governance/standards/domain-repo-structure.yaml`:
 - required files; allowed file names per folder; allowed top-level entries
 - competency-question numbering (`cq-001…005` from the template, `cq-101+` domain-specific), and that each question's `id` and query file match
 - execution-model files are named after a `toolName`, and `artifactPath` / `inputSchemaPath` point at them
@@ -237,7 +238,7 @@ Regenerates `CODEOWNERS` from the roles and review teams in `domain-manifest.ttl
 
 #### `rebase`
 ```text
-semtool rebase --repo enterprise-semantic-governance --to https://ontology.<company>.com/ [--all]
+semtool rebase --repo enterprise-governance --to https://ontology.<company>.com/ [--all]
 ```
 Replaces the base IRI (from governance `semantic.yaml`) in `.ttl`, `.yaml`, `.yml`, `.rq`, `.md`, `.json`, `.jinja`, `.py` and `.csv` files. Without `--all`, only the governance repository changes. With `--all`, it covers every repository, sub-domain, business domain and the domain template, skipping `vendor/`, `build/` and `.git`. Run `make verify` afterwards.
 
@@ -280,7 +281,7 @@ Finds every OMG IRI that FIBO imports and downloads the modules, recursively, in
 
 ```text
 make selftest
-python3 enterprise-semantic-governance/tools/tests/selftest.py -k D4 E3     # only matching scenarios
+python3 enterprise-governance/tools/tests/selftest.py -k D4 E3     # only matching scenarios
 ```
 
 A check that silently stops failing is worse than no check. The self-test:
@@ -338,7 +339,7 @@ Any TriG-capable triple store (Apache Jena Fuseki, GraphDB, Oxigraph and others)
 | Workflow | Runs | Steps |
 |---|---|---|
 | `.github/workflows/semantic-ci.yml` (monorepo, primary) | push to `main`, every pull request | `make setup` (venv, Java check, ROBOT, FIBO, OMG Commons/LCC; `build/tools` and `vendor/omg` cached per FIBO pin) → `make verify` → on pull requests `make changes BASE=origin/<base>` → `make hermit` → `make align` → `make selftest` → upload `build/` |
-| `enterprise-semantic-governance/.github/workflows/semantic-ci.yml` (reusable) | called by repositories split out of the monorepo | `semtool verify` and HermiT for one repository. Inputs: `path` (where the repository sits in the monorepo layout), `governance-ref`, `fibo-extensions-ref` (default `main`), `robot-version` |
+| `enterprise-governance/.github/workflows/semantic-ci.yml` (reusable) | called by repositories split out of the monorepo | `semtool verify` and HermiT for one repository. Inputs: `path` (where the repository sits in the monorepo layout), `governance-ref`, `fibo-extensions-ref` (default `main`), `robot-version` |
 | `domains/domain-template/.github/workflows/template-test.yml` | when the template lives in its own repository | `make verify-template` |
 
 Make the CI job a required status check on `main`, together with CODEOWNERS review, so no change merges without passing the gates and the two-key review.
@@ -347,7 +348,7 @@ Make the CI job a required status check on `main`, together with CODEOWNERS revi
 
 | You see | Meaning | Do |
 |---|---|---|
-| `No semantic.yaml in …` | `--repo` doesn't point at a repository folder | point at `enterprise-semantic-governance`, `fibo-extensions`, `domains/<bd>` or `domains/<bd>/<sd>` |
+| `No semantic.yaml in …` | `--repo` doesn't point at a repository folder | point at `enterprise-governance`, `fibo-extensions`, `domains/<bd>` or `domains/<bd>/<sd>` |
 | `WARN closure: unresolved imports skipped … Commons x20, LCC x1` | FIBO's OMG dependencies aren't downloaded (www.omg.org unreachable when `make` tried) | `make omg` when you have access (optional; every other check is unaffected) |
 | `FAIL reason (…): There are N unsatisfiable properties/classes` listing only FIBO/OMG IRIs | a defect in the pinned FIBO/OMG release (often only visible once OMG Commons is downloaded) | follow §8.10 "When reasoning fails on a FIBO or OMG term"; record it in `upstream-issues.yaml` (ADR-0007) |
 | `WARN D10 release tag … is not available in the FIBO checkout` | the FIBO tag couldn't be fetched (offline) | run any `make` target with network access; D10 then compares the checkout with the release |
@@ -363,7 +364,7 @@ Make the CI job a required status check on `main`, together with CODEOWNERS revi
 | `FAIL D<n> …` | two statements of one fact disagree | make the derived statement match the authoritative one (doc 7 §7.2); for D9 run the named generator |
 | `… needs a minor version bump, got 0.1.0 -> 0.1.0` | content changed without a version bump | bump `owl:versionInfo` and `owl:versionIRI` together |
 | `collection … was not bumped (graph names must change with content)` | knowledge changed within the same collection version | bump the collection `owl:versionInfo` and every `graphName` `/vX.Y.Z/` |
-| `enterprise standard changed … without an ADR` | a shape or the structure standard changed | add `enterprise-semantic-governance/docs/adr/NNNN-….md` |
+| `enterprise standard changed … without an ADR` | a shape or the structure standard changed | add `enterprise-governance/docs/adr/NNNN-….md` |
 | `git diff against origin/main failed` | base ref missing (shallow clone, not fetched) | `git fetch origin main` or check out with full history |
 | `NOT ALIGNED … template-owned file(s) drifted` (`make align`) | CI, `.gitignore` or `semantic.yaml` wiring edited in a sub-domain | revert, or change the template and re-render / `copier update` |
 | `BASELINE FAILS` (`make selftest`) | the repository itself doesn't pass | run `make verify` first; the self-test needs a clean baseline |

@@ -36,7 +36,7 @@ from rdflib import BNode, Dataset, Graph, Literal, URIRef
 from rdflib.namespace import OWL, RDF, RDFS, SKOS
 
 ROOT = Path(__file__).resolve().parents[2]          # monorepo root
-sys.path.insert(0, str(ROOT / "enterprise-semantic-governance" / "tools"))
+sys.path.insert(0, str(ROOT / "enterprise-governance" / "tools"))
 import semtool  # noqa: E402
 
 TEXT_SUFFIXES = {".ttl", ".trig", ".yaml", ".yml", ".rq", ".json", ".md", ".csv", ".txt"}
@@ -64,7 +64,7 @@ def git(*args: str) -> str:
 # =============================================================================
 
 def discover_repos() -> list[semtool.Repo]:
-    paths = [ROOT / "enterprise-semantic-governance", ROOT / "fibo-extensions"]
+    paths = [ROOT / "enterprise-governance", ROOT / "fibo-extensions"]
     paths += sorted(p.parent for p in (ROOT / "domains").glob("*/semantic.yaml"))
     paths += sorted(p.parent for p in (ROOT / "domains").glob("*/*/semantic.yaml"))
     return [semtool.Repo(p) for p in paths if (p / "semantic.yaml").exists()]
@@ -122,7 +122,7 @@ def repo_record(repo: semtool.Repo, roles: dict[str, str]) -> dict:
         "id": rid,
         "negative_tests": negative,
         "competency_questions": cqs,
-        "name": dom.get("name") or {"governance": "Enterprise semantic governance",
+        "name": dom.get("name") or {"governance": "Enterprise governance",
                                     "fibo-extensions": "FIBO extensions"}.get(repo.kind, repo.root.name),
         "kind": repo.kind,
         "folder": repo.root.name,

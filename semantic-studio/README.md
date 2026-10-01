@@ -2,7 +2,7 @@
 
 A web view of the semantic layer: domains, concepts, rules, processes, APIs, data, records, the capability map, the taxonomy, FIBO, gate results, decisions and documents, with search and SPARQL.
 
-This first release is **Explore** mode, which is read-only. Everything it shows is generated from the repositories at one commit, so it cannot disagree with them. Changes still go through pull requests and the gates. See [ADR-0008](../enterprise-semantic-governance/docs/adr/0008-semantic-studio.md).
+This first release is **Explore** mode, which is read-only. Everything it shows is generated from the repositories at one commit, so it cannot disagree with them. Changes still go through pull requests and the gates. See [ADR-0008](../enterprise-governance/docs/adr/0008-semantic-studio.md).
 
 ## Run it
 
@@ -21,6 +21,8 @@ make studio-fresh     # run verify, hermit and selftest first, so the Health pag
 | `make studio-serve` | `studio`, then serve the site with SPARQL (`STUDIO_PORT=8787`) |
 | `make studio-docker` | `studio-data` (with the usual Python setup), then build the `semantic-studio` image (Node runs inside it) and run it on `127.0.0.1` |
 | `make studio-fresh` | `verify`, `hermit`, `selftest`, then `studio`; the studio is built even if a check fails, so you can see what failed |
+| `make studio-lock` | re-resolve `package-lock.json` to versions at least 72 hours old (see below) |
+| `make studio-lock-check` | check that every locked version is at least 72 hours old |
 | `make clean-studio` | remove `build/` and `node_modules/` |
 
 `make` installs the JavaScript dependencies into `node_modules/` with `npm ci` (the versions in `package-lock.json`) the first time, and again whenever `package.json` or `package-lock.json` changes. Python, FIBO and everything else come from the usual automatic setup.
@@ -87,6 +89,17 @@ cd semantic-studio && npm run dev   # rebuilds on change, http://localhost:5173/
 
 The dev server serves the site but not `/sparql`. To query while developing, run `make studio-serve` in another terminal and set `"sparqlEndpoint": "http://localhost:8787/sparql"` in `build/site/config.json`. `npm run typecheck` runs TypeScript over `src/` (strict mode).
 
-Dependencies are pinned by `package-lock.json` and installed with `npm ci`. To add or upgrade one, edit `package.json`, run `npm install` here, and commit both files.
+### Dependencies and the npm proxy
+
+The enterprise npm proxy refuses package versions published less than 72 hours ago, so every dependency, direct and transitive, must be older than that.
+- **Direct dependencies.** They are pinned to exact, tested versions in `package.json`, except the two `@types` packages, which are only used for type checking.
+- **Every version.** `package-lock.json` fixes all of them, and `make` and the Docker build install with `npm ci`.
+- **When resolving.** `.npmrc` sets `min-release-age=3`, which npm 11.10 and later applies to any `npm install`.
+- **Re-resolving.** `make studio-lock` rewrites `package-lock.json`, choosing for every package the newest version allowed by `package.json` that is at least 72 hours old. It uses `--min-release-age`, or `--before` on older npm, so it works with any npm version. The age is set by `STUDIO_MIN_AGE_HOURS`, default 72.
+- **Checking.** `make studio-lock-check` asks the registry when each locked version was published, and fails if any is too new.
+
+To add or upgrade a dependency: edit `package.json`, run `make studio-lock`, then `make studio-lock-check`, and commit both files. If `npm ci` fails because the proxy refused a package, run `make studio-lock`.
+
+Behind a proxy, `make studio-docker` passes your npm registry (`npm config get registry`), your `~/.npmrc` as a build secret for credentials, and your pip index to the image build. Override them with `NPM_REGISTRY=...` and `PIP_INDEX_URL=...`.
 
 To show a new kind of asset in its own section, add it to `src/model.ts` (kinds) and to the relevant page in `src/pages/`. Anything not given a section still shows up on its term page, with all its facts and references.

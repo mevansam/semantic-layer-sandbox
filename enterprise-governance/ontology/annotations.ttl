@@ -9,7 +9,7 @@
 # -----------------------------------------------------------------------------
 # Enterprise Annotation Profile
 #
-# Owned by: Enterprise Semantic Governance (representation standard).
+# Owned by: Enterprise Governance (representation standard).
 # Every enterprise and domain ontology term MUST use these annotations as
 # required by shapes/meta-shapes.ttl. The profile deliberately reuses FIBO's
 # own annotation vocabulary (maturity levels, adapted-from, etc.) plus SKOS and

@@ -21,7 +21,7 @@ An ontology-based semantic layer for grounding AI agents in business meaning, ru
 | [3 Federated repository structure](docs/framework/03-federated-repository-structure.md) | [7 Change management without drift](docs/framework/07-change-management.md) |
 | [4 Semantic model and ontology](docs/framework/04-semantic-model-and-ontology.md) | [8 Validation tooling reference](docs/framework/08-validation-tooling.md) |
 
-Standards are in `enterprise-semantic-governance/docs/standards/` and ADRs in `enterprise-semantic-governance/docs/adr/`.
+Standards are in `enterprise-governance/docs/standards/` and ADRs in `enterprise-governance/docs/adr/`.
 
 **To browse all of it in a web browser,** run `make studio-serve` (or `make studio-docker`, which needs Docker instead of Node) and open http://localhost:8787/. See [Semantic Studio](semantic-studio/README.md).
 
@@ -29,7 +29,7 @@ Standards are in `enterprise-semantic-governance/docs/standards/` and ADRs in `e
 
 ```
 docs/framework/                      Framework guide (start here)
-enterprise-semantic-governance/      Enterprise governance + semantic fabric: standards, meta-shapes, AI controls,
+enterprise-governance/               Enterprise governance + semantic fabric: standards, meta-shapes, AI controls,
                                      alignment, taxonomy, capability map, GraphRAG contract, semtool, CI
 fibo-extensions/                     FIBO (pinned submodule), enterprise FIBO profile, enterprise core, domain registry,
                                      ontology-domain umbrellas
@@ -80,7 +80,7 @@ All of these are git-ignored. To do everything up front instead:
 make setup    # venv, Java check, ROBOT, FIBO, OMG Commons/LCC
 make list     # business domains and sub-domains found
 
-alias semtool='venv/bin/python3 enterprise-semantic-governance/tools/semtool.py'   # used in the examples below
+alias semtool='venv/bin/python3 enterprise-governance/tools/semtool.py'   # used in the examples below
 ```
 
 Notes:
@@ -114,7 +114,7 @@ Each check leaves a report in `build/reports/` that the Health page reads. See [
 ### Validate the enterprise layer
 
 ```bash
-make verify-governance      # enterprise-semantic-governance: syntax, meta-shapes, consistency (incl. generated files, FIBO pin)
+make verify-governance      # enterprise-governance: syntax, meta-shapes, consistency (incl. generated files, FIBO pin)
 make verify-fibo            # fibo-extensions: + FIBO extension rules, closure, coherence with FIBO
 make verify-template        # generate the worked sub-domains from domains/domain-template and run every gate on them
 ```
@@ -193,7 +193,7 @@ make changes BASE=origin/main STRICT=1      # also fail on Provisional content
 ### Create a sub-domain
 
 ```bash
-# 1. declare it in enterprise-semantic-governance/capabilities/curation.yaml (sub_domains), then:
+# 1. declare it in enterprise-governance/capabilities/curation.yaml (sub_domains), then:
 make capabilities
 # 2. register its namespace in fibo-extensions/registry/domain-registry.ttl (status Provisional)
 # 3. write an answers file (copy domains/domain-template/answers/rwm-fp.yaml), then generate it:
@@ -218,7 +218,7 @@ make codeowners      # each sub-domain's domain-manifest.ttl -> CODEOWNERS
 
 ```bash
 make selftest                                                          # all scenarios (~30 s)
-python3 enterprise-semantic-governance/tools/tests/selftest.py -k D4 E3  # only matching scenarios
+python3 enterprise-governance/tools/tests/selftest.py -k D4 E3  # only matching scenarios
 ```
 
 Run it after changing `semtool.py`, a meta-shape or the structure standard. It seeds one defect at a time into a temporary copy of the repository and expects the intended check to catch it, plus one correct change that must pass.
@@ -229,7 +229,7 @@ Follow [`fibo-extensions/docs/upgrading-fibo.md`](fibo-extensions/docs/upgrading
 
 ## Gates
 
-From `enterprise-semantic-governance/GOVERNANCE.md`:
+From `enterprise-governance/GOVERNANCE.md`:
 
 
 - G1 syntax and domain-repo structure
@@ -248,7 +248,7 @@ On pull requests, `semtool changes` also checks that version bumps match the cha
 | What | Where | How |
 |---|---|---|
 | Namespace `https://ontology.example.com/` | everywhere | `semtool rebase --to https://ontology.<company>.com/ --all`, then `make verify` |
-| Capability-map gaps and proposed capabilities | `enterprise-semantic-governance/capabilities/data-quality-report.md` | send to the map owners; when the map is fixed, run `make capabilities` and trim `curation.yaml` (ADR-0004) |
+| Capability-map gaps and proposed capabilities | `enterprise-governance/capabilities/data-quality-report.md` | send to the map owners; when the map is fixed, run `make capabilities` and trim `curation.yaml` (ADR-0004) |
 | Role holders and teams | each `domain-manifest.ttl` and `domains/*/domain.ttl`, governance `semantic.yaml` | edit, then `make codeowners` and commit `CODEOWNERS` |
 | Policy sources, retention periods, regulatory citations | domain `rules/`, `records/` | confirm with rule owners, Records, Legal & Compliance |
-| Control framework mappings (NIST AI RMF, ISO/IEC 42001) | `enterprise-semantic-governance/ontology/controls.ttl` | map to the enterprise control framework |
+| Control framework mappings (NIST AI RMF, ISO/IEC 42001) | `enterprise-governance/ontology/controls.ttl` | map to the enterprise control framework |

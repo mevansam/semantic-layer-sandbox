@@ -8,7 +8,7 @@
 # USE_VENV=0 uses the current python3 as is (you install the requirements yourself).
 USE_VENV      ?= 1
 VENV          := $(CURDIR)/venv
-REQUIREMENTS  := enterprise-semantic-governance/requirements.txt
+REQUIREMENTS  := enterprise-governance/requirements.txt
 ifeq ($(USE_VENV),1)
 PYTHON        := $(VENV)/bin/python3
 PY_READY      := $(VENV)/.installed
@@ -16,7 +16,7 @@ else
 PYTHON        ?= python3
 PY_READY      :=
 endif
-SEMTOOL := $(PYTHON) enterprise-semantic-governance/tools/semtool.py
+SEMTOOL := $(PYTHON) enterprise-governance/tools/semtool.py
 TEMPLATE := domains/domain-template
 # Every sub-domain (a folder with semantic.yaml under domains/<business-domain>/) and every parent layer.
 SUBDOMAINS := $(patsubst %/semantic.yaml,%,$(wildcard domains/*/*/semantic.yaml))
@@ -41,7 +41,7 @@ export ROBOT_JAR
 FIBO_DIR      := fibo-extensions/vendor/fibo
 OMG_DIR       := fibo-extensions/vendor/omg
 FIBO_PIN      := $(shell git ls-files -s $(FIBO_DIR) 2>/dev/null | awk '{print $$2}')
-FIBO_TAG      := $(shell sed -n 's/^ *release_tag: *//p' enterprise-semantic-governance/semantic.yaml | head -1)
+FIBO_TAG      := $(shell sed -n 's/^ *release_tag: *//p' enterprise-governance/semantic.yaml | head -1)
 FIBO_READY    := $(TOOLS_DIR)/fibo-$(or $(FIBO_PIN),unpinned)-$(FIBO_TAG).stamp
 OMG_READY     := $(OMG_DIR)/.fetched-$(or $(FIBO_PIN),unpinned)
 
@@ -49,7 +49,7 @@ OMG_READY     := $(OMG_DIR)/.fetched-$(or $(FIBO_PIN),unpinned)
 REASONING_DEPS := $(PY_READY) tools $(FIBO_READY) $(OMG_READY)
 
 .PHONY: help setup python tools check-java omg env clean-tools fibo verify verify-governance verify-fibo verify-domains verify-template drift changes selftest align hermit taxonomy capabilities codeowners list \
-        studio studio-data studio-app studio-serve studio-docker studio-fresh check-node check-docker clean-studio
+        studio studio-data studio-app studio-serve studio-docker studio-fresh studio-lock studio-lock-check check-node check-docker clean-studio
 
 # `make` or `make help` lists the targets. Full reference: docs/framework/08-validation-tooling.md
 help:
@@ -80,6 +80,8 @@ help:
 	@echo "  make studio-docker     export the data, then build and run the studio in Docker (Node not needed)"
 	@echo "  make studio-fresh      verify + hermit + selftest first, so the Health page is current, then studio"
 	@echo "  make studio-data       export the data only (semantic-studio/build/site/data)"
+	@echo "  make studio-lock       re-resolve npm dependencies to versions at least $(STUDIO_MIN_AGE_HOURS) h old (commit package-lock.json)"
+	@echo "  make studio-lock-check check every locked npm version is at least $(STUDIO_MIN_AGE_HOURS) h old"
 
 # ---- Setup ----------------------------------------------------------------------------------
 setup: $(PY_READY) tools $(FIBO_READY) $(OMG_READY)
@@ -174,7 +176,7 @@ $(OMG_READY): $(FIBO_READY)
 verify: verify-governance verify-fibo verify-domains verify-template
 
 verify-governance: $(PY_READY)
-	$(SEMTOOL) verify --repo enterprise-semantic-governance
+	$(SEMTOOL) verify --repo enterprise-governance
 
 verify-fibo: $(REASONING_DEPS)
 	$(SEMTOOL) verify --repo fibo-extensions
@@ -195,17 +197,17 @@ verify-template: $(REASONING_DEPS)
 
 # Gate G8 on its own: facts repeated across files agree, generated files are current (also part of `verify`).
 drift: $(PY_READY)
-	@set -e; for d in enterprise-semantic-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) drift --repo $$d; done
+	@set -e; for d in enterprise-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) drift --repo $$d; done
 
 # Pull requests: every changed module bumps its version by at least its change class; changed knowledge
 # bumps the collection version; changes to machine-checked standards carry an ADR.  make changes BASE=origin/main
 BASE ?= origin/main
 changes: $(PY_READY)
-	@set -e; for d in enterprise-semantic-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) changes --base $(BASE) --repo $$d $(if $(STRICT),--strict,); done
+	@set -e; for d in enterprise-governance fibo-extensions $(BUSINESS_DOMAINS) $(SUBDOMAINS); do $(SEMTOOL) changes --base $(BASE) --repo $$d $(if $(STRICT),--strict,); done
 
-# Self-test of the tooling: each check must catch a seeded defect (enterprise-semantic-governance/tools/tests).
+# Self-test of the tooling: each check must catch a seeded defect (enterprise-governance/tools/tests).
 selftest: $(PY_READY)
-	$(PYTHON) enterprise-semantic-governance/tools/tests/selftest.py
+	$(PYTHON) enterprise-governance/tools/tests/selftest.py
 
 # How each sub-domain lines up with the template (unchanged / edited / added / seed-only).
 align: $(PY_READY)
@@ -217,10 +219,10 @@ hermit: $(REASONING_DEPS)
 	@rc=0; for d in $(BUSINESS_DOMAINS); do $(SEMTOOL) reason --reasoner HermiT --repo $$d || rc=1; done; exit $$rc
 
 taxonomy: $(PY_READY)
-	$(SEMTOOL) taxonomy --repo enterprise-semantic-governance
+	$(SEMTOOL) taxonomy --repo enterprise-governance
 
 capabilities: $(PY_READY)
-	$(SEMTOOL) capabilities --repo enterprise-semantic-governance
+	$(SEMTOOL) capabilities --repo enterprise-governance
 
 # Regenerate every sub-domain's CODEOWNERS from its domain-manifest.ttl (commit the result).
 codeowners: $(PY_READY)
@@ -261,8 +263,15 @@ studio-fresh:
 
 # Docker builds the site in the image (Node stage), so Node is not needed; the data is exported here with the
 # usual Python setup. The port is published on this machine only (127.0.0.1).
+# Behind a proxy: your npm registry and ~/.npmrc (as a build secret) and pip index are passed to the build;
+# override with NPM_REGISTRY=... / PIP_INDEX_URL=...
+NPM_REGISTRY  = $(shell npm config get registry 2>/dev/null)
+PIP_INDEX_URL = $(shell $(PYTHON) -m pip config get global.index-url 2>/dev/null)
+comma := ,
 studio-docker: check-docker studio-data
-	docker build -t $(STUDIO_IMAGE) $(STUDIO_DIR)
+	DOCKER_BUILDKIT=1 docker build -t $(STUDIO_IMAGE) \
+	  --build-arg NPM_REGISTRY=$(NPM_REGISTRY) --build-arg PIP_INDEX_URL=$(PIP_INDEX_URL) \
+	  $(if $(wildcard $(HOME)/.npmrc),--secret id=npmrc$(comma)src=$(HOME)/.npmrc) $(STUDIO_DIR)
 	@echo "Semantic Studio: http://localhost:$(STUDIO_PORT)/   (Ctrl-C to stop)"
 	docker run --rm $$( [ -t 0 ] && echo -it ) -p 127.0.0.1:$(STUDIO_PORT):8787 $(STUDIO_IMAGE)
 
@@ -280,8 +289,19 @@ check-docker:
 # To add or upgrade a dependency: edit package.json, run `npm install` in semantic-studio/, commit both files.
 $(STUDIO_NODE_READY): $(STUDIO_DIR)/package.json $(STUDIO_DIR)/package-lock.json | check-node
 	@echo "Installing Semantic Studio's JavaScript dependencies into $(STUDIO_DIR)/node_modules/"
-	cd $(STUDIO_DIR) && npm ci --no-audit --no-fund
+	cd $(STUDIO_DIR) && npm ci --no-audit --no-fund || { \
+	  echo "ERROR: npm ci failed. If the npm proxy refused a package as too new, run: make studio-lock"; exit 1; }
 	@touch $@
+
+# Dependencies must be versions published at least STUDIO_MIN_AGE_HOURS ago (the enterprise npm proxy blocks
+# newer ones). studio-lock re-resolves package-lock.json under that rule; studio-lock-check verifies it.
+STUDIO_MIN_AGE_HOURS ?= 72
+export STUDIO_MIN_AGE_HOURS
+studio-lock: check-node
+	cd $(STUDIO_DIR) && node scripts/lock.mjs
+
+studio-lock-check: check-node
+	cd $(STUDIO_DIR) && node scripts/lock.mjs --check
 
 clean-studio:
 	rm -rf $(STUDIO_DIR)/build $(STUDIO_DIR)/node_modules

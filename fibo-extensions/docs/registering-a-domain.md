@@ -1,6 +1,6 @@
 # Registering a business domain or sub-domain
 
-1. **Confirm the domain in the capability map.** The business domain must exist in `enterprise-semantic-governance/capabilities`. Declare its sub-domains in `capabilities/curation.yaml` (`sub_domains`, ADR-0005) and propose capabilities for any that have none (ADR-0004). Register the business domain itself too (its namespace `{base}domain/<business-domain>/` holds the parent layer).
+1. **Confirm the domain in the capability map.** The business domain must exist in `enterprise-governance/capabilities`. Declare its sub-domains in `capabilities/curation.yaml` (`sub_domains`, ADR-0005) and propose capabilities for any that have none (ADR-0004). Register the business domain itself too (its namespace `{base}domain/<business-domain>/` holds the parent layer).
 2. **Reserve a namespace.** Open a PR against `registry/domain-registry.ttl`:
    ```turtle
    ent-reg:<code> a ent-gov:DomainRegistration ;

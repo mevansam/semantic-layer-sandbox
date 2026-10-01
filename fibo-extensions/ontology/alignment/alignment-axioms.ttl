@@ -7,7 +7,7 @@
 # CROSS-DOMAIN ALIGNMENT AXIOMS
 #
 # Implements "Specialization" / "Equivalent" decisions recorded in
-# enterprise-semantic-governance/alignment/alignment-register.ttl.
+# enterprise-governance/alignment/alignment-register.ttl.
 # Axioms here are the ONLY place one domain's term may be related to another
 # domain's term. Each axiom block cites its ALN-nnn decision.
 #

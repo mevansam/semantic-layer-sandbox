@@ -6,7 +6,7 @@ The logical model ([doc 5](05-logical-model.md)) is spread across many files in 
 |---|---|---|---|---|
 | **Import** | `owl:imports <module IRI>` in an ontology header | `insights.ttl` imports `…/financial-planning/planning/` | `semtool closure`: an IRI-to-file map built from every `owl:Ontology` header in the governance, FIBO extensions, own and dependency folders, plus FIBO and OMG XML catalogs | E3 (allowed targets), D4 (declared dependency), D6 (umbrella), G4 (coherence) |
 | **Reference by IRI** | a term IRI used as the object of a triple, with no import | `sh:targetClass fp:FinancialGoal` in `rules/business-rules.ttl` | loading the files together (meta, rules, kg); by design, **not** by import, so rules, processes, APIs, data and records stay out of OWL reasoning | G2 meta-shapes (`sh:class`), G5, G6, G8 |
-| **Configuration pointer** | relative paths and globs in `semantic.yaml` | `governance: ../../../enterprise-semantic-governance`, `dependencies: [../financial-planning]`, `paths.rules: [rules/*.ttl]` | `semtool` (`Repo` class) | D2, D4, D6 |
+| **Configuration pointer** | relative paths and globs in `semantic.yaml` | `governance: ../../../enterprise-governance`, `dependencies: [../financial-planning]`, `paths.rules: [rules/*.ttl]` | `semtool` (`Repo` class) | D2, D4, D6 |
 | **File pointer inside RDF** | a repository-relative path as a literal | `ent-fab:sourcePath "rules/*.ttl"`; `ent-fab:artifactPath`, `ent-fab:inputSchemaPath`; `ent-gov:apiSpecification` | `sourcePath`: `semtool kg` (partitions); `artifactPath` / `inputSchemaPath`: `semtool structure`; `apiSpecification`: documentation only, no command reads it | `sourcePath`: D5 (every partition matches files); `artifactPath` / `inputSchemaPath`: G1 `structure` (file exists and is named after the tool); `apiSpecification`: semantic review |
 | **Generation** | a command that writes a file from sources | `curation.yaml` + CSV → `capability-map.ttl`; manifest → `CODEOWNERS` | `semtool taxonomy`, `capabilities`, `codeowners`; `new_domain.py` | D9 (generated files are current) |
 
@@ -20,7 +20,7 @@ flowchart BT
         FIBOM["12 FIBO modules<br/>FND: Objectives, Assessments, Analytics, CurrencyAmount,<br/>ProductsAndServices, People, FinancialDates, Reporting, Documents<br/>FBC: ClientsAndAccounts, FinancialProductsAndServices, FinancialInstruments"]
         OMG["OMG Commons + LCC<br/>(vendor/omg, fetched)"]
     end
-    subgraph GOVR["enterprise-semantic-governance"]
+    subgraph GOVR["enterprise-governance"]
         ANN["ontology/annotations.ttl<br/>governance/annotations/"]
         GOVM["ontology/governance.ttl<br/>governance/model/"]
         PROC["ontology/process.ttl<br/>governance/process/"]
@@ -157,12 +157,12 @@ Legend: dotted arrows are references by IRI (a triple whose object is a term def
 
 ```mermaid
 flowchart TB
-    GOVY["enterprise-semantic-governance/semantic.yaml<br/>repo_kind: governance<br/>base_iri · teams · fibo.release_tag · graph_name_template<br/>paths: ontology, reference, shapes, assets, alignment"]
+    GOVY["enterprise-governance/semantic.yaml<br/>repo_kind: governance<br/>base_iri · teams · fibo.release_tag · graph_name_template<br/>paths: ontology, reference, shapes, assets, alignment"]
     FXY["fibo-extensions/semantic.yaml<br/>repo_kind: fibo-extensions<br/>fibo_dir · catalogs (FIBO, OMG)<br/>paths: ontology, profile, registry, umbrellas"]
     BDY["domains/retail-wealth-management/semantic.yaml<br/>repo_kind: business-domain<br/>domain: name, ontology_domain, code rwm, namespace<br/>paths.ontology: domain.ttl · sub_domains: [...]"]
     FPY["…/financial-planning/semantic.yaml<br/>repo_kind: domain · dependencies: []<br/>domain: name, parent, code rwm-fp, namespace<br/>paths (9 asset kinds) · examples · competency_questions"]
     IAY["…/insights-and-analytics/semantic.yaml<br/>repo_kind: domain · dependencies: [../financial-planning]<br/>domain: code rwm-ia, namespace · paths …"]
-    FXY -- "governance: ../enterprise-semantic-governance" --> GOVY
+    FXY -- "governance: ../enterprise-governance" --> GOVY
     BDY -- "governance: ../../…" --> GOVY
     BDY -- "fibo_extensions: ../../…" --> FXY
     BDY -- "sub_domains" --> FPY & IAY
@@ -227,8 +227,8 @@ flowchart LR
 
 | Generated file | Regenerate with | Freshness check |
 |---|---|---|
-| `enterprise-semantic-governance/taxonomy/enterprise-taxonomy.ttl` | `make taxonomy` | D9 |
-| `enterprise-semantic-governance/capabilities/capability-map.ttl`, `data-quality-report.md` | `make capabilities` | D9 |
+| `enterprise-governance/taxonomy/enterprise-taxonomy.ttl` | `make taxonomy` | D9 |
+| `enterprise-governance/capabilities/capability-map.ttl`, `data-quality-report.md` | `make capabilities` | D9 |
 | `domains/*/*/CODEOWNERS` | `make codeowners` (also run by `verify`) | D9 |
 | a sub-domain's template-owned files (CI, `.gitignore`, `semantic.yaml` wiring) | `copier update` | `make align` fails if one differs (DRIFTED) |
 | `build/*` | `make verify` | not committed |

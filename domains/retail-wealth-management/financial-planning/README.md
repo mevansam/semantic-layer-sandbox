@@ -2,7 +2,7 @@
 
 Semantic repository of the **Financial Planning** sub-domain of the **Retail Wealth Management** business domain (Investment Servicing ontology domain in the capability map). It was generated from `domains/domain-template`.
 
-This domain is accountable for **meaning, rules, data, records and APIs**. The enterprise governs how that knowledge is represented, shared and consumed by AI (see `enterprise-semantic-governance`).
+This domain is accountable for **meaning, rules, data, records and APIs**. The enterprise governs how that knowledge is represented, shared and consumed by AI (see `enterprise-governance`).
 
 | Folder | Accountability | Owner (see `domain-manifest.ttl`, `CODEOWNERS`) |
 |---|---|---|

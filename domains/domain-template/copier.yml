@@ -172,7 +172,7 @@ base_iri:
   default: https://ontology.example.com/
 governance_path:
   type: str
-  default: ../../../enterprise-semantic-governance
+  default: ../../../enterprise-governance
 fibo_extensions_path:
   type: str
   default: ../../../fibo-extensions

@@ -1,6 +1,6 @@
 # Parent layer of a business domain with sub-domains (ADR-0005).
 repo_kind: business-domain
-governance: ../../enterprise-semantic-governance
+governance: ../../enterprise-governance
 fibo_extensions: ../../fibo-extensions
 
 domain:

@@ -9,7 +9,7 @@ source_rules:            # the domain-owned SHACL shapes this pack executes (nev
       - https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/rules/AdviceBoundaryRule        # IA-R-001
       - https://ontology.example.com/domain/retail-wealth-management/insights-and-analytics/rules/InsightTraceabilityRule   # IA-R-003
 reusable_shapes:
-  - enterprise-semantic-governance/fabric/reusable-assets/common-shapes.ttl
+  - enterprise-governance/fabric/reusable-assets/common-shapes.ttl
 input:
   graph: proposed insight(s) as RDF using the planning ontology
 on_violation:

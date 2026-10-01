@@ -10,7 +10,7 @@ git -C fibo-extensions/vendor/fibo checkout master_2026Q3
 git add fibo-extensions/vendor/fibo                        # records the new pin
 git config -f .gitmodules submodule.fibo-extensions/vendor/fibo.branch master_2026Q3
 git config -f fibo-extensions/.gitmodules submodule.vendor/fibo.branch master_2026Q3
-# set fibo.release_tag: master_2026Q3 in enterprise-semantic-governance/semantic.yaml
+# set fibo.release_tag: master_2026Q3 in enterprise-governance/semantic.yaml
 # re-validate profile/upstream-issues.yaml (known FIBO/OMG defects) and set its fibo_release: master_2026Q3
 make verify hermit        # every repo and sub-domain against the new FIBO
 ```

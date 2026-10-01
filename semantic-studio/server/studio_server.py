@@ -10,7 +10,7 @@
              reach files or URLs outside the graph. Results are capped (--max-rows) and time-limited
              (--timeout seconds). Cross-origin requests only from --cors-origin.
 
-Standard library + rdflib only (already in enterprise-semantic-governance/requirements.txt).
+Standard library + rdflib only (already in enterprise-governance/requirements.txt).
 """
 from __future__ import annotations
 

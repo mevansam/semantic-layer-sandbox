@@ -1,9 +1,9 @@
-# Enterprise Semantic Governance (+ Semantic Fabric)
+# Enterprise Governance (+ Semantic Fabric)
 
 The baseline that sets **how** enterprise knowledge is represented, shared and consumed by AI. Business domains own **what** it means (see `domain-template`). FIBO is the upper ontology (see `fibo-extensions`).
 
 ```
-enterprise-semantic-governance/     ← you are here: standards + fabric
+enterprise-governance/              ← you are here: standards + fabric
 fibo-extensions/                    ← pinned FIBO, enterprise FIBO profile, core extensions, domain registry
 domains/domain-template/            ← template every sub-domain is generated from
 domains/retail-wealth-management/   ← first business domain: financial-planning, insights-and-analytics

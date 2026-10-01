@@ -5,7 +5,7 @@ Enterprise governance decides **how** knowledge is represented, shared and consu
 - how their decisions become files and automated checks ("governance as code")
 - the review, release and change processes that keep independent teams consistent
 
-The human-readable operating model is `enterprise-semantic-governance/GOVERNANCE.md`. Its machine-readable form is `enterprise-semantic-governance/ontology/governance.ttl`. When the two disagree, the ontology wins.
+The human-readable operating model is `enterprise-governance/GOVERNANCE.md`. Its machine-readable form is `enterprise-governance/ontology/governance.ttl`. When the two disagree, the ontology wins.
 
 ## 2.1 Who governs what
 
@@ -161,7 +161,7 @@ Consistency check D8 fails if the register refers to a term or domain that no lo
 
 ## 2.8 Architecture decision records
 
-Enterprise-level decisions are ADRs in `enterprise-semantic-governance/docs/adr/`. Use the template `0000-template.md`, record the change class, and mark superseded ADRs. The current baseline:
+Enterprise-level decisions are ADRs in `enterprise-governance/docs/adr/`. Use the template `0000-template.md`, record the change class, and mark superseded ADRs. The current baseline:
 
 | ADR | Decision |
 |---|---|
@@ -173,5 +173,6 @@ Enterprise-level decisions are ADRs in `enterprise-semantic-governance/docs/adr/
 | 0006 | Consistency gate G8 and pull-request change-class check (no drift) |
 | 0007 | Known defects in the pinned FIBO/OMG release are patched out of the build closure only |
 | 0008 | Semantic Studio: a read-only web view generated from the repositories |
+| 0009 | The governance repository is named `enterprise-governance` |
 
 Next: [Federated repository structure →](03-federated-repository-structure.md)

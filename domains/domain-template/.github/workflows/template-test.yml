@@ -13,6 +13,6 @@ jobs:
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: "17" }
       - run: |
-          pip install -r enterprise-semantic-governance/requirements.txt
+          pip install -r enterprise-governance/requirements.txt
           bash fibo-extensions/scripts/fetch-omg-dependencies.sh
           make verify-template   # make tools runs first: checks Java, downloads ROBOT to build/tools/

@@ -102,7 +102,7 @@ export function GovernancePage() {
         <h3 className="sub-h">Risks</h3>
         <TermList ids={risks} />
       </Section>
-      <Section title="Cross-domain alignment decisions" actions={<a className="small" href={href.doc("enterprise-semantic-governance/docs/standards/07-cross-domain-alignment.md")}>Standard</a>}>
+      <Section title="Cross-domain alignment decisions" actions={<a className="small" href={href.doc("enterprise-governance/docs/standards/07-cross-domain-alignment.md")}>Standard</a>}>
         {alignment.length ? (
           <table>
             <thead>

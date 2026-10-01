@@ -79,7 +79,7 @@ How each part maps to the knowledge graph (standard 08):
 | Record classes | `…/records` | `records/*.ttl` |
 | Manifest and collections | `…/manifest` | `domain-manifest.ttl`, `collections/*.ttl` |
 | Execution models | `…/execution` | `execution-models/*.ttl` |
-| Enterprise vocabularies, core, registry, umbrellas | `{base}graph/enterprise/…` | `enterprise-semantic-governance/`, `fibo-extensions/` |
+| Enterprise vocabularies, core, registry, umbrellas | `{base}graph/enterprise/…` | `enterprise-governance/`, `fibo-extensions/` |
 | FIBO labels, definitions and parents used by the domain | `{base}graph/fibo/{release}/profile-closure` | the import closure (`build/closure.ttl`) |
 
 Graph names are `{base}graph/{publisher}/{collection}/v{MAJOR.MINOR.PATCH}/{partition}`, for example `…/graph/rwm-fp/financial-planning/v0.1.0/rules`.
@@ -131,10 +131,10 @@ flowchart BT
 | FIBO | `fibo-extensions/vendor/fibo` (submodule) + `fibo.release_tag` in governance `semantic.yaml` | Review board | Quarterly upgrade PR ([doc 7 §7.6](07-change-management.md#upgrade-fibo)) | FIBO release tag | D10, G4 for every sub-domain |
 | FIBO profile | `fibo-extensions/profile/enterprise-fibo-profile.ttl` | Review board | PR adding or removing `owl:imports` | module semver | E3, G4 |
 | Enterprise core | `fibo-extensions/ontology/core/enterprise-core.ttl` | Review board hosts; **owning domain** decides meaning (`ent-av:owningDomain`) | After an alignment decision | module semver | E1, G2, G4, D8 |
-| Alignment axioms and register | `fibo-extensions/ontology/alignment/`, `enterprise-semantic-governance/alignment/alignment-register.ttl` | Review board with the consulted domain owners | Alignment process ([doc 2 §2.7](02-enterprise-governance.md#27-cross-domain-alignment)) | module semver | G4, D8 |
+| Alignment axioms and register | `fibo-extensions/ontology/alignment/`, `enterprise-governance/alignment/alignment-register.ttl` | Review board with the consulted domain owners | Alignment process ([doc 2 §2.7](02-enterprise-governance.md#27-cross-domain-alignment)) | module semver | G4, D8 |
 | Domain registry | `fibo-extensions/registry/domain-registry.ttl` | Review board | Registration or publication PR | module semver | E2, E3, D2, D7 |
 | Ontology-domain umbrellas | `fibo-extensions/ontology/ontology-domains/<od>.ttl` | Review board | When a business domain publishes | module semver | D6, D7 |
-| Meta-model | `enterprise-semantic-governance/ontology/*.ttl`, `fabric/fabric.ttl` | Ontology standards team + review board | ADR for new concepts | module semver | G2, D1 |
+| Meta-model | `enterprise-governance/ontology/*.ttl`, `fabric/fabric.ttl` | Ontology standards team + review board | ADR for new concepts | module semver | G2, D1 |
 | Standards (machine-checked) | `shapes/meta-*.ttl`, `standards/domain-repo-structure.yaml` | Ontology standards team + review board | ADR required (`semtool changes`) | module semver / file `version` | every sub-domain's G1–G2 |
 | Taxonomy | `taxonomy/source/enterprise-taxonomy.md` → generated `.ttl` | Taxonomy owner via review board | Edit the markdown, run `semtool taxonomy` | generated | D9 |
 | Capability map | `capabilities/source/*.csv` + `curation.yaml` + `taxonomy-crosswalk.csv` → generated `.ttl` + report | Capability-map owners; curation by review board (ADR-0004) | Replace or curate the source, run `semtool capabilities` | generated | D9, D2, D6 |

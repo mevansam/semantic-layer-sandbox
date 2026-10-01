@@ -13,7 +13,7 @@ Every folder that holds governed knowledge has a `semantic.yaml` that declares i
 
 | Kind (`repo_kind`) | Folder | Owned by | Holds | Gates |
 |---|---|---|---|---|
-| `governance` | `enterprise-semantic-governance/` | Semantic review board, ontology standards team, AI risk office, fabric platform | Base IRI and teams (`semantic.yaml`); enterprise meta-model; meta-shapes; structure standard; taxonomy; capability map; alignment register; controls; fabric model; reusable assets; GraphRAG contract; `semtool`; standards; ADRs | G1 G2 G8 |
+| `governance` | `enterprise-governance/` | Semantic review board, ontology standards team, AI risk office, fabric platform | Base IRI and teams (`semantic.yaml`); enterprise meta-model; meta-shapes; structure standard; taxonomy; capability map; alignment register; controls; fabric model; reusable assets; GraphRAG contract; `semtool`; standards; ADRs | G1 G2 G8 |
 | `fibo-extensions` | `fibo-extensions/` | Semantic review board (hosts); owning domains (meaning of core terms) | FIBO submodule; enterprise FIBO profile; enterprise core; alignment axioms; ontology-domain umbrellas; domain registry | G1–G4, G8 |
 | *(template)* | `domains/domain-template/` | Ontology standards team | The Copier template every sub-domain is generated from (`template/`), and the parent layer for new business domains (`parent-template/`) | its own CI generates a sub-domain from each worked example and runs every gate on it |
 | `business-domain` | `domains/<business-domain>/` | Business-domain owner | Umbrella ontology and parent manifest (`domain.ttl`); list of sub-domains | G1–G4, G8 (reasons over all sub-domains together) |
@@ -25,7 +25,7 @@ Every folder that holds governed knowledge has a `semantic.yaml` that declares i
 .
 ├── Makefile                          verify · drift · changes · hermit · align · taxonomy · capabilities · codeowners
 ├── .github/workflows/semantic-ci.yml monorepo CI: every gate for every repository
-├── enterprise-semantic-governance/
+├── enterprise-governance/
 │   ├── semantic.yaml                 base_iri, teams, FIBO release tag, named-graph template   ← enterprise settings, once
 │   ├── ontology/                     governance.ttl · process.ttl · controls.ttl · annotations.ttl   (meta-model)
 │   ├── fabric/                       fabric.ttl · reusable-assets/ · graphrag/retrieval-contract.yaml
@@ -199,10 +199,10 @@ flowchart LR
 
 ## 3.8 Monorepo or separate repositories
 
-Everything is wired through **relative paths** in `semantic.yaml` (`governance: ../../../enterprise-semantic-governance`, `fibo_extensions: …`, `dependencies: [../financial-planning]`). The same tooling therefore works in two setups:
+Everything is wired through **relative paths** in `semantic.yaml` (`governance: ../../../enterprise-governance`, `fibo_extensions: …`, `dependencies: [../financial-planning]`). The same tooling therefore works in two setups:
 
 - **Monorepo**, as now: one CI workflow at the root (`.github/workflows/semantic-ci.yml`) verifies every repository.
-- **Separate repositories**: each has its own workflow. A split-out sub-domain calls the enterprise reusable workflow (`enterprise-semantic-governance/.github/workflows/semantic-ci.yml`) with `path: domains/<bd>/<sd>`. The workflow checks the sub-domain out at that path and checks out governance and FIBO extensions beside it, so the relative paths still resolve. Their refs are inputs (`governance-ref`, `fibo-extensions-ref`, default `main`); pin them to release tags for reproducible builds. The generated `ci.yml` already passes the right path.
+- **Separate repositories**: each has its own workflow. A split-out sub-domain calls the enterprise reusable workflow (`enterprise-governance/.github/workflows/semantic-ci.yml`) with `path: domains/<bd>/<sd>`. The workflow checks the sub-domain out at that path and checks out governance and FIBO extensions beside it, so the relative paths still resolve. Their refs are inputs (`governance-ref`, `fibo-extensions-ref`, default `main`); pin them to release tags for reproducible builds. The generated `ci.yml` already passes the right path.
 
 A change to an enterprise repository must be verified against every registered sub-domain before merge, and the cross-repository consistency checks (D6–D9, [doc 7](07-change-management.md)) need every repository present. In the monorepo, `make verify` does both. With separate repositories, an enterprise integration job has to check them all out in the monorepo layout and run `make verify`. Until that job exists, the monorepo is the supported setup.
 

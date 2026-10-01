@@ -1,6 +1,6 @@
 # Semantic Studio: architecture and implementation
 
-This document explains how Semantic Studio is built: what happens at build time, what runs when you use it, where the SPARQL store and engine come from, and how to extend it. For running it, see the [README](../README.md); for why it is built this way, see [ADR-0008](../../enterprise-semantic-governance/docs/adr/0008-semantic-studio.md).
+This document explains how Semantic Studio is built: what happens at build time, what runs when you use it, where the SPARQL store and engine come from, and how to extend it. For running it, see the [README](../README.md); for why it is built this way, see [ADR-0008](../../enterprise-governance/docs/adr/0008-semantic-studio.md).
 
 ## 1. The short version
 
@@ -136,7 +136,7 @@ sequenceDiagram
 
 ### The exporter (`exporter/export_site_data.py`)
 
-It imports `semtool` (`enterprise-semantic-governance/tools/semtool.py`), so it finds repositories, files and FIBO modules exactly as the checks do. Nothing it does changes a governed file.
+It imports `semtool` (`enterprise-governance/tools/semtool.py`), so it finds repositories, files and FIBO modules exactly as the checks do. Nothing it does changes a governed file.
 
 | Step | Function | Notes |
 |---|---|---|
@@ -309,7 +309,12 @@ flowchart TB
 ```
 
 - **The image.** It contains the exported data, not the repositories. Its build context is limited by `.dockerignore` to the sources and `build/site/data`. It runs as an unprivileged user and has a health check on `config.json`.
-- **Pinned dependencies.** `package-lock.json` fixes every JavaScript dependency, direct and indirect. `make` and the Docker build install with `npm ci`, so every build uses exactly those versions. To add or upgrade one, edit `package.json`, run `npm install` in `semantic-studio/` and commit both files.
+- **Pinned dependencies.** `package-lock.json` fixes every JavaScript dependency, direct and indirect. `make` and the Docker build install with `npm ci`, so every build uses exactly those versions.
+- **Minimum age.** The enterprise npm proxy refuses versions younger than 72 hours, so every locked version must be older than that.
+  - `make studio-lock` (`scripts/lock.mjs`) re-resolves the lock file under that rule: it uses `npm install --package-lock-only` with `--min-release-age` on npm 11.10 and later, and `--before` otherwise.
+  - `make studio-lock-check` checks every locked version's publish time against the registry.
+  - `.npmrc` (`min-release-age=3`) applies the same rule to ad-hoc `npm install` on npm 11.10 and later.
+- **Proxies in Docker.** `make studio-docker` passes the npm registry, the pip index, and `~/.npmrc` (as a BuildKit secret, so credentials stay out of the image).
 
 ## 8. Extending it
 

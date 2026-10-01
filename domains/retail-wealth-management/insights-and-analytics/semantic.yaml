@@ -1,5 +1,5 @@
 repo_kind: domain
-governance: ../../../enterprise-semantic-governance
+governance: ../../../enterprise-governance
 fibo_extensions: ../../../fibo-extensions
 
 # Extension point: sibling sub-domains whose PUBLISHED modules this one imports

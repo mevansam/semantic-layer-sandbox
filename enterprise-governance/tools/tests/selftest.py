@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Self-test for semtool: proves every validation check still catches what it is meant to catch.
 
-    python enterprise-semantic-governance/tools/tests/selftest.py            # all scenarios
-    python enterprise-semantic-governance/tools/tests/selftest.py -k D4 E3  # scenarios whose id contains D4 or E3
+    python enterprise-governance/tools/tests/selftest.py            # all scenarios
+    python enterprise-governance/tools/tests/selftest.py -k D4 E3  # scenarios whose id contains D4 or E3
     make selftest
 
 Each scenario copies the repository into a temporary folder (FIBO's vendor folder is not copied),
@@ -24,7 +24,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]          # monorepo root
-GOV = "enterprise-semantic-governance"
+GOV = "enterprise-governance"
 FX = "fibo-extensions"
 RWM = "domains/retail-wealth-management"
 FP = f"{RWM}/financial-planning"

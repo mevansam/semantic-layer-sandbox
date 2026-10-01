@@ -4,13 +4,13 @@ A [Copier](https://copier.readthedocs.io) template for a **sub-domain** reposito
 
 ## Create a domain
 
-1. Declare the sub-domain in `enterprise-semantic-governance/capabilities/curation.yaml` (`sub_domains`) and register its namespace `{base}domain/<business-domain>/<sub-domain>/` in `fibo-extensions/registry` (see `fibo-extensions/docs/registering-a-domain.md`). The business domain must exist in the capability map (ADR-0004, ADR-0005).
+1. Declare the sub-domain in `enterprise-governance/capabilities/curation.yaml` (`sub_domains`) and register its namespace `{base}domain/<business-domain>/<sub-domain>/` in `fibo-extensions/registry` (see `fibo-extensions/docs/registering-a-domain.md`). The business domain must exist in the capability map (ADR-0004, ADR-0005).
 2. Write an answers file (worked examples: `answers/rwm-fp.yaml`, `answers/rwm-ia.yaml`), generate the sub-domain, and verify it. The commands are in [Create a sub-domain](../../README.md#create-a-sub-domain) in the root README. Generation also scaffolds the business domain's parent layer from `parent-template/` if it doesn't exist yet.
 3. Replace the seed concept, rule, tool and tests with real modelling, **keeping the file names** (see below).
 
 ## The structure every domain keeps
 
-The template's structure is an enterprise standard (`enterprise-semantic-governance/standards/domain-repo-structure.yaml`), checked by `semtool structure` in every domain's CI (gate G1). The rule is simple: **edit the template's files in place, never rename or replace them; add files only where the naming conventions allow.**
+The template's structure is an enterprise standard (`enterprise-governance/standards/domain-repo-structure.yaml`), checked by `semtool structure` in every domain's CI (gate G1). The rule is simple: **edit the template's files in place, never rename or replace them; add files only where the naming conventions allow.**
 
 ```
 template/                                           → generated domain repo

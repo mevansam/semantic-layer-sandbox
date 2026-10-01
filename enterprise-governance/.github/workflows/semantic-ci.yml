@@ -1,5 +1,5 @@
 # Reusable CI for every semantic repository.
-# Callers:  jobs: semantic: uses: example-org/enterprise-semantic-governance/.github/workflows/semantic-ci.yml@v0
+# Callers:  jobs: semantic: uses: example-org/enterprise-governance/.github/workflows/semantic-ci.yml@v0
 #           with: { path: domains/<business-domain>/<sub-domain> }   # where the repo sits in the monorepo layout
 # Layout:   repositories are checked out in the monorepo layout, matching the relative paths in semantic.yaml.
 #           The monorepo root workflow (.github/workflows/semantic-ci.yml) is the primary CI; this reusable
@@ -32,16 +32,16 @@ jobs:
         with:
           path: ${{ inputs.path || github.event.repository.name }}
 
-      - name: Checkout enterprise-semantic-governance
-        if: github.event.repository.name != 'enterprise-semantic-governance'
+      - name: Checkout enterprise-governance
+        if: github.event.repository.name != 'enterprise-governance'
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository_owner }}/enterprise-semantic-governance
+          repository: ${{ github.repository_owner }}/enterprise-governance
           ref: ${{ inputs.governance-ref }}
-          path: enterprise-semantic-governance
+          path: enterprise-governance
 
       - name: Checkout fibo-extensions (with pinned FIBO submodule)
-        if: github.event.repository.name != 'fibo-extensions' && github.event.repository.name != 'enterprise-semantic-governance'
+        if: github.event.repository.name != 'fibo-extensions' && github.event.repository.name != 'enterprise-governance'
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository_owner }}/fibo-extensions
@@ -54,7 +54,7 @@ jobs:
         run: git -C fibo-extensions submodule update --init --depth 1
 
       - name: Fetch OMG Commons / LCC dependencies of FIBO
-        if: github.event.repository.name != 'enterprise-semantic-governance'
+        if: github.event.repository.name != 'enterprise-governance'
         run: bash fibo-extensions/scripts/fetch-omg-dependencies.sh
 
       - uses: actions/setup-python@v5
@@ -68,16 +68,16 @@ jobs:
 
       - name: Install tooling
         run: |
-          pip install -r enterprise-semantic-governance/requirements.txt
+          pip install -r enterprise-governance/requirements.txt
           curl -sSL -o robot.jar https://github.com/ontodev/robot/releases/download/${{ inputs.robot-version }}/robot.jar
           echo "ROBOT_JAR=$PWD/robot.jar" >> "$GITHUB_ENV"
 
       - name: Verify (gates G1-G8 as applicable)
-        run: python enterprise-semantic-governance/tools/semtool.py verify --repo ${{ inputs.path || github.event.repository.name }}
+        run: python enterprise-governance/tools/semtool.py verify --repo ${{ inputs.path || github.event.repository.name }}
 
       - name: Full OWL DL coherence (HermiT)
-        if: github.event.repository.name != 'enterprise-semantic-governance'
-        run: python enterprise-semantic-governance/tools/semtool.py reason --reasoner HermiT --repo ${{ inputs.path || github.event.repository.name }}
+        if: github.event.repository.name != 'enterprise-governance'
+        run: python enterprise-governance/tools/semtool.py reason --reasoner HermiT --repo ${{ inputs.path || github.event.repository.name }}
 
       - name: Upload knowledge graph + GraphRAG cards
         if: always()

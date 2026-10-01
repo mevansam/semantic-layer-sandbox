@@ -5,4 +5,4 @@ on:
     branches: [main]
 jobs:
   semantic:
-    uses: example-org/enterprise-semantic-governance/.github/workflows/semantic-ci.yml@main
+    uses: example-org/enterprise-governance/.github/workflows/semantic-ci.yml@main

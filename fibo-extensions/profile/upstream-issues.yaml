@@ -7,7 +7,7 @@
 #
 # Rules:
 # - one entry per defect, with evidence, the axiom(s) removed, and the upstream report
-# - `fibo_release` must equal fibo.release_tag in enterprise-semantic-governance/semantic.yaml;
+# - `fibo_release` must equal fibo.release_tag in enterprise-governance/semantic.yaml;
 #   `make drift` (D10) fails after a FIBO upgrade until every entry is re-validated and the release updated
 # - an entry whose axiom no longer exists in the closure is reported as stale (fixed upstream): remove it
 # - changes to this file need semantic review board approval

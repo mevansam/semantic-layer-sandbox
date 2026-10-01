@@ -1,5 +1,5 @@
 repo_kind: fibo-extensions
-governance: ../enterprise-semantic-governance
+governance: ../enterprise-governance
 
 # FIBO is a pinned, read-only git submodule (see .gitmodules / ADR-0001).
 fibo_dir: vendor/fibo

@@ -21,8 +21,8 @@ Every structural choice in the repository follows from this split (ADR-0002):
 | Pillar | Accountable for | Lives in |
 |---|---|---|
 | **Domain ownership** | Business ontologies · Business rules · Domain APIs · Data stewardship · Record keeping | `domains/<business-domain>/<sub-domain>/` (one folder per sub-domain, generated from the template) |
-| **Enterprise governance** | Ontology standards · Semantic review · AI risks & controls · Cross-domain alignment | `enterprise-semantic-governance/` and `fibo-extensions/` |
-| **Semantic fabric** (part of enterprise governance) | Governed knowledge collections · Knowledge graph management · Reusable semantic assets · Published execution models | Standards and tooling in `enterprise-semantic-governance/fabric/`. Each sub-domain's `collections/` and `execution-models/` |
+| **Enterprise governance** | Ontology standards · Semantic review · AI risks & controls · Cross-domain alignment | `enterprise-governance/` and `fibo-extensions/` |
+| **Semantic fabric** (part of enterprise governance) | Governed knowledge collections · Knowledge graph management · Reusable semantic assets · Published execution models | Standards and tooling in `enterprise-governance/fabric/`. Each sub-domain's `collections/` and `execution-models/` |
 
 ## The layers
 
@@ -31,7 +31,7 @@ flowchart TB
     subgraph EXT["External, read-only"]
         FIBO["FIBO master_2026Q2<br/>(pinned git submodule)"]
     end
-    subgraph ENT["Enterprise layer (enterprise-semantic-governance, fibo-extensions)"]
+    subgraph ENT["Enterprise layer (enterprise-governance, fibo-extensions)"]
         direction LR
         PROF["Enterprise FIBO profile<br/>(12 adopted modules)"]
         CORE["Enterprise core + alignment axioms<br/>(shared terms, one owning domain each)"]
@@ -120,7 +120,7 @@ Independent teams can model independently and still produce one coherent enterpr
 ## Repository at a glance
 
 ```
-enterprise-semantic-governance/   ENTERPRISE: standards, meta-model, meta-shapes, taxonomy, capability map,
+enterprise-governance/            ENTERPRISE: standards, meta-model, meta-shapes, taxonomy, capability map,
                                   alignment register, AI controls, fabric model, GraphRAG contract, semtool, ADRs
 fibo-extensions/                  ENTERPRISE: FIBO (pinned submodule), FIBO profile, enterprise core,
                                   alignment axioms, ontology-domain umbrellas, domain registry
