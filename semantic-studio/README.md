@@ -2,7 +2,7 @@
 
 A web view of the semantic layer: domains, concepts, rules, processes, APIs, data, records, the capability map, the taxonomy, FIBO, gate results, decisions and documents, with search and SPARQL.
 
-This first release is **Explore** mode, which is read-only. Everything it shows is generated from the repositories at one commit, so it cannot disagree with them. Changes still go through pull requests and the gates. See [ADR-0008](../enterprise-governance/docs/adr/0008-semantic-studio.md).
+This first release is **Explore** mode, which is read-only. Everything it shows is generated from the repositories at one commit, so it cannot disagree with them. Changes still go through pull requests and the gates. The design choices, and the alternatives considered, are in [docs/architecture.md](docs/architecture.md#10-design-choices).
 
 ## Run it
 
@@ -46,7 +46,7 @@ Setting it to `""` hides the SPARQL page's query box.
 | Capability map, Taxonomy | filterable trees, with what realises or is governed by each entry |
 | FIBO | the 12 modules of the enterprise profile, what builds on each, and every FIBO term in use |
 | Graph | how repositories build on each other and on FIBO (or each ontology separately); the neighbourhood of any term |
-| Governance | gates, decisions (ADRs), framework guide, standards, AI controls, alignment decisions, meta-shapes, known upstream defects |
+| Governance | gates, decisions (ADRs) with the rules each justifies, the enterprise rule catalogue (what each rule requires, how it is enforced, why, where it is defined), framework guide, standards, AI controls, alignment decisions, meta-shapes, known upstream defects |
 | Health | gate matrix (G1-G8, HermiT, drift, template), every warning and failure, self-test, upstream defects |
 | Docs | every markdown document, with Mermaid diagrams and working links |
 | SPARQL | queries over everything; examples and every competency question; CSV/JSON download |

@@ -77,6 +77,11 @@ def bump_module(w: Path, path: str, old: str, new: str):
     p.write_text(s)
 
 
+def regenerate_decisions(w: Path):
+    subprocess.run([sys.executable, str(w / GOV / "tools/semtool.py"), "decisions", "--repo", str(w / GOV)],
+                   capture_output=True, check=True)
+
+
 NEW_CLASS = """
 fp:EducationGoal a owl:Class ;
     rdfs:label "education goal"@en ;
@@ -130,6 +135,15 @@ SCENARIOS = [
      lambda w: sub(w, f"{FX}/.gitmodules", "branch = master_2026Q2", "branch = master_2026Q1"), "D10"),
     ("D10 upstream defects not re-validated for the FIBO release", GOV, "drift",
      lambda w: sub(w, f"{FX}/profile/upstream-issues.yaml", "fibo_release: master_2026Q2", "fibo_release: master_2026Q1"), "D10"),
+    ("D9 ADR changed, decision register not regenerated", GOV, "drift",
+     lambda w: sub(w, f"{GOV}/docs/adr/0007-known-upstream-fibo-defects.md", "- **Status:** Accepted", "- **Status:** Superseded by ADR-0010"), "D9"),
+    ("D11 rule defined in a missing standard", GOV, "drift",
+     lambda w: sub(w, f"{GOV}/standards/enterprise-rules.ttl", '"enterprise-governance/docs/standards/03-processes.md"',
+                   '"enterprise-governance/docs/standards/03-process.md"'), "D11"),
+    ("D11 rule points at a missing section", GOV, "drift",
+     lambda w: sub(w, f"{GOV}/standards/enterprise-rules.ttl", "GOVERNANCE.md#two-key-review", "GOVERNANCE.md#two-key-reviews"), "D11"),
+    ("D11 meta-shape without a link", GOV, "drift",
+     lambda w: sub(w, f"{GOV}/standards/enterprise-rules.ttl", 'ent-ms:TermNamingShape ent-gov:definedIn', 'ent-ms:TermNamingShapeOld ent-gov:definedIn'), "D11"),
     # G3 extension rules
     ("E1 statement about a FIBO term", FP, "extensions",
      lambda w: append(w, f"{FP}/ontology/planning.ttl",
@@ -152,6 +166,11 @@ SCENARIOS = [
                     "retail-wealth-management/insights-and-analytics> ;")), "meta-shapes"),
     ("G2 business rule without a policy source", FP, "meta",
      lambda w: sub(w, f"{FP}/rules/business-rules.ttl", r'\n    ent-av:policySource "[^"]*" ;', "", regex=True), "meta-shapes"),
+    ("G2 rule justified by a superseded decision", GOV, "meta",
+     lambda w: (sub(w, f"{GOV}/docs/adr/0007-known-upstream-fibo-defects.md", "- **Status:** Accepted", "- **Status:** Superseded by ADR-0010"),
+                regenerate_decisions(w)), "meta-shapes"),
+    ("G2 rule justified by an unknown decision", GOV, "meta",
+     lambda w: sub(w, f"{GOV}/standards/enterprise-rules.ttl", "ent-gov:justifiedBy ent-adr:ADR-0007 .", "ent-gov:justifiedBy ent-adr:ADR-0003 ."), "meta-shapes"),
     # G1 structure
     ("G1 negative test not listed", FP, "structure",
      lambda w: (w / FP / "tests/negative/nc-004-orphan.ttl").write_text("# orphan\n"), "structure"),

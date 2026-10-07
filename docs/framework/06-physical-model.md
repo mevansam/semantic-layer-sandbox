@@ -27,6 +27,8 @@ flowchart BT
         CTL["ontology/controls.ttl<br/>governance/controls/"]
         FABM["fabric/fabric.ttl<br/>fabric/model/"]
         ALR["alignment/alignment-register.ttl<br/>governance/alignment/"]
+        RULES["standards/enterprise-rules.ttl<br/>governance/rule/ (+ links for meta-shapes)"]
+        DREG["standards/decision-register.ttl<br/>governance/decision/ (generated from docs/adr/)"]
     end
     subgraph FXR["fibo-extensions"]
         PROF["profile/enterprise-fibo-profile.ttl<br/>fibo-ext/profile/"]
@@ -57,6 +59,9 @@ flowchart BT
     FABM --> CTL
     FABM --> PROC
     ALR --> GOVM
+    RULES -- "justifiedBy" --> DREG
+    RULES --> GOVM
+    DREG --> GOVM
     REG --> GOVM
     FPO --> CORE
     IAO --> CORE

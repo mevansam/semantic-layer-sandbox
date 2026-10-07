@@ -319,3 +319,4 @@ table.lines tr.hl td { background: #fff5d6; }
 a.mono, .markdown code, .r-detail { overflow-wrap: anywhere; word-break: break-word; }
 .li > *, .between > * { min-width: 0; }
 @media (max-width: 900px) { .li.cq { flex-direction: column; } }
+.link-list { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; }

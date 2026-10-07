@@ -43,6 +43,7 @@ make verify                                                      # everything (a
 | I changed a published module, a dependency or the parent layer | `make verify` (verifies dependents and the business domain in one go), then `make hermit` |
 | I changed an enterprise repository (standards, meta-model, registry, profile, core, template) | `make verify` (every domain must still pass), `make hermit`, `make align`; for shapes or standards also add an ADR |
 | I changed the taxonomy, capability map or a manifest's roles | `make taxonomy` / `make capabilities` / `make codeowners`, commit the generated files, then `make drift` |
+| I added or changed an ADR | link the rules it justifies in `standards/enterprise-rules.ttl`, `make decisions`, then `make verify` |
 | I changed `semtool.py`, a meta-shape or the structure standard | `make selftest`, then `make verify` |
 | I want to see what a competency question returns | `semtool cq --repo domains/<bd>/<sd> --show 5` |
 | I want to look at the knowledge graph an agent would get | `semtool kg --repo domains/<bd>/<sd>`, then query `build/kg.trig` (§8.8) |
@@ -60,10 +61,11 @@ Run from the repository root. Each target exits non-zero on failure, so they can
 | `make changes BASE=<ref> [STRICT=1]` | `semtool changes --base <ref>` for every repository (default `BASE=origin/main`; `STRICT=1` adds `--strict`) | PR check | ~1 s |
 | `make hermit` | full OWL DL reasoning (HermiT) over each business domain with all its sub-domains and FIBO | G4 (complete) | ~25 s |
 | `make align` | `compare_domain.py` for every sub-domain; fails if a template-owned file drifted or a template file is missing | template conformance | ~5 s |
-| `make selftest` | seeds 31 defects one at a time and expects each to be caught, plus one correct change that must pass | the checks themselves | ~30 s |
+| `make selftest` | seeds 37 defects one at a time and expects each to be caught, plus one correct change that must pass | the checks themselves | ~30 s |
 | `make taxonomy` | regenerate `taxonomy/enterprise-taxonomy.ttl` | generator | |
 | `make capabilities` | regenerate `capabilities/capability-map.ttl` and `data-quality-report.md` | generator | |
 | `make codeowners` | regenerate `CODEOWNERS` in every sub-domain | generator | |
+| `make decisions` | regenerate `standards/decision-register.ttl` from the ADRs | generator | |
 | `make tools` | check Java (≥ 11), download ROBOT to `build/tools/` once, verify the jar runs. Prerequisite of `verify`, `verify-fibo`, `verify-domains`, `verify-template` and `hermit`. Variables: `ROBOT_VERSION` (default `v1.9.10`), `ROBOT_JAR` (use your own jar), `JAVA_MIN` (default 11) | setup | first run: download |
 | `make check-java` | only the Java check | setup | |
 | `eval "$(make -s env)"` | set `ROBOT_JAR` in your shell (optional; `semtool` finds `build/tools/` itself) | setup | |
@@ -209,7 +211,7 @@ Checks that facts stated in more than one place agree. Which codes run depends o
 | sub-domain | D2 identity · D3 modules · D4 dependencies · D5 collections and graph names |
 | business domain | D2 identity · D6 parent layer |
 | fibo-extensions | D7 registry and umbrellas |
-| governance | D8 alignment and core · D9 generated files current (regenerated in a temporary copy) and curation · D10 FIBO pin |
+| governance | D8 alignment and core · D9 generated files current (regenerated in a temporary copy) and curation · D10 FIBO pin · D11 rules link to existing standards and decisions |
 
 Every finding starts with its code and says what disagrees with what, e.g. `FAIL D4 manifest dependsOnSubDomain [] differs from semantic.yaml dependencies [...]`. The fix is always to make the *derived* statement match the *authoritative* one (table in [doc 7 §7.2](07-change-management.md#72-where-every-fact-lives)). For D9, re-run the generator named in the message and commit the result.
 
@@ -231,7 +233,8 @@ Version findings on **Release** content are `FAIL`; on **Provisional** content t
 #### `codeowners` (sub-domains)
 Regenerates `CODEOWNERS` from the roles and review teams in `domain-manifest.ttl` (the two-key review; see [doc 2 §2.3](02-enterprise-governance.md#23-two-key-review)). `verify` runs it. Commit the result, or D9 fails.
 
-#### `taxonomy` and `capabilities` (generators, run on the governance repository)
+#### `taxonomy`, `capabilities` and `decisions` (generators, run on the governance repository)
+- `decisions`: the ADRs in `docs/adr/` (number, title, status, date, supersedes) → `standards/decision-register.ttl` (`ent-gov:ArchitectureDecision`). Run it (`make decisions`) after adding or changing an ADR, or D9 fails. It **fails** if an ADR has no `# ADR-NNNN: title` heading or no `Status:` line.
 - `taxonomy`: `taxonomy/source/enterprise-taxonomy.md` (nested list) → `taxonomy/enterprise-taxonomy.ttl` (SKOS).
 - `capabilities [--source FILE]`: the capability map CSV/XLSX (default `capabilities/source/capability-map.csv`; columns mapped by `capabilities/columns.yaml`) + `curation.yaml` + `taxonomy-crosswalk.csv` → `capabilities/capability-map.ttl` and `data-quality-report.md`. Read the report after every import: it lists excluded mappings with reasons, capability gaps and proposed capabilities.
 - **Fails** if the source file or a required column is missing (`adjust capabilities/columns.yaml`).
@@ -288,10 +291,13 @@ A check that silently stops failing is worse than no check. The self-test:
 1. Copies the repository to a temporary folder, commits it there as a git baseline, and confirms that every command it will use passes on the clean copy.
 2. Runs each **scenario**. A scenario seeds one defect, runs one command against one repository, and expects a failure containing specific text.
 
-There are 31 defect scenarios:
-- all drift codes, D1–D10 (D10 twice: the FIBO pin, and the known-defects register after a FIBO change)
+There are 37 defect scenarios:
+- all drift codes, D1–D11:
+  - D10 twice: the FIBO pin, and the known-defects register after a FIBO change
+  - D9 also for an ADR changed without regenerating the decision register
+  - D11 three times: a missing standard, a missing section, a meta-shape with no link
 - E1–E3
-- a dependency cycle and a rule without a policy source (G2)
+- G2: a dependency cycle, a rule without a policy source, and a rule justified by a superseded or an unknown decision
 - two structure cases (G1)
 - a negative case that no longer trips its rule (G5)
 - four pull-request cases

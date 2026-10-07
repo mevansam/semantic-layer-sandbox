@@ -135,7 +135,7 @@ flowchart BT
 | Domain registry | `fibo-extensions/registry/domain-registry.ttl` | Review board | Registration or publication PR | module semver | E2, E3, D2, D7 |
 | Ontology-domain umbrellas | `fibo-extensions/ontology/ontology-domains/<od>.ttl` | Review board | When a business domain publishes | module semver | D6, D7 |
 | Meta-model | `enterprise-governance/ontology/*.ttl`, `fabric/fabric.ttl` | Ontology standards team + review board | ADR for new concepts | module semver | G2, D1 |
-| Standards (machine-checked) | `shapes/meta-*.ttl`, `standards/domain-repo-structure.yaml` | Ontology standards team + review board | ADR required (`semtool changes`) | module semver / file `version` | every sub-domain's G1–G2 |
+| Standards (machine-checked) | `shapes/meta-*.ttl`, `standards/domain-repo-structure.yaml`, `standards/enterprise-rules.ttl` | Ontology standards team + review board | ADR required (`semtool changes`); each rule linked to its ADR | module semver / file `version` | every sub-domain's G1–G2; governance G2, D9, D11 |
 | Taxonomy | `taxonomy/source/enterprise-taxonomy.md` → generated `.ttl` | Taxonomy owner via review board | Edit the markdown, run `semtool taxonomy` | generated | D9 |
 | Capability map | `capabilities/source/*.csv` + `curation.yaml` + `taxonomy-crosswalk.csv` → generated `.ttl` + report | Capability-map owners; curation by review board (ADR-0004) | Replace or curate the source, run `semtool capabilities` | generated | D9, D2, D6 |
 | AI controls | `ontology/controls.ttl` | AI risk office | ADR | module semver | G2 |

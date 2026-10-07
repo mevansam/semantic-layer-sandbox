@@ -33,6 +33,9 @@ paths:
     - fabric/reusable-assets/*.ttl
   alignment:
     - alignment/*.ttl
+  decisions:                      # rule catalogue (hand-written) + decision register (generated from docs/adr/)
+    - standards/enterprise-rules.ttl
+    - standards/decision-register.ttl
 
 # Knowledge-graph named graph convention (see docs/standards/08-semantic-fabric.md)
 graph_name_template: "{base}graph/{publisher}/{collection}/{version}/{partition}"

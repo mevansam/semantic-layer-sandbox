@@ -161,18 +161,31 @@ Consistency check D8 fails if the register refers to a term or domain that no lo
 
 ## 2.8 Architecture decision records
 
-Enterprise-level decisions are ADRs in `enterprise-governance/docs/adr/`. Use the template `0000-template.md`, record the change class, and mark superseded ADRs. The current baseline:
+An ADR records **why** a rule that binds domains exists, and what was rejected. It does not restate the rule; the rule lives in a standard. ADRs are required only for changes that bind domains: an enterprise rule, a meta-shape, the structure standard, an AI control, or a template change every sub-domain must follow. History (tooling, renames, fixes) goes in [`CHANGELOG.md`](../../CHANGELOG.md). The scope, template and index are in [`enterprise-governance/docs/adr/README.md`](../../enterprise-governance/docs/adr/README.md).
+
+Rules are linked to their decisions, so the reasoning is found from the rule:
+
+```mermaid
+flowchart LR
+  adr["docs/adr/NNNN-*.md<br/>(reasoning, alternatives)"] -- "semtool decisions" --> reg["standards/decision-register.ttl<br/>ent-gov:ArchitectureDecision (generated, D9)"]
+  cat["standards/enterprise-rules.ttl<br/>gates G1-G8, rules E1-E7, D1-D11, C1-C3, R1-R2, K1, U1, A1<br/>+ links for every meta-shape"] -- "ent-gov:justifiedBy" --> reg
+  cat -- "ent-gov:definedIn" --> std["the standard that defines the rule<br/>(GOVERNANCE.md, docs/standards/, extension rules, ...)"]
+```
+
+- **Every link names an Accepted decision.** A meta-shape (G2) enforces it, so superseding a decision forces its rules to be re-linked.
+- **Every rule and meta-shape names a standard that exists.** D11 checks that, and warns about an Accepted decision that no rule cites.
+- **Semantic Studio shows the links both ways:** on a rule, *why*; on a decision, *which rules*.
 
 | ADR | Decision |
 |---|---|
-| 0001 | FIBO is the upper ontology, consumed read-only and pinned |
+| 0001 | FIBO is the enterprise upper ontology, consumed read-only and pinned |
 | 0002 | Domains own meaning; the enterprise owns representation (two-key review) |
-| 0003 | *Superseded* provisional capability map |
-| 0004 | Curated import of the capability map (partly amended by 0005) |
-| 0005 | Business domains with sub-domains; IRIs follow the folder layout |
-| 0006 | Consistency gate G8 and pull-request change-class check (no drift) |
-| 0007 | Known defects in the pinned FIBO/OMG release are patched out of the build closure only |
-| 0008 | Semantic Studio: a read-only web view generated from the repositories |
-| 0009 | The governance repository is named `enterprise-governance` |
+| 0004 | The capability map is imported through reviewed curation rules |
+| 0005 | Business domains split into sub-domains; IRIs follow the folder layout |
+| 0006 | Repeated facts must agree (G8), and versions must follow change classes |
+| 0007 | Known FIBO/OMG defects are removed from the build closure only |
+| 0010 | ADRs only for rules that bind domains; every rule links to its decision |
+
+Numbers 0003, 0008 and 0009 are retired; what they recorded is in the changelog.
 
 Next: [Federated repository structure →](03-federated-repository-structure.md)

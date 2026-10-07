@@ -16,6 +16,8 @@ export interface Kind {
 // Most specific first. Each entry: [type CURIE, key, label].
 const KINDS: [string, string, string][] = [
   ["ent-gov:BusinessRule", "rule", "Business rule"],
+  ["ent-gov:EnterpriseRule", "erule", "Enterprise rule"],
+  ["ent-gov:ArchitectureDecision", "decision", "Decision (ADR)"],
   ["ent-gov:DomainApi", "api", "Domain API"],
   ["ent-fab:QueryTool", "tool", "Agent tool"],
   ["ent-fab:RulePack", "tool", "Rule pack"],

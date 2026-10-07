@@ -1,6 +1,6 @@
 # Semantic Studio: architecture and implementation
 
-This document explains how Semantic Studio is built: what happens at build time, what runs when you use it, where the SPARQL store and engine come from, and how to extend it. For running it, see the [README](../README.md); for why it is built this way, see [ADR-0008](../../enterprise-governance/docs/adr/0008-semantic-studio.md).
+This document explains how Semantic Studio is built: what happens at build time, what runs when you use it, where the SPARQL store and engine come from, and how to extend it. For running it, see the [README](../README.md); for why it is built this way, see [§10 Design choices](#10-design-choices).
 
 ## 1. The short version
 
@@ -332,4 +332,18 @@ flowchart TB
 - **Snapshot.** The studio shows one export. Changes appear after `make studio` and a reload; the SPARQL server also needs a restart.
 - **Data size.** The whole graph is loaded into the browser. That is fine at today's 1.1 MB, and should stay fine up to a few hundred thousand triples. Beyond that, the browser should fetch per-repository slices, and SPARQL should move to Oxigraph or another store (section 2).
 - **Query time limit.** rdflib queries can't be interrupted; the time limit stops waiting, not the work (section 2).
-- **Read-only by design.** Editing will come as a **Propose** mode that opens pull requests (ADR-0008).
+- **Read-only by design.** Editing will come as a **Propose** mode that opens pull requests (§10).
+
+## 10. Design choices
+
+Semantic Studio is tooling: it binds no domain, so its choices are recorded here rather than in an ADR (see the ADR scope in `enterprise-governance/docs/adr/README.md`).
+
+| Choice | Why | Alternatives considered |
+|---|---|---|
+| **A separate tool at the repository root**, starting with a read-only Explore mode | The name and place leave room for editing later, without mixing a web app into the governance repository | Generating the site inside `semtool`: rejected to keep `semtool` focused on checks; the exporter imports `semtool` and reuses its repository model |
+| **Generated from the repositories at one commit, never edited** | The view can never disagree with the repositories; every page shows the commit it was built from | A live triple store browsed directly (Fuseki, GraphDB): shows triples but not ownership, gates, processes or documents, and adds a server to run and secure |
+| **Health from the checks' own reports** (`build/reports/`) plus drift and alignment at export | One source of truth for gate results; reports from another commit, or older than a change, are marked | Re-running every gate at export: needs Java and takes minutes |
+| **SPARQL through a small read-only server** (rdflib) | No new dependency; loads in under a second; Update, SERVICE and FROM are refused | Oxigraph in the browser (WebAssembly): would keep a static host self-contained; can be added later behind the same `sparqlEndpoint` setting |
+| **Labels first, a Technical detail switch for IRIs and triples** | Business owners and engineers use the same pages | Two separate sites: twice the upkeep |
+| **All 12 FIBO profile modules loaded** | What domains may build on is visible before anyone uses it | Only the FIBO terms in use: hides the rest of the profile |
+| **Editing (Propose mode) will open pull requests** | The gates and two-key review stay the only way in | Writing files directly: bypasses review |

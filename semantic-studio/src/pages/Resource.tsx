@@ -3,6 +3,7 @@ import { ReactNode, useState } from "react";
 import { Empty, Icon, KV, Pill, Section, SourceLink, Term, TermList, ValueOf } from "../components/ui";
 import { useData, useSettings } from "../data";
 import { capitalize, KG } from "../kg";
+import { DecisionSections, WhySection } from "../components/Decisions";
 import { byLabel, isExternal, kindOf, repoOfNode } from "../model";
 import { href } from "../router";
 
@@ -11,6 +12,8 @@ const SHOWN = [
   "rdf:type", "rdfs:label", "skos:prefLabel", "skos:definition", "dct:description", "dct:abstract", "rdfs:comment",
   "ent-av:ruleStatement", "ent-av:agentGuidance", "ent-av:businessExample", "skos:editorialNote", "skos:scopeNote",
   "rdfs:subClassOf", "skos:broader", "owl:versionInfo", "fibo-fnd-utl-av:hasMaturityLevel", "rdfs:domain", "rdfs:range",
+  "ent-gov:justifiedBy", "ent-gov:definedIn", "ent-gov:enforcedBy", "ent-gov:decisionStatus", "ent-gov:decisionRecord",
+  "ent-gov:supersedesDecision", "dct:date", "ent-gov:ruleCode",
 ];
 
 export function ResourcePage({ iri }: { iri: string }) {
@@ -41,7 +44,8 @@ export function ResourcePage({ iri }: { iri: string }) {
   const maturity = kg.object(s, t("fibo-fnd-utl-av:hasMaturityLevel"));
   const version = kg.text(s, t("owl:versionInfo"));
   const status = kg.text(s, t("ent-gov:capabilityStatus"));
-  const ruleId = kg.text(s, t("ent-av:ruleIdentifier"));
+  const ruleId = kg.text(s, t("ent-av:ruleIdentifier"), t("ent-gov:ruleCode")) ?? (kind.key === "decision" ? kg.text(s, t("skos:notation")) : undefined);
+  const decisionStatus = kg.text(s, t("ent-gov:decisionStatus"));
 
   return (
     <div className="stack">
@@ -67,6 +71,7 @@ export function ResourcePage({ iri }: { iri: string }) {
             <Pill tone="info">{kind.label}</Pill>
             {ruleId && <Pill tone="mute">{ruleId}</Pill>}
             {status && <Pill tone={status === "Proposed" ? "warn" : "mute"}>{status}</Pill>}
+            {decisionStatus && <Pill tone={decisionStatus === "Accepted" ? "pass" : "warn"}>{decisionStatus}</Pill>}
             {maturity !== undefined && <Pill tone="mute">{kg.label(maturity)}</Pill>}
             {version && <Pill tone="mute">v{version}</Pill>}
           </div>
@@ -157,8 +162,10 @@ function KindSections({ s, kindKey }: { s: number; kindKey: string }) {
       return <OntologySections s={s} />;
     case "rule":
       return <RuleSections s={s} />;
+    case "decision":
+      return <DecisionSections s={s} />;
     default:
-      return null;
+      return <WhySection s={s} />;
   }
 }
 
@@ -420,6 +427,7 @@ function Facts({ s }: { s: number }) {
   const kindKey = kindOf(kg, s).key;
   if (kindKey === "rule") ["sh:property", "sh:targetClass", "ent-gov:hasRuleOwner", "sh:severity", "sh:sparql", "ent-av:ruleIdentifier"].forEach((c) => skip.add(kg.P(c)));
   if (kindKey === "ontology") skip.add(kg.P("owl:imports"));
+  if (kindKey === "decision") skip.add(kg.P("skos:notation"));
   if (kindKey === "property") ["rdfs:subPropertyOf", "owl:inverseOf"].forEach((c) => skip.add(kg.P(c)));
   const groups = groupBy(kg, kg.out[s].filter((e) => !skip.has(e.p)), (e) => e.p);
   if (!groups.length) return null;
@@ -447,7 +455,8 @@ function Facts({ s }: { s: number }) {
 
 function ReferencedBy({ s }: { s: number }) {
   const { kg } = useData();
-  const skip = new Set(["rdfs:subClassOf", "skos:broader", "rdf:type", "rdfs:domain", "rdfs:range", "sh:targetClass", "skos:inScheme", "owl:imports"].map((c) => kg.P(c)));
+  const skip = new Set(["rdfs:subClassOf", "skos:broader", "rdf:type", "rdfs:domain", "rdfs:range", "sh:targetClass", "skos:inScheme", "owl:imports",
+    "ent-gov:justifiedBy", "ent-gov:supersedesDecision"].map((c) => kg.P(c)));
   const all = kg.inc[s].filter((e) => !skip.has(e.p));
   const [showAll, setShowAll] = useState(false);
   if (!all.length) return null;

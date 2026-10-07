@@ -31,6 +31,8 @@ Every folder that holds governed knowledge has a `semantic.yaml` that declares i
 │   ├── fabric/                       fabric.ttl · reusable-assets/ · graphrag/retrieval-contract.yaml
 │   ├── shapes/                       meta-common.ttl · meta-assets.ttl · meta-business.ttl            (standards as SHACL)
 │   ├── standards/                    domain-repo-structure.yaml                                       (structure standard)
+│   │                                 enterprise-rules.ttl  (rule catalogue → standards + ADRs)
+│   │                                 docs/adr/*.md  →  decision-register.ttl                          (generated)
 │   ├── taxonomy/                     source/enterprise-taxonomy.md  →  enterprise-taxonomy.ttl        (generated)
 │   ├── capabilities/                 source/*.csv + curation.yaml + taxonomy-crosswalk.csv
 │   │                                   →  capability-map.ttl + data-quality-report.md                 (generated)

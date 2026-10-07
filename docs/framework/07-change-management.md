@@ -61,8 +61,9 @@ This document lists where each fact lives, what checks it, how versions work, an
 | **D6** | Business domain:<ul><li>`sub_domains` = the sub-domain folders = `includesSubDomain` = capability-map sub-domains</li><li>umbrella imports = the sub-domains' published modules</li><li>the ontology-domain umbrella imports the business-domain umbrella</li></ul> | business domain |
 | **D7** | Every registered, non-reserved domain has its folder with a matching namespace; published modules exist; codes and namespaces are unique; ontology-domain umbrellas import only registered domains | fibo-extensions |
 | **D8** | Alignment decisions refer to terms that still exist and to domains in the capability map; enterprise-core owning domains are registered | governance |
-| **D9** | Taxonomy, capability map, data-quality report and every `CODEOWNERS` equal a fresh regeneration; `curation.yaml` `sub_domains` = each business domain's `semantic.yaml` `sub_domains` (which D6 ties to the folders) | governance |
+| **D9** | Taxonomy, capability map, data-quality report, decision register and every `CODEOWNERS` equal a fresh regeneration; `curation.yaml` `sub_domains` = each business domain's `semantic.yaml` `sub_domains` (which D6 ties to the folders) | governance |
 | **D10** | The FIBO branch pinned in `.gitmodules` (root and `fibo-extensions/`), the commit of the release tag (fetched by `make`), and `fibo_release` in `fibo-extensions/profile/upstream-issues.yaml` all equal `fibo.release_tag`; notes if nothing pins a branch or the tag is unavailable | governance |
+| **D11** | Every enterprise rule and every targeted meta-shape names a standard (`ent-gov:definedIn`) that exists, down to the section; warns about an accepted decision that no rule cites (`ent-gov:justifiedBy`, ADR-0010) | governance |
 
 Every check is mutation-tested by `make selftest`: each code has at least one seeded defect it must catch ([doc 8 §8.7](08-validation-tooling.md#87-self-test-testing-the-checks-themselves)).
 
@@ -80,7 +81,7 @@ For every governed module that exists at the base and was changed (new modules n
 
 It also checks two more things:
 - If any source of a knowledge collection changed, the **collection version** must change. The graph names then change with it, and D5 checks that they do.
-- If `shapes/` or `standards/` changed in the governance repository, the PR must add or change an **ADR** under `docs/adr/`.
+- If `shapes/` or `standards/` changed in the governance repository, the PR must add or change an **ADR** under `docs/adr/`. That includes the rule catalogue, `standards/enterprise-rules.ttl` (rule C3).
 
 Enforcement follows maturity:
 - **Release** content: a finding is a failure.
@@ -270,12 +271,22 @@ Each playbook lists the steps, then what catches a missed step.
 
 #### Change a standard (meta-shape, structure standard, control, meta-model)
 
-1. Write an ADR (`docs/adr/NNNN-…md`, change class *enterprise standard*).
+1. Write an ADR (`docs/adr/NNNN-…md`, see `docs/adr/README.md`): the reasoning and the rejected alternatives, not the rule itself.
 2. Change the shape, standard or vocabulary. Bump its version.
-3. `make verify`. Every domain must pass the new standard in the same PR. Otherwise fix those domains in the PR, or introduce the shape at `sh:Warning` first and raise it to `sh:Violation` in a later release.
-4. Announce it to all domains. Update the template if new domains need new content.
+3. Link it in `standards/enterprise-rules.ttl`:
+   - `ent-gov:definedIn`: the standard that defines it
+   - `ent-gov:justifiedBy`: the ADR
 
-*Caught if missed:* `changes` (shape or standard change without an ADR), every domain's G1/G2.
+   For a new rule, add it to the catalogue with its code. If the ADR supersedes another, re-link that decision's rules.
+4. `make decisions`, then `make verify`. Every domain must pass the new standard in the same PR. Otherwise fix those domains in the PR, or introduce the shape at `sh:Warning` first and raise it to `sh:Violation` in a later release.
+5. Announce it to all domains. Update the template if new domains need new content.
+
+*Caught if missed:*
+- `changes`: a shape or standard change without an ADR (C3)
+- G2: a link to a missing or superseded decision
+- D9: the register not regenerated
+- D11: a missing standard or section
+- every domain's G1/G2
 
 #### Update the taxonomy or the capability map
 

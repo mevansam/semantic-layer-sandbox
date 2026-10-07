@@ -1,3 +1,4 @@
+import { DecisionChip, decisions, enterpriseRules, pathLink, RuleTable } from "../components/Decisions";
 import { Empty, Pill, Section, Term, TermList } from "../components/ui";
 import { useData } from "../data";
 import { byLabel, GATES } from "../model";
@@ -9,7 +10,9 @@ export function GovernancePage() {
   const d = useData();
   const { kg } = d;
   const P = (c: string) => kg.P(c);
-  const adrs = d.docs.filter((x) => x.group === "adr").sort((a, b) => a.path.localeCompare(b.path));
+  const adrs = decisions(kg);
+  const rules = enterpriseRules(kg);
+  const adrIndex = d.docs.find((x) => x.group === "adr" && x.path.endsWith("/README.md"));
   const standards = d.docs.filter((x) => x.group === "standards").sort((a, b) => a.path.localeCompare(b.path));
   const framework = d.docs.filter((x) => x.group === "framework").sort((a, b) => a.path.localeCompare(b.path));
   const controls = kg.instances("ent-ctl:AIControl").sort(byLabel(kg));
@@ -45,14 +48,26 @@ export function GovernancePage() {
             <a href={href.doc("docs/framework/07-change-management.md")}>Changing things without drift</a>
           </p>
         </Section>
-        <Section title="Decisions" actions={<span className="small muted">{adrs.length} records</span>}>
+        <Section title="Decisions" actions={adrIndex && <a className="small" href={href.doc(adrIndex.path)}>When an ADR is needed</a>}>
+          <p className="small muted">Why the rules that bind domains exist. Each decision lists the rules it justifies.</p>
           <ul className="list">
-            {adrs.map((a) => (
-              <li key={a.path} className="li">
-                <a href={href.doc(a.path)}>{a.title}</a>
-                {a.status && <Pill tone={/accept/i.test(a.status) ? "pass" : "mute"}>{a.status}</Pill>}
-              </li>
-            ))}
+            {adrs.map((a) => {
+              const record = kg.text(a, P("ent-gov:decisionRecord"));
+              const n = kg.subjects(P("ent-gov:justifiedBy"), a).length;
+              return (
+                <li key={a} className="li">
+                  <span>
+                    <DecisionChip id={a} /> <a href={href.resource(kg.iri(a))}>{kg.label(a)}</a>
+                    <span className="small muted"> &middot; {n} linked rule{n === 1 ? "" : "s"} and shapes</span>
+                  </span>
+                  {record && (
+                    <a className="small" href={pathLink(d, record)}>
+                      Read
+                    </a>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </Section>
       </div>
@@ -76,6 +91,12 @@ export function GovernancePage() {
           </ul>
         </Section>
       </div>
+      <Section
+        title="Enterprise rules"
+        actions={<span className="small muted">{rules.length} rules; each names the standard that defines it and the decision that justifies it</span>}
+      >
+        {rules.length ? <RuleTable rules={rules} /> : <Empty>No rule catalogue in this build.</Empty>}
+      </Section>
       <Section title="AI controls" actions={<span className="small muted">{controls.length} controls, {risks.length} risks</span>}>
         <table>
           <thead>

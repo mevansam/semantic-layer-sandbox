@@ -1,32 +1,38 @@
-# ADR-0004: Curated import of the enterprise capability map
+# ADR-0004: The capability map is imported through reviewed curation rules
 
-- **Status:** Accepted; decisions 5 (namespaces) and 6 (first domain's repository) superseded by ADR-0005
+- **Status:** Accepted
 - **Date:** 2026-09-28
-- **Supersedes:** ADR-0003
-- **Change class:** Enterprise standard (breaking for the first domain's namespace)
+- **Deciders:** Semantic review board, capability-map owners consulted
 
 ## Context
-The authoritative capability map (`capabilities/source/capability-map.csv`, 308 rows) arrived. It maps **38 business (API) domains** to **8 ontology domains** (the named data ontologies) and to a capability hierarchy (L1–L4, 134 nodes). It has no capability IDs, descriptions or taxonomy links, and several mappings are inconsistent:
+The semantic model is governed by the enterprise capability map: every domain manifest names the capabilities it realises, and every capability has an accountable domain. The authoritative map (ontology domains > business domains > a capability hierarchy) has no identifiers or taxonomy links. It also has systematic errors:
+- whole capability trees copied onto domains they don't belong to
+- technology groupings mixed with business capabilities
+- doubtful ontology-domain placements
+- many domains with no capabilities at all
 
-- Whole capability trees are copied onto domains they don't belong to. For example, the full Benefits Management tree is assigned to Benefits Management, Plan Management, Product & Services and Employer Management.
-- Technology groupings ("Shared Software & Technology") are mixed in with business capabilities.
-- Some ontology-domain placements look incorrect, such as Legal, Risk, Compliance & Surveillance under Employee Operations.
-- 26 domains have no capabilities at all, including every domain behind self-directed wealth planning.
-- There is no "Retail Wealth Planning & Advisory" domain.
+Importing it as is would make those errors part of every domain's governance.
 
 ## Decision
-1. **Structure.** Ontology domain (`ent-gov:OntologyDomain`) > business domain (`ent-gov:BusinessDomain`, `ent-gov:inOntologyDomain`) > capability tree (SKOS). Capability IDs are derived from the path, e.g. `ent-cap:investment-management.portfolio-management`.
-2. **Import only business-specific, correct mappings** (`capabilities/curation.yaml`):
-   - A domain keeps a mapping only where the mapped path contains the domain's own capability: the same name, or a reviewed alias. The deepest such node is the domain's *anchor*.
-   - One accountable domain per capability (`ent-gov:accountableDomain`): the domain with the deepest anchor at or above the capability.
-   - Technology nodes are typed `ent-gov:TechnologyCapability` and are never used as business anchors.
-   - Suspicious ontology-domain placements are not imported; the domain stays unplaced until reviewed.
-3. **Proposed capabilities.** Domains with no capabilities may propose them in `curation.yaml`. These are imported with `capabilityStatus "Proposed"` and handed to the map owners through the generated `data-quality-report.md`.
-4. **Taxonomy crosswalk.** Domain-to-taxonomy links are kept in `capabilities/taxonomy-crosswalk.csv` (status *proposed*), because the map doesn't carry them.
-5. **Namespaces** follow the map: `{base}domain/{ontology-domain}/{business-domain}/`. Each ontology domain has an umbrella ontology in `fibo-extensions/ontology/ontology-domains/`.
-6. **The self-directed wealth planning slice** belongs to ontology domain **Planning and Guidance**, business domain **Financial Plan Management**. The repo is `planning-and-guidance-financial-plan-management`, with registry code `pg-fpm`. The financial health score sits in a separate `assessments` module earmarked for **Financial Assessments**. Projections run through **Calculator Management**. The advised side of the advice boundary is **Retail Wealth Management**.
+- **Import only correct, business-specific mappings.** The rules are in `capabilities/curation.yaml`:
+  - A domain keeps a mapping only where the path contains the domain's own capability, by name or by a reviewed alias.
+  - Each capability has exactly one accountable domain.
+  - Technology nodes are never business anchors.
+  - Doubtful ontology-domain placements stay unplaced until reviewed.
+- **Proposed capabilities.** A domain with no capabilities may propose them. They are imported as `Proposed` and sent back to the map owners.
+- **Derived identifiers.** Capability IRIs are derived from the capability path.
+- **Report back.** Everything excluded, proposed or missing is listed in a generated data-quality report for the map owners. The map is fixed at its source, not in our copy.
 
-## Consequences
-- The kept mappings, the exclusions with reasons, the proposed capabilities and the capability gaps are all listed in `capabilities/data-quality-report.md`. It goes back to the capability-map owners.
-- When the map is corrected, re-run `semtool capabilities`. Aliases and proposals that become redundant should be removed from `curation.yaml`.
-- The first domain's IRIs changed before any release (v0.1.0, unreleased), so no deprecation mappings are needed.
+## Why
+- An accountable domain for every capability is what makes "who owns this?" answerable. Duplicated trees would give many owners.
+- Curation rules in one reviewed file make every deviation from the source visible and reversible. When the source is corrected, re-running the import removes the workaround.
+- Proposals let new domains start without waiting for the map, without pretending their capabilities are authoritative.
+
+## Alternatives rejected
+- **Import the map as is.** Rejected: it would bake its errors into every domain's manifest and review.
+- **Hand-maintain a corrected copy.** Rejected: it would drift from the source with every update.
+- **Wait for the owners to fix the map.** Rejected: it blocks every domain in the meantime.
+
+## Where the rules are
+- [`capabilities/README.md`](../../capabilities/README.md) and [`capabilities/curation.yaml`](../../capabilities/curation.yaml): the curation rules and aliases.
+- [`capabilities/data-quality-report.md`](../../capabilities/data-quality-report.md): what was excluded, proposed or missing (generated).

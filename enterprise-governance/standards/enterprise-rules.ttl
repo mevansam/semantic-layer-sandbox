@@ -1,0 +1,324 @@
+@prefix ent-rule: <https://ontology.example.com/governance/rule/> .
+@prefix ent-adr:  <https://ontology.example.com/governance/decision/> .
+@prefix ent-gov:  <https://ontology.example.com/governance/model/> .
+@prefix ent-ms:   <https://ontology.example.com/governance/shapes/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+# -----------------------------------------------------------------------------
+# ENTERPRISE RULES - the catalogue of rules the enterprise imposes on domains,
+# each with the standard that defines it (ent-gov:definedIn, a path from the
+# root of the repositories) and the accepted decision that justifies it
+# (ent-gov:justifiedBy, an ADR in the decision register). Meta-shapes are linked
+# the same way at the end. See docs/adr/README.md (ADR-0010).
+#
+# Adding or changing a rule here is a standard change: it needs an ADR (C3).
+# -----------------------------------------------------------------------------
+
+<https://ontology.example.com/governance/rules/>
+    a owl:Ontology ;
+    rdfs:label "Enterprise rules"@en ;
+    dct:abstract "Catalogue of the rules the enterprise imposes on domains (gates, FIBO extension rules, consistency checks, change-class rules, review rules), with the standards that define them and the architecture decisions that justify them."@en ;
+    owl:versionIRI <https://ontology.example.com/governance/rules/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
+# ---- Release gates -------------------------------------------------------------
+ent-rule:G1 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "G1" ;
+    rdfs:label "syntax and structure gate"@en ;
+    skos:definition "All RDF parses, and every sub-domain keeps the structure of the domain repository standard."@en ;
+    ent-gov:enforcedBy "semtool syntax, semtool structure (make verify)" ;
+    ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#release-gates-ci-all-mandatory" , "enterprise-governance/standards/domain-repo-structure.yaml" ;
+    ent-gov:justifiedBy ent-adr:ADR-0005 .
+ent-rule:G2 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "G2" ;
+    rdfs:label "standards gate"@en ;
+    skos:definition "Every governed asset conforms to the enterprise meta-shapes."@en ;
+    ent-gov:enforcedBy "semtool meta (make verify)" ;
+    ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#release-gates-ci-all-mandatory" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-rule:G3 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "G3" ;
+    rdfs:label "FIBO extension rules gate"@en ;
+    skos:definition "Extension rules E1-E3 hold: no statements about FIBO, a registered namespace, imports only from the profile and published modules."@en ;
+    ent-gov:enforcedBy "semtool extensions (make verify)" ;
+    ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#release-gates-ci-all-mandatory" , "fibo-extensions/docs/extension-rules.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0001 .
+ent-rule:G4 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "G4" ;
+    rdfs:label "logical coherence gate"@en ;
+    skos:definition "The import closure with FIBO classifies with no unsatisfiable classes or properties."@en ;
+    ent-gov:enforcedBy "semtool closure, semtool reason (make verify; make hermit for full OWL DL)" ;
+    ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#release-gates-ci-all-mandatory" ;
+    ent-gov:justifiedBy ent-adr:ADR-0001 , ent-adr:ADR-0007 .
+ent-rule:G5 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "G5" ;
+    rdfs:label "business rules gate"@en ;
+    skos:definition "Positive examples conform to every business rule, and each negative example trips the rules it is meant to trip."@en ;
+    ent-gov:enforcedBy "semtool rules (make verify)" ;
+    ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#release-gates-ci-all-mandatory" , "enterprise-governance/docs/standards/02-business-rules.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-rule:G6 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "G6" ;
+    rdfs:label "competency gate"@en ;
+    skos:definition "Every competency question answers over the assembled knowledge graph with the expected results."@en ;
+    ent-gov:enforcedBy "semtool cq (make verify)" ;
+    ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#release-gates-ci-all-mandatory" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-rule:G7 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "G7" ;
+    rdfs:label "publishable gate"@en ;
+    skos:definition "The knowledge graph assembles and the GraphRAG concept cards export."@en ;
+    ent-gov:enforcedBy "semtool kg, semtool cards (make verify)" ;
+    ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#release-gates-ci-all-mandatory" , "enterprise-governance/docs/standards/08-semantic-fabric.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-rule:G8 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "G8" ;
+    rdfs:label "consistency gate"@en ;
+    skos:definition "Facts repeated across files agree, and generated files are current (checks D1-D11)."@en ;
+    ent-gov:enforcedBy "semtool drift (make verify, make drift)" ;
+    ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#release-gates-ci-all-mandatory" , "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 .
+
+# ---- FIBO extension rules ------------------------------------------------------
+ent-rule:E1 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "E1" ;
+    rdfs:label "no statements about FIBO"@en ;
+    skos:definition "No triple has a FIBO or OMG term as its subject; FIBO is extended only by specialisation."@en ;
+    ent-gov:enforcedBy "semtool extensions (G3)" ;
+    ent-gov:definedIn "fibo-extensions/docs/extension-rules.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0001 .
+ent-rule:E2 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "E2" ;
+    rdfs:label "registered namespace"@en ;
+    skos:definition "A repository mints IRIs only inside its own registered namespace, which follows its folder."@en ;
+    ent-gov:enforcedBy "semtool extensions (G3), domain registry" ;
+    ent-gov:definedIn "fibo-extensions/docs/extension-rules.md" , "enterprise-governance/docs/standards/01-ontology-standards.md#2-iris-and-namespaces" ;
+    ent-gov:justifiedBy ent-adr:ADR-0005 .
+ent-rule:E3 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "E3" ;
+    rdfs:label "allowed imports"@en ;
+    skos:definition "Imports are limited to the enterprise FIBO profile, enterprise modules and other sub-domains' published modules."@en ;
+    ent-gov:enforcedBy "semtool extensions (G3)" ;
+    ent-gov:definedIn "fibo-extensions/docs/extension-rules.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0001 , ent-adr:ADR-0005 .
+ent-rule:E4 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "E4" ;
+    rdfs:label "FIBO parentage and taxonomy anchoring"@en ;
+    skos:definition "Every business class specialises FIBO or enterprise core and is anchored to a taxonomy node."@en ;
+    ent-gov:enforcedBy "meta-shape BusinessClassShape (G2)" ;
+    ent-gov:definedIn "fibo-extensions/docs/extension-rules.md" , "enterprise-governance/docs/standards/01-ontology-standards.md#1-fibo-is-the-upper-ontology" ;
+    ent-gov:justifiedBy ent-adr:ADR-0001 .
+ent-rule:E5 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "E5" ;
+    rdfs:label "most specific FIBO parent"@en ;
+    skos:definition "Each class uses the most specific correct FIBO parent; where none fits, the gap is recorded as a FIBO-GAP note."@en ;
+    ent-gov:enforcedBy "semantic review" ;
+    ent-gov:definedIn "fibo-extensions/docs/extension-rules.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0001 .
+ent-rule:E6 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "E6" ;
+    rdfs:label "shared terms move to enterprise core"@en ;
+    skos:definition "Terms used by several domains move to enterprise core after an alignment decision, keeping one owning domain."@en ;
+    ent-gov:enforcedBy "semantic review, alignment register" ;
+    ent-gov:definedIn "fibo-extensions/docs/extension-rules.md" , "enterprise-governance/docs/standards/07-cross-domain-alignment.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-rule:E7 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "E7" ;
+    rdfs:label "OWL for meaning, SHACL for rules"@en ;
+    skos:definition "OWL restrictions express meaning; business policy is expressed as SHACL rules, not OWL axioms."@en ;
+    ent-gov:enforcedBy "semantic review" ;
+    ent-gov:definedIn "fibo-extensions/docs/extension-rules.md" .
+
+# ---- Consistency checks (gate G8) ----------------------------------------------
+ent-rule:D1 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D1" ;
+    rdfs:label "version IRIs follow versions"@en ;
+    skos:definition "Every module's owl:versionIRI is its ontology IRI followed by its owl:versionInfo."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 .
+ent-rule:D2 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D2" ;
+    rdfs:label "one identity everywhere"@en ;
+    skos:definition "A sub-domain's folder, namespace, registry entry, manifest, template answers and capability-map entry agree."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 , ent-adr:ADR-0005 .
+ent-rule:D3 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D3" ;
+    rdfs:label "manifest lists the modules"@en ;
+    skos:definition "The manifest's ontology modules are exactly the modules in ontology/, all inside the namespace."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 .
+ent-rule:D4 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D4" ;
+    rdfs:label "dependencies agree"@en ;
+    skos:definition "Declared dependencies, manifest dependencies and actual imports agree, and dependencies are sibling sub-domains."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 , ent-adr:ADR-0005 .
+ent-rule:D5 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D5" ;
+    rdfs:label "graph names follow collection versions"@en ;
+    skos:definition "Every graph name carries the collection's code, folder and version, and every partition matches files."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 .
+ent-rule:D6 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D6" ;
+    rdfs:label "business domain agrees with its sub-domains"@en ;
+    skos:definition "A business domain's sub-domains, umbrella imports, parent manifest and capability-map entries agree."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 , ent-adr:ADR-0005 .
+ent-rule:D7 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D7" ;
+    rdfs:label "registry agrees with the repositories"@en ;
+    skos:definition "Every registered domain has its folder and namespace; codes and namespaces are unique; published modules exist."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 .
+ent-rule:D8 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D8" ;
+    rdfs:label "alignment refers to live terms"@en ;
+    skos:definition "Alignment decisions refer to existing terms and domains; enterprise-core owners are registered."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 .
+ent-rule:D9 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D9" ;
+    rdfs:label "generated files are current"@en ;
+    skos:definition "Taxonomy, capability map, data-quality report, decision register and every CODEOWNERS equal a fresh regeneration."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 , ent-adr:ADR-0010 .
+ent-rule:D10 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D10" ;
+    rdfs:label "one FIBO release"@en ;
+    skos:definition "The pinned FIBO branch, the release tag's commit and the upstream defect register all name the configured release."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 , ent-adr:ADR-0007 .
+ent-rule:D11 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "D11" ;
+    rdfs:label "rules link to existing standards and decisions"@en ;
+    skos:definition "Every rule and meta-shape names a standard that exists; every accepted decision is cited by a rule."@en ;
+    ent-gov:enforcedBy "semtool drift (G8)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" , "enterprise-governance/docs/adr/README.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0010 .
+
+# ---- Change-class rules (pull requests) ----------------------------------------
+ent-rule:C1 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "C1" ;
+    rdfs:label "versions follow change classes"@en ;
+    skos:definition "Every changed module bumps its version by at least the class of its change; findings fail on Release content."@en ;
+    ent-gov:enforcedBy "semtool changes (pull requests)" ;
+    ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#change-classes" , "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 .
+ent-rule:C2 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "C2" ;
+    rdfs:label "collections version with their content"@en ;
+    skos:definition "A changed source of a knowledge collection bumps the collection's version, and so its graph names."@en ;
+    ent-gov:enforcedBy "semtool changes (pull requests)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 .
+ent-rule:C3 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "C3" ;
+    rdfs:label "standards change by ADR"@en ;
+    skos:definition "A change to meta-shapes, the structure standard or the rule catalogue comes with an ADR."@en ;
+    ent-gov:enforcedBy "semtool changes (pull requests)" ;
+    ent-gov:definedIn "docs/framework/07-change-management.md#73-the-checks" , "enterprise-governance/docs/adr/README.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0006 , ent-adr:ADR-0010 .
+
+# ---- Review rules --------------------------------------------------------------
+ent-rule:R1 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "R1" ;
+    rdfs:label "two-key review"@en ;
+    skos:definition "Every change is approved by the accountable domain role (meaning) and by the enterprise (representation); CODEOWNERS is generated from the manifest."@en ;
+    ent-gov:enforcedBy "CODEOWNERS (semtool codeowners), branch protection" ;
+    ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#two-key-review" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-rule:R2 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "R2" ;
+    rdfs:label "semantic review checklist"@en ;
+    skos:definition "The semantic review board reviews representation, not meaning, against its checklist."@en ;
+    ent-gov:enforcedBy "semantic review" ;
+    ent-gov:definedIn "enterprise-governance/docs/standards/05-semantic-review.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+
+# ---- Capability map ------------------------------------------------------------
+ent-rule:K1 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "K1" ;
+    rdfs:label "curated capability-map import"@en ;
+    skos:definition "The capability map is imported only through the reviewed curation rules; deviations are reported back to the map owners."@en ;
+    ent-gov:enforcedBy "semtool capabilities, D9" ;
+    ent-gov:definedIn "enterprise-governance/capabilities/README.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0004 .
+
+# ---- Upstream FIBO defects -----------------------------------------------------
+ent-rule:U1 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "U1" ;
+    rdfs:label "known upstream defects are registered"@en ;
+    skos:definition "An axiom of the pinned FIBO/OMG release is removed from the build closure only if it is a reviewed entry in the upstream defect register."@en ;
+    ent-gov:enforcedBy "semtool closure, D10" ;
+    ent-gov:definedIn "fibo-extensions/profile/upstream-issues.yaml" , "fibo-extensions/docs/upgrading-fibo.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0007 .
+
+# ---- Decisions -----------------------------------------------------------------
+ent-rule:A1 a ent-gov:EnterpriseRule ;
+    ent-gov:ruleCode "A1" ;
+    rdfs:label "decisions for binding rules"@en ;
+    skos:definition "A change that binds domains comes with an ADR, and every rule links to the decision that justifies it."@en ;
+    ent-gov:enforcedBy "semtool changes (C3), meta-shapes (G2), drift (D11)" ;
+    ent-gov:definedIn "enterprise-governance/docs/adr/README.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0010 .
+
+# ---- Meta-shapes (shapes/*.ttl) ------------------------------------------------
+ent-ms:OntologyHeaderShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#6-versioning-and-maturity" .
+ent-ms:TermDocumentationShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#4-required-annotations-the-annotation-profile" .
+ent-ms:TermNamingShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#3-naming" .
+ent-ms:PropertyNamingShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#3-naming" .
+ent-ms:BusinessClassShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#1-fibo-is-the-upper-ontology" ;
+    ent-gov:justifiedBy ent-adr:ADR-0001 .
+ent-ms:BusinessPropertyShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#1-fibo-is-the-upper-ontology" ;
+    ent-gov:justifiedBy ent-adr:ADR-0001 .
+ent-ms:TaxonomyNode ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#4-required-annotations-the-annotation-profile" .
+ent-ms:CapabilityNode ent-gov:definedIn "enterprise-governance/capabilities/README.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0004 .
+ent-ms:RoleAssignment ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#accountability-matrix-raci" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-ms:DomainManifestShape ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#accountability-matrix-raci" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-ms:ParentDomainManifestShape ent-gov:definedIn "enterprise-governance/standards/domain-repo-structure.yaml" ;
+    ent-gov:justifiedBy ent-adr:ADR-0005 .
+ent-ms:SubDomainDependencyShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#5-modularity" ;
+    ent-gov:justifiedBy ent-adr:ADR-0005 , ent-adr:ADR-0006 .
+ent-ms:BusinessRuleShape ent-gov:definedIn "enterprise-governance/docs/standards/02-business-rules.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-ms:BusinessProcessShape ent-gov:definedIn "enterprise-governance/docs/standards/03-processes.md" .
+ent-ms:ProcessStepShape ent-gov:definedIn "enterprise-governance/docs/standards/03-processes.md" .
+ent-ms:DomainApiShape ent-gov:definedIn "enterprise-governance/docs/standards/04-apis-data-records.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-ms:CriticalDataElementShape ent-gov:definedIn "enterprise-governance/docs/standards/04-apis-data-records.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-ms:DataProductShape ent-gov:definedIn "enterprise-governance/docs/standards/04-apis-data-records.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-ms:RecordClassShape ent-gov:definedIn "enterprise-governance/docs/standards/04-apis-data-records.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0002 .
+ent-ms:KnowledgeCollectionShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" .
+ent-ms:GraphPartitionShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" .
+ent-ms:UsagePolicyShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" .
+ent-ms:ExecutionModelShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" .
+ent-ms:RiskAssessmentShape ent-gov:definedIn "enterprise-governance/docs/standards/06-ai-risk-and-controls.md" .
+ent-ms:EnterpriseRuleShape ent-gov:definedIn "enterprise-governance/docs/adr/README.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0010 .
+ent-ms:ArchitectureDecisionShape ent-gov:definedIn "enterprise-governance/docs/adr/README.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0010 .
+ent-ms:JustificationShape ent-gov:definedIn "enterprise-governance/docs/adr/README.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0010 .

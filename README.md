@@ -21,7 +21,7 @@ An ontology-based semantic layer for grounding AI agents in business meaning, ru
 | [3 Federated repository structure](docs/framework/03-federated-repository-structure.md) | [7 Change management without drift](docs/framework/07-change-management.md) |
 | [4 Semantic model and ontology](docs/framework/04-semantic-model-and-ontology.md) | [8 Validation tooling reference](docs/framework/08-validation-tooling.md) |
 
-Standards are in `enterprise-governance/docs/standards/` and ADRs in `enterprise-governance/docs/adr/`.
+Standards are in `enterprise-governance/docs/standards/`, and the rules they impose are catalogued in `enterprise-governance/standards/enterprise-rules.ttl`. Each rule is linked to the decision that justifies it in `enterprise-governance/docs/adr/` (when an ADR is needed: [docs/adr/README.md](enterprise-governance/docs/adr/README.md)). History is in [CHANGELOG.md](CHANGELOG.md).
 
 **To browse all of it in a web browser,** run `make studio-serve` (or `make studio-docker`, which needs Docker instead of Node) and open http://localhost:8787/. See [Semantic Studio](semantic-studio/README.md).
 
@@ -212,6 +212,7 @@ Never edit these by hand. Regenerate them and commit them together with the sour
 make taxonomy        # taxonomy/source/enterprise-taxonomy.md -> taxonomy/enterprise-taxonomy.ttl
 make capabilities    # capabilities/source + curation.yaml + crosswalk -> capability-map.ttl + data-quality-report.md
 make codeowners      # each sub-domain's domain-manifest.ttl -> CODEOWNERS
+make decisions       # enterprise-governance/docs/adr/*.md -> standards/decision-register.ttl
 ```
 
 ### Test the tooling

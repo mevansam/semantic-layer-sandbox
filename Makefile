@@ -49,7 +49,7 @@ OMG_READY     := $(OMG_DIR)/.fetched-$(or $(FIBO_PIN),unpinned)
 REASONING_DEPS := $(PY_READY) tools $(FIBO_READY) $(OMG_READY)
 
 .PHONY: help setup python tools check-java omg env clean-tools fibo verify verify-governance verify-fibo verify-domains verify-template drift changes selftest align hermit taxonomy capabilities codeowners list \
-        studio studio-data studio-app studio-serve studio-docker studio-fresh studio-lock studio-lock-check check-node check-docker clean-studio
+        decisions studio studio-data studio-app studio-serve studio-docker studio-fresh studio-lock studio-lock-check check-node check-docker clean-studio
 
 # `make` or `make help` lists the targets. Full reference: docs/framework/08-validation-tooling.md
 help:
@@ -64,6 +64,7 @@ help:
 	@echo "  make taxonomy          taxonomy/source/*.md  -> taxonomy/enterprise-taxonomy.ttl"
 	@echo "  make capabilities      capabilities/source + curation.yaml -> capability-map.ttl + data-quality-report.md"
 	@echo "  make codeowners        domain-manifest.ttl -> CODEOWNERS for every sub-domain"
+	@echo "  make decisions         docs/adr/*.md -> standards/decision-register.ttl (after adding or changing an ADR)"
 	@echo "Setup (all automatic when a target needs it; listed for doing it up front)"
 	@echo "  make setup             everything below: Python venv, Java check, ROBOT, FIBO checkout, OMG dependencies"
 	@echo "  make python            venv/ with the Python requirements (USE_VENV=0 to use your own python3)"
@@ -225,13 +226,17 @@ capabilities: $(PY_READY)
 	$(SEMTOOL) capabilities --repo enterprise-governance
 
 # Regenerate every sub-domain's CODEOWNERS from its domain-manifest.ttl (commit the result).
+# Regenerate the decision register from the ADRs (ADR-0010; commit the result).
+decisions: $(PY_READY)
+	$(SEMTOOL) decisions --repo enterprise-governance
+
 codeowners: $(PY_READY)
 	@set -e; for d in $(SUBDOMAINS); do $(SEMTOOL) codeowners --repo $$d; done
 
 list:
 	@echo "business domains: $(BUSINESS_DOMAINS)"; echo "sub-domains:      $(SUBDOMAINS)"
 
-# ---- Semantic Studio (semantic-studio/, ADR-0008) --------------------------------------------
+# ---- Semantic Studio (semantic-studio/; design: semantic-studio/docs/architecture.md) ----------
 # A read-only web view of everything above. `make studio` exports the data (Python, from the repositories
 # and the reports `make verify` / `hermit` / `selftest` leave in build/reports) and builds the site (Node).
 # The Health page shows the gate results of the last runs: `make studio-fresh` runs them first.

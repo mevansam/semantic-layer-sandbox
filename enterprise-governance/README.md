@@ -20,6 +20,8 @@ domains/retail-wealth-management/   ← first business domain: financial-plannin
 | `ontology/controls.ttl` | AI risks & controls | Risk and control model, control catalog CTL-001…008, sensitivity classes |
 | `shapes/meta-*.ttl` | Ontology standards | Meta-shapes: the machine-checked standards every repo must pass |
 | `standards/domain-repo-structure.yaml` | Ontology standards | Domain repository structure standard: required files, naming conventions (`semtool structure`) |
+| `standards/enterprise-rules.ttl` | all | Catalogue of the rules the enterprise imposes on domains (gates, extension rules, drift checks, change-class and review rules). Each rule, and each meta-shape, links to the standard that defines it and the ADR that justifies it |
+| `standards/decision-register.ttl` | all | The ADRs as RDF, generated from `docs/adr/` (`semtool decisions`) |
 | `taxonomy/` | Governance | Enterprise taxonomy source (markdown) → SKOS (476 concepts) |
 | `capabilities/` | Governance | Enterprise capability map (8 ontology domains, 38 business domains): curated import, taxonomy crosswalk, data-quality report (ADR-0004) |
 | `alignment/` | Cross-domain alignment | Alignment decision register |
@@ -27,7 +29,7 @@ domains/retail-wealth-management/   ← first business domain: financial-plannin
 | `fabric/reusable-assets/` | Semantic fabric | Shared shapes and patterns (monetary amount, model provenance, 0–100 score…) |
 | `fabric/graphrag/retrieval-contract.yaml` | Semantic fabric | What GraphRAG retrieves, as which unit, with which citations and runtime obligations |
 | `docs/standards/01…08` | all | Standards documents |
-| `docs/adr/` | all | Architecture decision records |
+| `docs/adr/` | all | Architecture decision records: why the rules that bind domains exist ([when one is needed](docs/adr/README.md)) |
 | `tools/semtool.py` | all | The one CLI used by every repo, locally and in CI |
 | `tools/tests/selftest.py` | all | Self-test: every check must catch a seeded defect (`make selftest`) |
 | `.github/workflows/semantic-ci.yml` | all | Reusable CI workflow (gates G1–G8) |

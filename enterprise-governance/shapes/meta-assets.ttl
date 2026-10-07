@@ -212,5 +212,40 @@ ent-ms:SubDomainDependencyShape a sh:NodeShape ;
               ?value (^ent-gov:describesDomain/ent-gov:dependsOnSubDomain)* ?me .
             }""" ] .
 
+# ---- Enterprise rules and the decisions that justify them (ADR-0010) -----------
+
+ent-ms:EnterpriseRuleShape a sh:NodeShape ;
+    rdfs:label "Enterprise rule catalogue entry" ;
+    sh:targetClass ent-gov:EnterpriseRule ;
+    sh:property [ sh:path ent-gov:ruleCode ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "An enterprise rule needs exactly one ent-gov:ruleCode (as cited by tools and documents)." ] ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ; sh:message "An enterprise rule needs an rdfs:label." ] ;
+    sh:property [ sh:path skos:definition ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "An enterprise rule needs one skos:definition stating the rule." ] ;
+    sh:property [ sh:path ent-gov:enforcedBy ; sh:minCount 1 ;
+                  sh:message "An enterprise rule must say how it is enforced (ent-gov:enforcedBy)." ] ;
+    sh:property [ sh:path ent-gov:definedIn ; sh:minCount 1 ;
+                  sh:message "An enterprise rule must name the standard that defines it (ent-gov:definedIn)." ] .
+
+ent-ms:ArchitectureDecisionShape a sh:NodeShape ;
+    rdfs:label "Architecture decision register entry" ;
+    sh:targetClass ent-gov:ArchitectureDecision ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ] ;
+    sh:property [ sh:path ent-gov:decisionStatus ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ( "Proposed" "Accepted" "Superseded" ) ;
+                  sh:message "A decision's status is Proposed, Accepted or Superseded." ] ;
+    sh:property [ sh:path ent-gov:decisionRecord ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A decision needs the path of its ADR (ent-gov:decisionRecord)." ] .
+
+ent-ms:AcceptedDecision a sh:NodeShape ;
+    sh:property [ sh:path ent-gov:decisionStatus ; sh:hasValue "Accepted" ] .
+
+ent-ms:JustificationShape a sh:NodeShape ;
+    rdfs:label "A rule is justified by an accepted decision" ;
+    sh:targetSubjectsOf ent-gov:justifiedBy ;
+    sh:property [ sh:path ent-gov:justifiedBy ; sh:class ent-gov:ArchitectureDecision ;
+                  sh:message "ent-gov:justifiedBy must name a decision in the decision register (standards/decision-register.ttl; run `semtool decisions` after adding an ADR)." ] ;
+    sh:property [ sh:path ent-gov:justifiedBy ; sh:node ent-ms:AcceptedDecision ;
+                  sh:message "A rule must be justified by an Accepted decision: re-link it to the decision that superseded this one." ] .
+
 ent-ms:prefixes a owl:Ontology ;
     sh:declare [ sh:prefix "ent-gov" ; sh:namespace "https://ontology.example.com/governance/model/"^^xsd:anyURI ] .

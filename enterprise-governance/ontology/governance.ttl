@@ -23,10 +23,10 @@
 <https://ontology.example.com/governance/model/>
     a owl:Ontology ;
     rdfs:label "Enterprise Governance and Accountability Model"@en ;
-    dct:abstract "Domains, sub-domains, manifests, accountable roles, business rules, domain APIs, critical data elements, record classes, semantic reviews and cross-domain alignment decisions."@en ;
+    dct:abstract "Domains, sub-domains, manifests, accountable roles, business rules, domain APIs, critical data elements, record classes, semantic reviews, cross-domain alignment decisions, and the enterprise rules with the architecture decisions that justify them."@en ;
     owl:imports <https://ontology.example.com/governance/annotations/> ;
-    owl:versionIRI <https://ontology.example.com/governance/model/0.1.0/> ;
-    owl:versionInfo "0.1.0" ;
+    owl:versionIRI <https://ontology.example.com/governance/model/0.2.0/> ;
+    owl:versionInfo "0.2.0" ;
     fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
 
 # =============================================================================
@@ -329,3 +329,44 @@ ent-gov:includesSubDomain a owl:ObjectProperty ; rdfs:label "includes sub-domain
 ent-gov:dependsOnSubDomain a owl:ObjectProperty ; rdfs:label "depends on sub-domain"@en ;
     rdfs:domain ent-gov:DomainManifest ; rdfs:range ent-gov:SubDomain ;
     skos:definition "A sub-domain whose published ontology modules this domain builds on (imports). Dependencies must not form cycles."@en .
+
+# =============================================================================
+# Enterprise rules and the decisions that justify them (ADR-0010)
+# =============================================================================
+
+ent-gov:EnterpriseRule a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "enterprise rule"@en ;
+    skos:definition "A rule the enterprise imposes on how domains represent and share knowledge, such as a gate, an extension rule, a consistency check, a change-class rule or a review rule, enforced by a check or by review."@en .
+
+ent-gov:ArchitectureDecision a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "architecture decision"@en ;
+    skos:definition "A recorded enterprise decision, with its reasoning and rejected alternatives, that justifies one or more rules binding domains. Recorded as an ADR in the governance repository."@en .
+
+ent-gov:ruleCode a owl:DatatypeProperty ; rdfs:label "rule code"@en ;
+    rdfs:domain ent-gov:EnterpriseRule ;
+    skos:definition "Short code by which tools and documents cite an enterprise rule, for example G3, E1 or D4."@en .
+
+ent-gov:enforcedBy a owl:DatatypeProperty ; rdfs:label "enforced by"@en ;
+    rdfs:domain ent-gov:EnterpriseRule ;
+    skos:definition "How an enterprise rule is enforced: the check that applies it, or the review that does."@en .
+
+ent-gov:definedIn a owl:DatatypeProperty ; rdfs:label "defined in"@en ;
+    skos:definition "Path, from the root of the repositories, of the standard or document that defines a rule; an optional #fragment names the section."@en .
+
+ent-gov:justifiedBy a owl:ObjectProperty ; rdfs:label "justified by"@en ;
+    rdfs:range ent-gov:ArchitectureDecision ;
+    skos:definition "An accepted architecture decision that records why a rule, meta-shape or control exists and which alternatives were rejected."@en .
+
+ent-gov:decisionStatus a owl:DatatypeProperty ; rdfs:label "decision status"@en ;
+    rdfs:domain ent-gov:ArchitectureDecision ;
+    skos:definition "Status of an architecture decision: Proposed, Accepted or Superseded."@en .
+
+ent-gov:decisionRecord a owl:DatatypeProperty ; rdfs:label "decision record"@en ;
+    rdfs:domain ent-gov:ArchitectureDecision ;
+    skos:definition "Path, from the root of the repositories, of the ADR document that records a decision."@en .
+
+ent-gov:supersedesDecision a owl:ObjectProperty ; rdfs:label "supersedes decision"@en ;
+    rdfs:domain ent-gov:ArchitectureDecision ; rdfs:range ent-gov:ArchitectureDecision ;
+    skos:definition "An earlier architecture decision that this one replaces."@en .

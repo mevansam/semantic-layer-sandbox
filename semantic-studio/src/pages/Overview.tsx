@@ -2,6 +2,7 @@ import { Icon, Pill, Section, Term } from "../components/ui";
 import { Repo, useData } from "../data";
 import { byLabel, declaredIn, filesWithRole, findings, schemeMembers } from "../model";
 import { href } from "../router";
+import { DecisionChip, decisions } from "../components/Decisions";
 import { repoHealthSummary } from "./Health";
 
 export function OverviewPage() {
@@ -20,7 +21,7 @@ export function OverviewPage() {
   const perOD = ods.map((o) => [o, bds.filter((b) => kg.has(b, inOD, o)).length] as [number, number]).sort((a, b) => b[1] - a[1]);
   const unplaced = bds.filter((b) => !kg.objects(b, inOD).length).length;
   const max = Math.max(1, ...perOD.map(([, n]) => n), unplaced);
-  const adrs = d.docs.filter((x) => x.group === "adr" && !/template/i.test(x.path)).sort((a, b) => b.path.localeCompare(a.path));
+  const adrs = decisions(kg).reverse();
   const gov = meta.repos.find((r) => r.kind === "governance");
   const fx = meta.repos.find((r) => r.kind === "fibo-extensions");
   const business = meta.repos.filter((r) => r.kind === "business-domain");
@@ -125,9 +126,11 @@ export function OverviewPage() {
           <Section title="Decisions" actions={<a className="small" href={href.governance()}>All decisions</a>}>
             <ul className="list">
               {adrs.slice(0, 5).map((a) => (
-                <li key={a.path} className="li">
-                  <a href={href.doc(a.path)}>{a.title.replace(/^ADR[- ]?\d+[:.]?\s*/i, "")}</a>
-                  {a.status && <Pill tone={/accept/i.test(a.status) ? "pass" : "mute"}>{a.status}</Pill>}
+                <li key={a} className="li">
+                  <span>
+                    <DecisionChip id={a} /> <a href={href.resource(kg.iri(a))}>{kg.label(a)}</a>
+                  </span>
+                  <span className="small muted">{kg.subjects(kg.P("ent-gov:justifiedBy"), a).length} linked</span>
                 </li>
               ))}
             </ul>

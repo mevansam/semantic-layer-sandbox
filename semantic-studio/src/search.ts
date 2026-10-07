@@ -37,9 +37,9 @@ export function buildIndex(d: Data): Entry[] {
     const repo = repoOfNode(d, s);
     const curie = kg.curie(iri);
     const def = kg.definition(s) ?? "";
-    const notation = kg.text(s, kg.P("skos:notation"), kg.P("ent-av:ruleIdentifier")) ?? "";
+    const notation = kg.text(s, kg.P("skos:notation"), kg.P("ent-av:ruleIdentifier"), kg.P("ent-gov:ruleCode")) ?? "";
     const boost =
-      { class: 3, property: 2, rule: 3, api: 3, tool: 3, data: 2, record: 2, process: 2, domain: 2, capability: 1, taxonomy: 1, ontology: 2 }[kind.key] ?? 1;
+      { class: 3, property: 2, rule: 3, erule: 3, decision: 3, api: 3, tool: 3, data: 2, record: 2, process: 2, domain: 2, capability: 1, taxonomy: 1, ontology: 2 }[kind.key] ?? 1;
     entries.push({
       title: label,
       kind: kind.label,

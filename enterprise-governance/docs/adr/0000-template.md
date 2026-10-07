@@ -1,17 +1,23 @@
-# ADR-NNNN: <title>
+# ADR-NNNN: <the decision, as one sentence>
 
 - **Status:** Proposed | Accepted | Superseded by ADR-XXXX
 - **Date:** YYYY-MM-DD
-- **Deciders:** <review board members, domain owners consulted>
-- **Change class:** Editorial | Additive | Breaking | Enterprise standard
+- **Deciders:** <review board members; domain owners consulted>
+- **Supersedes:** ADR-XXXX (only if it does)
+
+<!-- An ADR is only for a rule that binds domains (see README.md). Say why; don't restate the rule. -->
 
 ## Context
-What problem, which domains or terms are affected, and what the constraints are.
+The problem, and the forces that make it a decision rather than an obvious choice. A few sentences.
 
 ## Decision
-What we decided, stated so an agent could apply it.
+What was decided, in a few bullets. Rules that implement it are described in the standards, not here.
 
-## Consequences
-Impact on domains, consumers, knowledge collections and execution models. Migration steps and version bumps.
+## Why
+The reasons this option won. This is the part people will come back for.
 
-## Alternatives considered
+## Alternatives rejected
+Each option seriously considered, and why it lost.
+
+## Where the rules are
+The standards that define the rules this decision justifies. The rules themselves link here with `ent-gov:justifiedBy` in `standards/enterprise-rules.ttl`.
