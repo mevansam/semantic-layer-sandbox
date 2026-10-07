@@ -1280,7 +1280,7 @@ def cmd_codeowners(repo: Repo, args) -> bool:
 #   D8 alignment     alignment register and enterprise core refer only to terms and domains that exist
 #   D9 generated     taxonomy, capability map, data-quality report, decision register and CODEOWNERS match their sources
 #   D10 FIBO pin     .gitmodules / submodule checkout = fibo.release_tag in semantic.yaml
-#   D11 rule links   every rule and targeted meta-shape names a standard that exists; accepted decisions are cited
+#   D11 rule links   every targeted meta-shape names a standard that exists and a decision; accepted decisions are cited
 
 def markdown_anchors(text: str) -> set[str]:
     """GitHub-style heading anchors of a markdown document (outside code blocks)."""
@@ -1634,6 +1634,8 @@ def cmd_drift(repo: Repo, args) -> bool:
         for shp in sorted(targeted):
             check((shp, GOV.definedIn, None) in catalogue, "D11",
                   f"meta-shape {short(shp)} has no ent-gov:definedIn in standards/enterprise-rules.ttl")
+            check((shp, GOV.justifiedBy, None) in catalogue, "D11",
+                  f"meta-shape {short(shp)} has no ent-gov:justifiedBy (the ADR that justifies it) in standards/enterprise-rules.ttl")
         cited = set(catalogue.objects(None, GOV.justifiedBy))
         for d in sorted(catalogue.subjects(GOV.decisionStatus, Literal("Accepted"))):
             if d not in cited:

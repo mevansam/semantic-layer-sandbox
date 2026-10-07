@@ -56,3 +56,10 @@ ent-adr:ADR-0010 a ent-gov:ArchitectureDecision ;
     ent-gov:decisionRecord "enterprise-governance/docs/adr/0010-decision-records-and-rule-links.md" ;
     ent-gov:decisionStatus "Accepted" .
 
+ent-adr:ADR-0011 a ent-gov:ArchitectureDecision ;
+    rdfs:label "The baseline enterprise standards for ontologies, processes and the semantic fabric"@en ;
+    dct:date "2026-10-06"^^xsd:date ;
+    skos:notation "ADR-0011" ;
+    ent-gov:decisionRecord "enterprise-governance/docs/adr/0011-baseline-enterprise-standards.md" ;
+    ent-gov:decisionStatus "Accepted" .
+

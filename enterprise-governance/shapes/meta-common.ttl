@@ -13,6 +13,14 @@
 # Standard: docs/standards/01-ontology-standards.md
 # -----------------------------------------------------------------------------
 
+<https://ontology.example.com/governance/shapes/common/>
+    a owl:Ontology ;
+    rdfs:label "Meta-shapes: common"@en ;
+    dct:abstract "Shapes every governed repository must conform to: ontology headers, term documentation and naming (standard 01)."@en ;
+    owl:versionIRI <https://ontology.example.com/governance/shapes/common/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
+
 ent-ms:OntologyHeaderShape a sh:NodeShape ;
     rdfs:label "Ontology header standard" ;
     sh:targetClass owl:Ontology ;

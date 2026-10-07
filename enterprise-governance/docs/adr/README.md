@@ -22,6 +22,7 @@ Every enterprise rule and meta-shape names the ADR that justifies it with `ent-g
 - **The register.** `semtool decisions` generates the decision register, [`standards/decision-register.ttl`](../../standards/decision-register.ttl), from the files in this folder. `make drift` (D9) fails if the register is out of date.
 - **What the checks enforce.**
   - Meta-shapes (G2) require every link to point at an **Accepted** decision. A superseded decision forces its rules to be re-linked.
+  - Every enterprise rule (G2) and every meta-shape (D11) must name at least one decision. Standards from the baseline are covered by ADR-0011.
   - Drift (D11) checks that every `definedIn` document exists, and warns about an Accepted decision that no rule cites.
 - **Where to see the links.** Semantic Studio shows them both ways: on a rule's page, *why*; on a decision's page, *which rules*.
 
@@ -45,5 +46,6 @@ Every enterprise rule and meta-shape names the ADR that justifies it with `ent-g
 | [0006](0006-consistency-gate-and-change-classes.md) | Repeated facts must agree (G8), and versions must follow change classes | Accepted |
 | [0007](0007-known-upstream-fibo-defects.md) | Known FIBO/OMG defects are removed from the build closure only | Accepted |
 | [0010](0010-decision-records-and-rule-links.md) | ADRs only for rules that bind domains; every rule links to its decision | Accepted |
+| [0011](0011-baseline-enterprise-standards.md) | The baseline enterprise standards for ontologies, processes and the semantic fabric | Accepted |
 
 Numbers 0003, 0008 and 0009 are retired. They recorded build history (a provisional capability map, Semantic Studio, a folder rename), which is now in [`CHANGELOG.md`](../../../CHANGELOG.md).

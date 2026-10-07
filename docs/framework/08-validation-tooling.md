@@ -61,7 +61,7 @@ Run from the repository root. Each target exits non-zero on failure, so they can
 | `make changes BASE=<ref> [STRICT=1]` | `semtool changes --base <ref>` for every repository (default `BASE=origin/main`; `STRICT=1` adds `--strict`) | PR check | ~1 s |
 | `make hermit` | full OWL DL reasoning (HermiT) over each business domain with all its sub-domains and FIBO | G4 (complete) | ~25 s |
 | `make align` | `compare_domain.py` for every sub-domain; fails if a template-owned file drifted or a template file is missing | template conformance | ~5 s |
-| `make selftest` | seeds 37 defects one at a time and expects each to be caught, plus one correct change that must pass | the checks themselves | ~30 s |
+| `make selftest` | seeds 41 defects one at a time and expects each to be caught, plus one correct change that must pass | the checks themselves | ~30 s |
 | `make taxonomy` | regenerate `taxonomy/enterprise-taxonomy.ttl` | generator | |
 | `make capabilities` | regenerate `capabilities/capability-map.ttl` and `data-quality-report.md` | generator | |
 | `make codeowners` | regenerate `CODEOWNERS` in every sub-domain | generator | |
@@ -291,16 +291,17 @@ A check that silently stops failing is worse than no check. The self-test:
 1. Copies the repository to a temporary folder, commits it there as a git baseline, and confirms that every command it will use passes on the clean copy.
 2. Runs each **scenario**. A scenario seeds one defect, runs one command against one repository, and expects a failure containing specific text.
 
-There are 37 defect scenarios:
+There are 41 defect scenarios:
 - all drift codes, D1–D11:
-  - D10 twice: the FIBO pin, and the known-defects register after a FIBO change
+  - D1 also for a meta-shape file whose version IRI is out of step
   - D9 also for an ADR changed without regenerating the decision register
-  - D11 three times: a missing standard, a missing section, a meta-shape with no link
+  - D10 twice: the FIBO pin, and the known-defects register after a FIBO change
+  - D11 four times: a missing standard, a missing section, a meta-shape with no link, a meta-shape with no decision
 - E1–E3
-- G2: a dependency cycle, a rule without a policy source, and a rule justified by a superseded or an unknown decision
+- G2: a dependency cycle, a business rule without a policy source, and an enterprise rule with no decision, or justified by a superseded or unknown decision
 - two structure cases (G1)
 - a negative case that no longer trips its rule (G5)
-- four pull-request cases
+- five pull-request cases, including a meta-shape changed without a version bump
 
 A final scenario makes a *correct* additive change (new class, MINOR bump, collection bump) and expects it to **pass**, which guards against false alarms.
 

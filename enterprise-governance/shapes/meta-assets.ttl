@@ -14,12 +14,22 @@
 @prefix ent-fab:  <https://ontology.example.com/fabric/model/> .
 @prefix ent-tax:  <https://ontology.example.com/taxonomy/> .
 @prefix ent-cap:  <https://ontology.example.com/capability/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
 
 # -----------------------------------------------------------------------------
 # META-SHAPES (governed assets) - the publication contract for domain-owned
 # assets and fabric artefacts. A domain release is blocked unless its manifest,
 # rules, APIs, stewardship, records, collections and execution models conform.
 # -----------------------------------------------------------------------------
+
+<https://ontology.example.com/governance/shapes/assets/>
+    a owl:Ontology ;
+    rdfs:label "Meta-shapes: governed assets"@en ;
+    dct:abstract "Shapes for domain-owned assets and fabric artefacts (manifests, rules, processes, APIs, data, records, collections, execution models, risk assessments) and for the enterprise rule catalogue and decision register."@en ;
+    owl:versionIRI <https://ontology.example.com/governance/shapes/assets/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
 
 # ---- Reusable node constraints ------------------------------------------------
 
@@ -225,7 +235,9 @@ ent-ms:EnterpriseRuleShape a sh:NodeShape ;
     sh:property [ sh:path ent-gov:enforcedBy ; sh:minCount 1 ;
                   sh:message "An enterprise rule must say how it is enforced (ent-gov:enforcedBy)." ] ;
     sh:property [ sh:path ent-gov:definedIn ; sh:minCount 1 ;
-                  sh:message "An enterprise rule must name the standard that defines it (ent-gov:definedIn)." ] .
+                  sh:message "An enterprise rule must name the standard that defines it (ent-gov:definedIn)." ] ;
+    sh:property [ sh:path ent-gov:justifiedBy ; sh:minCount 1 ;
+                  sh:message "An enterprise rule must name the decision that justifies it (ent-gov:justifiedBy, an ADR)." ] .
 
 ent-ms:ArchitectureDecisionShape a sh:NodeShape ;
     rdfs:label "Architecture decision register entry" ;
@@ -247,5 +259,6 @@ ent-ms:JustificationShape a sh:NodeShape ;
     sh:property [ sh:path ent-gov:justifiedBy ; sh:node ent-ms:AcceptedDecision ;
                   sh:message "A rule must be justified by an Accepted decision: re-link it to the decision that superseded this one." ] .
 
-ent-ms:prefixes a owl:Ontology ;
+# Prefix declarations used by the SPARQL constraints above (not an ontology module).
+ent-ms:prefixes
     sh:declare [ sh:prefix "ent-gov" ; sh:namespace "https://ontology.example.com/governance/model/"^^xsd:anyURI ] .

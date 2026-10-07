@@ -63,7 +63,7 @@ This document lists where each fact lives, what checks it, how versions work, an
 | **D8** | Alignment decisions refer to terms that still exist and to domains in the capability map; enterprise-core owning domains are registered | governance |
 | **D9** | Taxonomy, capability map, data-quality report, decision register and every `CODEOWNERS` equal a fresh regeneration; `curation.yaml` `sub_domains` = each business domain's `semantic.yaml` `sub_domains` (which D6 ties to the folders) | governance |
 | **D10** | The FIBO branch pinned in `.gitmodules` (root and `fibo-extensions/`), the commit of the release tag (fetched by `make`), and `fibo_release` in `fibo-extensions/profile/upstream-issues.yaml` all equal `fibo.release_tag`; notes if nothing pins a branch or the tag is unavailable | governance |
-| **D11** | Every enterprise rule and every targeted meta-shape names a standard (`ent-gov:definedIn`) that exists, down to the section; warns about an accepted decision that no rule cites (`ent-gov:justifiedBy`, ADR-0010) | governance |
+| **D11** | Every enterprise rule and every targeted meta-shape names a standard (`ent-gov:definedIn`) that exists, down to the section; every targeted meta-shape names a decision (`ent-gov:justifiedBy`; for rules, a meta-shape in G2 checks it); warns about an accepted decision that no rule cites (`ent-gov:justifiedBy`, ADR-0010) | governance |
 
 Every check is mutation-tested by `make selftest`: each code has at least one seeded defect it must catch ([doc 8 §8.7](08-validation-tooling.md#87-self-test-testing-the-checks-themselves)).
 

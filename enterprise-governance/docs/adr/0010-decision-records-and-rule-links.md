@@ -19,12 +19,12 @@ ADRs had been written for every notable change, including tooling, a folder rena
 - **Content.** An ADR records the reasoning and the rejected alternatives. It points to the standard that defines the rule; it does not restate it.
 - **Links.**
   - Enterprise rules are catalogued as RDF in `standards/enterprise-rules.ttl`.
-  - Each rule, and each meta-shape, names its standard (`ent-gov:definedIn`) and, where a decision exists, its ADR (`ent-gov:justifiedBy`).
+  - Each rule, and each meta-shape, names its standard (`ent-gov:definedIn`) and at least one ADR (`ent-gov:justifiedBy`). Standards adopted with the baseline without a record of their own are covered by a baseline ADR (ADR-0011), so every rule has a decision behind it.
   - The decision register is generated from the ADR files (`semtool decisions`).
 - **Checks.**
-  - A meta-shape (G2) requires every link to name an existing, Accepted decision.
+  - A meta-shape (G2) requires every enterprise rule to name a decision, and every link to name an existing, Accepted decision.
   - D9 requires the register to be current.
-  - D11 requires every referenced standard to exist, and warns about Accepted decisions that no rule cites.
+  - D11 requires every referenced standard to exist and every meta-shape to name a decision, and warns about Accepted decisions that no rule cites.
 - **Retired records.** ADRs 0003, 0008 and 0009 were history, not decisions; they are retired to `CHANGELOG.md`. Numbers are never reused.
 
 ## Why

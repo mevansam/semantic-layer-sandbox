@@ -6,12 +6,22 @@
 @prefix ent-ms: <https://ontology.example.com/governance/shapes/> .
 @prefix ent-av: <https://ontology.example.com/governance/annotations/> .
 @prefix ent-tax: <https://ontology.example.com/taxonomy/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
 
 # -----------------------------------------------------------------------------
 # META-SHAPES (business terms) - apply to enterprise-core FIBO extensions and
 # to every domain ontology. These enforce "governed by the enterprise
 # taxonomy" and "based on FIBO".
 # -----------------------------------------------------------------------------
+
+<https://ontology.example.com/governance/shapes/business/>
+    a owl:Ontology ;
+    rdfs:label "Meta-shapes: business ontology"@en ;
+    dct:abstract "Shapes for business classes and properties: FIBO parentage and taxonomy anchoring (standard 01, ADR-0001)."@en ;
+    owl:versionIRI <https://ontology.example.com/governance/shapes/business/0.1.0/> ;
+    owl:versionInfo "0.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
 
 ent-ms:BusinessClassShape a sh:NodeShape ;
     rdfs:label "Business class standard" ;

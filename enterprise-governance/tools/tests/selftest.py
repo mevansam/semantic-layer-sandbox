@@ -97,6 +97,8 @@ SCENARIOS = [
     # G8 drift
     ("D1 version IRI out of step", FP, "drift",
      lambda w: sub(w, f"{FP}/ontology/planning.ttl", 'owl:versionInfo "0.1.0"', 'owl:versionInfo "0.2.0"'), "D1"),
+    ("D1 meta-shape version IRI out of step", GOV, "drift",
+     lambda w: sub(w, f"{GOV}/shapes/meta-business.ttl", 'owl:versionInfo "0.1.0"', 'owl:versionInfo "0.2.0"'), "D1"),
     ("D2 code differs from registry", FP, "drift",
      lambda w: sub(w, f"{FP}/semantic.yaml", "code: rwm-fp", "code: rwm-fx"), "D2"),
     ("D2 template answers differ", FP, "drift",
@@ -142,6 +144,10 @@ SCENARIOS = [
                    '"enterprise-governance/docs/standards/03-process.md"'), "D11"),
     ("D11 rule points at a missing section", GOV, "drift",
      lambda w: sub(w, f"{GOV}/standards/enterprise-rules.ttl", "GOVERNANCE.md#two-key-review", "GOVERNANCE.md#two-key-reviews"), "D11"),
+    ("D11 meta-shape without a decision", GOV, "drift",
+     lambda w: sub(w, f"{GOV}/standards/enterprise-rules.ttl",
+                   '"enterprise-governance/docs/standards/01-ontology-standards.md#3-naming" ;\n    ent-gov:justifiedBy ent-adr:ADR-0011 .\nent-ms:PropertyNamingShape',
+                   '"enterprise-governance/docs/standards/01-ontology-standards.md#3-naming" .\nent-ms:PropertyNamingShape'), "D11"),
     ("D11 meta-shape without a link", GOV, "drift",
      lambda w: sub(w, f"{GOV}/standards/enterprise-rules.ttl", 'ent-ms:TermNamingShape ent-gov:definedIn', 'ent-ms:TermNamingShapeOld ent-gov:definedIn'), "D11"),
     # G3 extension rules
@@ -169,6 +175,10 @@ SCENARIOS = [
     ("G2 rule justified by a superseded decision", GOV, "meta",
      lambda w: (sub(w, f"{GOV}/docs/adr/0007-known-upstream-fibo-defects.md", "- **Status:** Accepted", "- **Status:** Superseded by ADR-0010"),
                 regenerate_decisions(w)), "meta-shapes"),
+    ("G2 rule without a decision", GOV, "meta",
+     lambda w: sub(w, f"{GOV}/standards/enterprise-rules.ttl",
+                   '"fibo-extensions/docs/extension-rules.md" ;\n    ent-gov:justifiedBy ent-adr:ADR-0011 .',
+                   '"fibo-extensions/docs/extension-rules.md" .'), "meta-shapes"),
     ("G2 rule justified by an unknown decision", GOV, "meta",
      lambda w: sub(w, f"{GOV}/standards/enterprise-rules.ttl", "ent-gov:justifiedBy ent-adr:ADR-0007 .", "ent-gov:justifiedBy ent-adr:ADR-0003 ."), "meta-shapes"),
     # G1 structure
@@ -187,6 +197,9 @@ SCENARIOS = [
                 bump_module(w, f"{FP}/ontology/planning.ttl", "0.1.0", "0.2.0")), "collection version was not bumped"),
     ("PR removed term needs a bump", IA, "changes --strict",
      lambda w: remove_block(w, f"{IA}/ontology/insights.ttl", "ia:SuggestedAction a owl:Class"), "major change"),
+    ("PR meta-shape changed without a version bump", GOV, "changes --strict",
+     lambda w: sub(w, f"{GOV}/shapes/meta-common.ttl", "Every ontology needs an rdfs:label.", "Every ontology needs a label."),
+     "needs a patch version bump"),
     ("PR meta-shape changed without an ADR", GOV, "changes",
      lambda w: sub(w, f"{GOV}/shapes/meta-common.ttl", "Every ontology needs an rdfs:label.", "Every ontology needs a label."), "without an ADR"),
 ]

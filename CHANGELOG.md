@@ -4,6 +4,10 @@ Notable changes to the semantic layer: tooling, structure, content milestones an
 
 ## 2026-10-06
 
+- **Every rule backed by an ADR.**
+  - ADR-0011 records the baseline standards that had no decision of their own: ontology headers, documentation, naming, processes, the semantic fabric, risk assessments, and E7.
+  - Every enterprise rule (G2) and every meta-shape (D11) must now name a decision.
+- **Meta-shape files are versioned modules.** Each of `meta-common`, `meta-assets` and `meta-business` has an ontology header and a semantic version, so `make changes` and D1 cover them like any other module.
 - **Decision records narrowed; rules link to their decisions** (ADR-0010).
   - ADRs 0003, 0008 and 0009 were retired here, and the remaining ADRs were cut down to their reasoning and the alternatives they rejected.
   - Enterprise rules are catalogued in `enterprise-governance/standards/enterprise-rules.ttl`. Each rule, and each meta-shape, links to the standard that defines it and to the ADR that justifies it.

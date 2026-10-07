@@ -173,7 +173,7 @@ flowchart LR
 ```
 
 - **Every link names an Accepted decision.** A meta-shape (G2) enforces it, so superseding a decision forces its rules to be re-linked.
-- **Every rule and meta-shape names a standard that exists.** D11 checks that, and warns about an Accepted decision that no rule cites.
+- **Every rule and meta-shape names a standard that exists and at least one decision.** G2 and D11 check that. D11 also warns about an Accepted decision that no rule cites.
 - **Semantic Studio shows the links both ways:** on a rule, *why*; on a decision, *which rules*.
 
 | ADR | Decision |
@@ -185,6 +185,7 @@ flowchart LR
 | 0006 | Repeated facts must agree (G8), and versions must follow change classes |
 | 0007 | Known FIBO/OMG defects are removed from the build closure only |
 | 0010 | ADRs only for rules that bind domains; every rule links to its decision |
+| 0011 | The baseline enterprise standards for ontologies, processes and the semantic fabric |
 
 Numbers 0003, 0008 and 0009 are retired; what they recorded is in the changelog.
 

@@ -11,9 +11,9 @@
 # -----------------------------------------------------------------------------
 # ENTERPRISE RULES - the catalogue of rules the enterprise imposes on domains,
 # each with the standard that defines it (ent-gov:definedIn, a path from the
-# root of the repositories) and the accepted decision that justifies it
-# (ent-gov:justifiedBy, an ADR in the decision register). Meta-shapes are linked
-# the same way at the end. See docs/adr/README.md (ADR-0010).
+# root of the repositories) and at least one accepted decision that justifies it
+# (ent-gov:justifiedBy, an ADR in the decision register). Every meta-shape is
+# linked the same way at the end. See docs/adr/README.md (ADR-0010).
 #
 # Adding or changing a rule here is a standard change: it needs an ADR (C3).
 # -----------------------------------------------------------------------------
@@ -22,8 +22,8 @@
     a owl:Ontology ;
     rdfs:label "Enterprise rules"@en ;
     dct:abstract "Catalogue of the rules the enterprise imposes on domains (gates, FIBO extension rules, consistency checks, change-class rules, review rules), with the standards that define them and the architecture decisions that justify them."@en ;
-    owl:versionIRI <https://ontology.example.com/governance/rules/0.1.0/> ;
-    owl:versionInfo "0.1.0" ;
+    owl:versionIRI <https://ontology.example.com/governance/rules/0.2.0/> ;
+    owl:versionInfo "0.2.0" ;
     fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Provisional .
 
 # ---- Release gates -------------------------------------------------------------
@@ -132,7 +132,8 @@ ent-rule:E7 a ent-gov:EnterpriseRule ;
     rdfs:label "OWL for meaning, SHACL for rules"@en ;
     skos:definition "OWL restrictions express meaning; business policy is expressed as SHACL rules, not OWL axioms."@en ;
     ent-gov:enforcedBy "semantic review" ;
-    ent-gov:definedIn "fibo-extensions/docs/extension-rules.md" .
+    ent-gov:definedIn "fibo-extensions/docs/extension-rules.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
 
 # ---- Consistency checks (gate G8) ----------------------------------------------
 ent-rule:D1 a ent-gov:EnterpriseRule ;
@@ -280,15 +281,20 @@ ent-rule:A1 a ent-gov:EnterpriseRule ;
     ent-gov:justifiedBy ent-adr:ADR-0010 .
 
 # ---- Meta-shapes (shapes/*.ttl) ------------------------------------------------
-ent-ms:OntologyHeaderShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#6-versioning-and-maturity" .
-ent-ms:TermDocumentationShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#4-required-annotations-the-annotation-profile" .
-ent-ms:TermNamingShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#3-naming" .
-ent-ms:PropertyNamingShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#3-naming" .
+ent-ms:OntologyHeaderShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#6-versioning-and-maturity" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
+ent-ms:TermDocumentationShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#4-required-annotations-the-annotation-profile" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
+ent-ms:TermNamingShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#3-naming" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
+ent-ms:PropertyNamingShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#3-naming" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
 ent-ms:BusinessClassShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#1-fibo-is-the-upper-ontology" ;
     ent-gov:justifiedBy ent-adr:ADR-0001 .
 ent-ms:BusinessPropertyShape ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#1-fibo-is-the-upper-ontology" ;
     ent-gov:justifiedBy ent-adr:ADR-0001 .
-ent-ms:TaxonomyNode ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#4-required-annotations-the-annotation-profile" .
+ent-ms:TaxonomyNode ent-gov:definedIn "enterprise-governance/docs/standards/01-ontology-standards.md#4-required-annotations-the-annotation-profile" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
 ent-ms:CapabilityNode ent-gov:definedIn "enterprise-governance/capabilities/README.md" ;
     ent-gov:justifiedBy ent-adr:ADR-0004 .
 ent-ms:RoleAssignment ent-gov:definedIn "enterprise-governance/GOVERNANCE.md#accountability-matrix-raci" ;
@@ -301,8 +307,10 @@ ent-ms:SubDomainDependencyShape ent-gov:definedIn "enterprise-governance/docs/st
     ent-gov:justifiedBy ent-adr:ADR-0005 , ent-adr:ADR-0006 .
 ent-ms:BusinessRuleShape ent-gov:definedIn "enterprise-governance/docs/standards/02-business-rules.md" ;
     ent-gov:justifiedBy ent-adr:ADR-0002 .
-ent-ms:BusinessProcessShape ent-gov:definedIn "enterprise-governance/docs/standards/03-processes.md" .
-ent-ms:ProcessStepShape ent-gov:definedIn "enterprise-governance/docs/standards/03-processes.md" .
+ent-ms:BusinessProcessShape ent-gov:definedIn "enterprise-governance/docs/standards/03-processes.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
+ent-ms:ProcessStepShape ent-gov:definedIn "enterprise-governance/docs/standards/03-processes.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
 ent-ms:DomainApiShape ent-gov:definedIn "enterprise-governance/docs/standards/04-apis-data-records.md" ;
     ent-gov:justifiedBy ent-adr:ADR-0002 .
 ent-ms:CriticalDataElementShape ent-gov:definedIn "enterprise-governance/docs/standards/04-apis-data-records.md" ;
@@ -311,11 +319,16 @@ ent-ms:DataProductShape ent-gov:definedIn "enterprise-governance/docs/standards/
     ent-gov:justifiedBy ent-adr:ADR-0002 .
 ent-ms:RecordClassShape ent-gov:definedIn "enterprise-governance/docs/standards/04-apis-data-records.md" ;
     ent-gov:justifiedBy ent-adr:ADR-0002 .
-ent-ms:KnowledgeCollectionShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" .
-ent-ms:GraphPartitionShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" .
-ent-ms:UsagePolicyShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" .
-ent-ms:ExecutionModelShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" .
-ent-ms:RiskAssessmentShape ent-gov:definedIn "enterprise-governance/docs/standards/06-ai-risk-and-controls.md" .
+ent-ms:KnowledgeCollectionShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
+ent-ms:GraphPartitionShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
+ent-ms:UsagePolicyShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
+ent-ms:ExecutionModelShape ent-gov:definedIn "enterprise-governance/docs/standards/08-semantic-fabric.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
+ent-ms:RiskAssessmentShape ent-gov:definedIn "enterprise-governance/docs/standards/06-ai-risk-and-controls.md" ;
+    ent-gov:justifiedBy ent-adr:ADR-0011 .
 ent-ms:EnterpriseRuleShape ent-gov:definedIn "enterprise-governance/docs/adr/README.md" ;
     ent-gov:justifiedBy ent-adr:ADR-0010 .
 ent-ms:ArchitectureDecisionShape ent-gov:definedIn "enterprise-governance/docs/adr/README.md" ;
